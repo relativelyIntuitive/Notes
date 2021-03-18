@@ -1,0 +1,248 @@
+
+ - FLASK NOTES -
+
+ ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+GENERAL:
+
+        -Flask is a server that uses Python to serve HTML, like a middleman
+        -Any other device accessing the serving is referred to as a client
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+SETING UP A SERVER:
+
+        1. Create a VENV for the server
+            -navigate to the directory that you want to creat the main venv folder in
+                *************************************************************************************************
+                -i.e.   python -m venv py3Env
+                    (CMD)
+
+                -i.e.   python3 -m venv py3Env
+                    (BASH)
+                    *************************************************************************************************
+
+        2. Use pip to install Flask to the VENV
+            *************************************************************************************************
+            -i.e.   pip install flask
+                (CMD)
+
+            -i.e.   pip3 install flask
+                (BASH)
+                *************************************************************************************************
+
+        3. Create a Python file containing something like the basic server below
+        *************************************************************************************************
+        -i.e.   # Import Flask to allow us to create our app
+                from flask import Flask  
+                # Create a new instance of the Flask class called "app"
+                app = Flask(__name__)    
+
+                # The "@" decorator associates this route with the function immediately following
+                @app.route('/')          
+                def hello_world():
+                    # Return the string 'Hello World!' as a response
+                    return 'Hello World!' 
+
+                # Ensure this file is being run directly and not from a different module    
+                if __name__=="__main__":   
+                    app.run(debug=True)
+
+            (^ creates a basic hello-world server ^)
+            *************************************************************************************************
+
+        -Note the capitalization of "flask/Flask" above, it is important
+        -Run the file with Python
+        -Flask will run the development server on port 5000 by default
+            (localhost:5000/ in browser to access, or with HTTP address given by the terminal)
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+BASIC ROUTES:
+
+        -Routes communicate to the server what kind of information the client needs
+        -All routes have 2 parts:
+            1. HTTP method
+                (GET, POST, PUT, PATCH, DELETE)
+            2. URL
+
+        -Adding a new route:
+
+        *************************************************************************************************
+            -i.e.   @app.route('/success')
+                    def success():
+                        return "success"
+                    *************************************************************************************************
+
+            -function should NOT BE NESTED in @app.route() statement
+            -route functions should all be listed with together, with import and app instantiation section above them,
+             and app.run(debug=True) section ending the file
+        -Parameters can be added to rules:
+
+        *************************************************************************************************
+            -i.e.   @app.route('/users/<username>/<id>')
+                    def show_user_profile(username, id):
+                        print(username)
+                        print(id)
+                        return "username: " + username + ", id: " + id
+                (^ allows name arguement to be made ^)
+            *************************************************************************************************
+
+            -any amount of parameters may be added, just like normal functions but enclosed in "< >"
+            -parameters MUST BE INCLUDED in @app.route() as well!
+                (they are passed to the function from the URL!)
+            -you can limit the input for these parameters with flask's built-in URL converters:
+                1. string
+                    (the default converter that accepts any text without a slash)
+                2. int
+                    (accepts integers)
+                3. float
+                    (like int but for floating point values)
+                4. path
+                    (like string but accepts slashes)
+
+        -Error-handlers can also be defined to serve custom-pages instead of the default browser-messages
+
+            *************************************************************************************************
+            -i.e.   @app.errorhandler(404)
+                    def page_not_found(e):
+                        return "Sorry! No response. Try again."
+                (^ defines a custom page to be served in the event of a 404 error ^)
+                *************************************************************************************************
+
+            -there are error-handlers available for many different situations
+        -Routing to HTML is also possible!
+            (continued below)
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+ROUTING OF DYNAMIC AND STATIC FILES:
+
+        1. Dynamic:
+            -Basic-Setup:
+                1. place a folder within the main flask-server directory, called "templates" EXACTLY and place HTML files in it
+                    (flask requires this name for the HTML folder!)
+                2. import "render_template" and then return the HTML path as an arg of "render_template('<+HTML path>')"
+
+                    *************************************************************************************************
+                    -i.e.   # added render_template to imports!
+                            from flask import Flask, render_template
+                            [+app_name] = Flask(__name__)
+
+                            @[+app_name].route('/<output>/<int:num>')
+                            def hello_world(num):
+                                return render_template('index.html', phrase=output, times=num)
+
+                            if __name__=='__main__':
+                                app.run(debug=True)
+                        (^ add render_template in line 1 and returns the .HTML in the route ^)
+                        *************************************************************************************************
+
+                    -importing of "render_template" needed to allow return of a rendered  HTML file
+                        (HTTP verb to use here is "GET")
+                    -2nd and 3rd args in return statement are optional arguments that pass data to the HTML
+                        (see below)
+            -Flask allows for embedding of Python variables and expressions in any HTML files that it renders via Jinja2!
+                -Two uses:
+                    - {{ <+variable> }}
+                    - {% <+expression> %}
+
+                *************************************************************************************************
+                -i.e.   <h3>My Flask Template</h3>
+                        <p>Phrase: {{ phrase }}</p>
+                        <p>Times: {{ times }}</p>
+                            
+                        {% for x in range(0,times) %} 
+                            <p>{{ phrase }}</p>
+                        {% endfor %}
+                            
+                        {% if phrase == "hello" %}
+                          <p>The phrase says hello</p>
+                        {% endif %}
+                    (^ the variables above reference the arguments passed by the @app.route('/') function above ^)
+                        *************************************************************************************************
+                -Note that ending statements must be made for embedded expressions
+                -Note that ":" is not needed to start a block when embedding with Flask
+                -This kind of embedded-logic should be used as little as possible, as it slows down the server's response-time
+                -This is possible thanks to a the render engine that flask uses, called Jinja2
+                    -HTML commenting syntax is NOT SUPPORTED by Jinja2!
+                        -"{# <+comments> #}" is the required syntax 
+                    -"len()" function is not supported by Jinja2
+                        (use "<+object>|length" to output object length) 
+
+        2. Static:
+            -Static content such as stylesheets, JavaScript, image files etc. are served from a folder in the main server-directory called "static"
+                (name MUST be "static"!)
+
+            *************************************************************************************************
+            -i.e.   <!-- linking a css style sheet -->
+                    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/my_style.css') }}">
+
+                    <!-- linking a javascript file -->
+                    <script type="text/javascript" src="{{ url_for('static', filename='js/my_script.js') }}"></script>
+
+                    <!-- linking an image -->
+                    <img src="{{ url_for('static', filename='img/my_img.png') }}">
+
+                (^ the static files are linked to the HTML file almost the same as when not using Flask ^)
+                *************************************************************************************************
+
+            -Note that the above file paths include extra folders added to the "static" directory to organize the different file types 
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+POST / NON-GET REQUESTS WITH FLASK:
+
+    BASIC SETUP:
+
+        1. Create a route for the POST request
+            -i.e. " @app.route('/users', methods=['POST']) "
+
+        2. Pull data from the request in the route function
+            - "request" must be imported!
+                -i.e. " from flask import Flask, request "
+            -i.e. " [+new_py_var_name] = request.form['[+form_input_name]'] "
+            -POST data will ALWAYS come through as strings!
+
+        3. Store the data in the "session"
+            -session is a way for data to persist across routes without a database connected!
+                - "session" MUST be imported!
+                    -i.e. " from flask import Flask, session "
+                -the app MUST be given a "secret key" to use session!
+                    -i.e. " [+app_name].secret_key = 'keep it secret, keep it safe' "
+                    -set this to a system variable or seperate file if you don't want the key visible in the code!
+            -many frameworks use cookies to store session data
+                -like Flask!
+                -cookies are not very secure, DO NOT store sensitive data on them!
+
+        3. Redirect to the route that will render after submitting the request
+            - "redirect" must be imported!
+                -i.e. " from flask import Flask, redirect "
+            -NEVER render HTML directly on a POST!
+                -always redirect to a GET route that does!
+                    -i.e. " return redirect("/show") "
+
+        4. Pass the session variables as parameters for the GET rout render_template() function
+            -i.e. "  return render_template('index.html', divisorLimit = session['factorsDivisorLimit']) "
+
+        5. Access them via Jinja2 like normal!
+
+            *************************************************************************************************
+            -i.e.   # *server.py*
+                    @godNum.route('/dividends')
+                    def dividendsInput():
+                        return render_template('dividends.html')
+
+                    @godNum.route('/dividends/calculate', methods=['POST'])
+                    def dividendsCalculate():
+                        session['dividendsDividendLimit'] = request.form['dividendLimit']
+                        session['dividendsDivisorLimit'] = request.form['divisorLimit']
+                        # jsDividends = render_js('godNumDividends.js', p1 = session['dividendsDividendLimit'], p2 = session['dividendsDivisorLimit'])
+                        # session['dividendsResults'] = jsDividends
+                        return redirect('/dividends/results')
+
+                    @godNum.route('/dividends/results')
+                    def dividendsResults():
+                        return render_template('dividends_results.html', dividendLimit = session['dividendsDividendLimit'], divisorLimit = session['dividendsDivisorLimit'])
+
+                (^ demonstrates basic use of session to store and serve POST data ^)
+                *************************************************************************************************

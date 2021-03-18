@@ -1,0 +1,20 @@
+EC2 | Intro
+While there are many services out there that help with application deployment, we'll be using Amazon EC2. This service provides easily scalable servers and storage space in the cloud that makes deployment easy. Also, the lowest-tier servers are free.
+
+Getting Started
+Before we get started, make sure you have signed up for AWS Free Tier. If you haven't, go to this link http://aws.amazon.com/free/and sign up. AWS requires you to provide a Credit Card during sign up, but don't worry; AWS will only charge you if you purchase non-free services. AWS will not charge you upon signing up.
+
+Road Map
+Launch an Amazon EC2 Instance
+We are going to be renting some space on a computer owned by Amazon. We have been using our own computer, localhost, to host our applications for us. Our computer was not designed to be a server, it was designed to be a client. Amazon has some powerful computers that can run multiple high traffic applications so we will be renting a small corner of a very large and powerful server computer.
+
+Note: In this chapter, we will demonstrate how to run a free instance. Amazon EC2 offers up to 1 year of free use so that programmers like us can enjoy the free service.
+
+Connect to our EC2 instance
+Now that we've rented our server space, how do we access it? What do we mean by access? It's just like when you open up your terminal and access the files in your own computer. Fortunately, we can use our own terminal to connect to the computer that we bought. It is as if we are accessing the terminal from that computer.
+
+Installation
+Your EC2 instance has only the operating system installed. In order to get our project up and running we'll have to install the necessary software. We will replicate the development environment from your computer on the server so that the application will run remotely just as it does locally.
+
+Point
+We are going to register our domain name to point to the IP address of this computer that we bought from Amazon. Now whenever someone requests our domain name, the request will look at the address book, and know which IP address to go to.

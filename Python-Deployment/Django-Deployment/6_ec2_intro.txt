@@ -1,0 +1,45 @@
+EC2 | Intro
+Objectives:
+Rent space from Amazon Web Services (AWS)
+Create an EC2 instance on AWS
+While there are many services out there that help with application deployment, we'll be using Amazon EC2. This service provides easily scalable servers and storage space in the cloud that makes deployment easy. Also, the lowest-tier servers are free. We are going to be renting some space on a computer owned by Amazon.
+
+We have been using our own computer, localhost, to host our applications for us. Our computer was not designed to be a server, it was designed to be a client. Amazon has some powerful computers that can run multiple high traffic applications so we will be renting a small corner of a very large and powerful server computer.
+
+Before we get started, make sure you have signed up for AWS Free Tier here. AWS requires you to provide a credit card during sign up, but don't worry; AWS will only charge you if you purchase non-free services. AWS will not charge you upon signing up. (In this chapter, we will demonstrate how to run a free instance. Amazon EC2 offers up to 1 year of free use so that programmers like us can enjoy the free service.)
+
+Log in to the AWS console at https://aws.amazon.com/
+Once you have logged in, click on Services and click on EC2.
+
+dashboard ec2
+Launch a new instance from the EC2 Dashboard by clicking Launch Instance as shown below.
+
+launch instance
+Select Ubuntu Server 18.04, SSD Volume Type option. Do NOT select Ubuntu 16.04
+
+
+Select the t2.micro option and click Review and Launch.
+
+select review and launch
+Click the Edit security groups link in the lower right corner.
+
+edit security groups
+SSH option should be there already. Update its source to MyIP. Click the add a rule button and add HTTP and HTTPS, set source to Anywhere, and then click Review and Launch.
+
+add http and https rules:
+(If you plan on reconnecting to this instance from a different location, see the Reconnecting module at the end of this chapter.)
+
+Next, you'll be asked to create a key file. This is what will let us connect and control the server from our local machine.
+
+Name your pem key whatever makes the most sense to you as shown in the next step. Give it a generic name, not the name of your project, as we can reuse this key.
+
+download pem key:
+Click Download Key Pair. The key will automatically be saved wherever your browser saves by default. This next part is very important! Put your pem key in a file that has no chance of EVER being pushed to GitHub or anywhere public. You should not send this file via email, or in any other way make it publicly available:
+
+choose safe location for pem key:
+After launching your instance, you will see a screen with lots of information. Scroll to the bottom of the page and click View Instances.
+
+click view instance at bottom of page:
+(Optional) Once you have several instances running, you will want to be able to identify what your different instances are for. We have the option of naming our instance, so let’s do so now by clicking on our instance’s name column as shown.
+
+name your instance

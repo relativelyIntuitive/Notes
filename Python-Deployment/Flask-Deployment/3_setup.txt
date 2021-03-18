@@ -1,0 +1,39 @@
+Setup
+Before we create our server we have to do some setup first. Let's get started!
+
+Today you will be deploying a full stack Flask application. When you are finished, your virtual machine will be set up to serve any Flask project. This will enable you to make an easy swap with a new project, for example, your belt exam. We'll show you how later.
+
+In this first section, you will be navigating around on your local machine. If you are using Unix (Mac), or Linux, these commands are for you. If you are on Windows, you will want to use git bash in order for these commands to run properly.
+
+Step 1: Getting Started
+Get started by activating your project's virtual environment.
+
+Once you have activated your virtual environment, cd into your project directory. You will now save all of your installed pip modules into a .txt file. Later, we will use this file to install all of the required pip modules on our remote machine with a single command.
+
+pip freeze > requirements.txt
+In your text editor, open your requirements.txt file and, if they exist, remove pygraphviz, pydot and anything with MySQL in it. These modules can be tricky to install and require additional installations, so we remove them now to prevent problems later.
+
+Step 2: Committing
+Important!
+
+We’re about to initialize a new git repo. Your git repo must be initialized within the outer project folder. This is the same level as your server.py file. If you ls and don’t see server.py, you are in the wrong place. Double check your location before you initialize your repo.
+
+First we’ll create a .gitignore file.
+
+touch .gitignore
+As the name implies, your gitignore file tells git to ignore any files, directories, etc. you include in the file. In this case, we’re instructing git to ignore all files with the extension “pyc”. If you placed your virtual environment in this folder, we will ignore that as well. In your gitignore file, venv/ should be replaced with the name of your virtual environment.
+
+Open your .gitignore file in your text editor and add the lines:
+
+  *.pyc
+  venv/
+We know this is familiar, but here’s a reminder of how to initialize a new repo:
+
+  > git init
+  > git add --all
+  > git commit -m "initial commit"
+Create a new github repo and, back in terminal run these commands, replacing the repo url with your own.
+
+  > git remote add origin https://github.com/AnnaBNana/flask_courses.git
+  > git push origin master
+Once you login to AWS and set up a cloud server, you’ll be pulling code from your GitHub repository.

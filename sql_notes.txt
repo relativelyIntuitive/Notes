@@ -1,0 +1,193 @@
+
+ - DATABASE SQL NOTES -
+
+    GENERAL MySQL tips
+        - "--" comments-out a line in a .sql file
+        -select multiple tables by seperating SELECT blocks with  ";" at the very end of each
+        -can use Database --> forward-engineer feature to turn ERD into SQL database
+        -can use Database --> reverse-engineer feature to generate ERD from an SQL database
+        -can execute SQL code to create database as well
+        -   USE `database_name`
+            (will select the given database)
+        -to export database, select it, use Server --> Data Export
+            -make sure to export to "self-contained file" instead of default "dump project folder"
+            -check "create dump in single-transaction" box
+            -check "include create schema" box
+                (adds "CREATE DATABASE IF NOT EXIST `database_name`" line to the exported SQL file)
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    SQL (STRUCTURED-QUERY LANGUAGE) FUNCTIONS (CRUD):
+
+        1. C: Create (make new entries)
+            -   INSERT INTO database_name.table_name (column_name1, column_name2) 
+                VALUES('column1_value', 'column2_value');
+
+            -i.e.INSERT INTO `twitter`.`tweets` (`tweet`, `user_id`, `created_at`, `updated_at`)
+                VALUES ('I am vino', '1', '2014-02-01 00:00:01', '2014-02-01 00:00:01');
+                    (`twitter` is the database, `tweets` is the table)
+                    (the amount of columns selected must match the number of values given)
+
+        2. R: Read (pull data and look at it)
+            "SOME" BUILT-IN FUNCTIONS: 
+                (can be used in any place within a query where you are making reference to a column)
+
+                -round(input,decimals) can output data to show the argued amount of decimal places
+                    -decimals value can be negative to round to integer values as well
+                        (i.e. round(population/1000000, 2) will output the population, in millions, rounded to the nearest hundrEDTH)
+                        (i.e. round(population/1000000, -2) will output the population, in millions, rounded to the nearest hundrED)
+                
+                -length(input) can output length of values per entry in the argued column
+                    (i.e. length(name) will output a column filled with the lengths of each entry in the name column)
+                
+                -left(input, amount) will output the argued amount of characters from the left of the argued input
+
+                -concat(input1, input2, ...)
+                    -concatenates inputs
+                    -useful for seaching if one column value is present in another
+                    -   SELECT capital, name
+                        FROM world
+                        WHERE capital LIKE concat('%', name, '%')
+                        (concatenates the value of name column into a LIKE query to find entries for capitals that include their country name)
+                -replace(input, selection, replacement)
+                    -replaces the selection in the input with the replacement
+                    -i.e. replace(capital,name, '') removes the country name from capitals whose names are just extensions of their names
+                        (would return "City" from "Mexico City")
+                -sum(column_name)
+                    -outputs sum of column values
+                -avg(column_name)
+                    -outputs sum of column values
+
+            WILD-CARDS:
+                - "%" used to represent any character(s)
+                - "_" used to represent any ONE character
+
+            SELECT-FROM-WHERE:
+                1. SELECT statement
+                    -Followed by * to select all columns
+                    -Followed by [+column_name] to select specific column
+                        -can list multiple columns with commas
+                            (SELECT col1, col2)
+                        -can create custome columns
+                            (SELECT col1/col2 will select a new column created from the results of the division of col1/col2)
+                        -can change displayed names of columns
+                            (SELECT col1 as namedCol will display the contents of col1 under the title of namedCol)
+                2. FROM clause
+                    -SELECT ... FROM the table called users
+                        (all selected entries from users table)
+
+                3. WHERE clause
+                    -SELECT only the entries FROM the table called ... WHERE city = 'wilmington'
+                        (all selected entries from users table with city value of wilmington)
+                    -Can use conditionals too
+                        - <>, <, >, <=, >=, OR, XOR, LIKE, RLIKE, NOT LIKE, BETWEEN, IN
+                            -<> means not-equal
+                            -XOR is like OR
+                                -Only selects entries that meet one XOR the other condition, but NOT BOTH
+                                -   SELECT *
+                                    FROM users
+                                    WHERE age < 18 XOR weight < 200
+                                    (would select all columns for users who are either under 18 & over 200lb, XOR over 18 & under 200lb ) 
+                            -LIKE 
+                                -followed by string literal w/format '%x' to find entries ending in x 
+                                    (or 'x%' for entries beginning with x)
+                                -or '%x%' for entries with x anywhere
+                                    ( '%x%x%' would check for entries with at least 2 x's)
+                                -   SELECT *
+                                    FROM users
+                                    WHERE first_name LIKE '%e'
+                                    (would select all columns only from users with first name ending in "e")
+                            -RLIKE folowed by string literal w/format 'word' to find entries that include the series of characters anywhere 
+                                -   SELECT *
+                                    FROM world
+                                    WHERE country RLIKE 'United'
+                                    (would select all columns from world table for each entry that has "United" appearring in their name)
+                            -NOT LIKE will exclude the searched values instead
+                            -BETWEEN/AND followed by a range of values
+                                -   SELECT *
+                                    FROM users
+                                    WHERE created_at BETWEEN '2011-01-01' AND '2011-12-31'
+                                    (would select all columns of only users created between the given datetimes)
+                            -Use IN() to select multiple attributes
+                                -   SELECT name, population
+                                    FROM world
+                                    WHERE name IN ('Sweden', 'Norway', 'Denmark');
+                                    (selects name and population columns of entries in the world table, for the names of Sweden, Norway and Denmark)
+
+            ORDER BY
+                -Can be added at end of query to sort the results
+                -   SELECT *
+                    FROM users
+                    ORDER BY birthday DESC;
+                    (will return all users and sort them in descending order by birthday)
+                    (ORDER BY first_name would just order them alphabetically by first name) 
+
+            LIMIT & OFFSET
+                -Can be added at the end of a query to limit the amount of results returned
+                -   SELECT *
+                    FROM users
+                    LIMIT 3;
+                    (only returns the first 3 entries from user table)
+                -   SELECT *
+                    FROM users
+                    LIMIT 3
+                    OFFSET 2;
+                    (offset sets starting point of the returned entries, ignoring the first 2 results in this case and returning 3-5)
+                -   SELECT *
+                    FROM users
+                    LIMIT 2,3;
+                    (LIMIT & OFFSET can be combined as such)
+            
+            JOIN
+                -   SELECT customers.name, addresses.city  
+                    FROM customers 
+                    JOIN addresses ON addresses.id = customers.address_id;
+                                      (primary-key)     (foreign-key)
+                    (joins customers and addresses charts together to display the name and city of each customer)
+                
+                -Joins 2 tables by their shared keys
+                -FROM table is always left-half of joined table and JOIN table is always right-half
+                -LEFT JOIN shows everything in left-table even if not keyed to the right-table
+                    (RIGHT JOIN does the reverse. Rarely used)
+                -Needs a second JOIN to join a third table for a complete many-to-many relationship
+                    -can join as many tables as needed
+                    -   SELECT * FROM orders 
+                        JOIN items_orders ON orders.id = items_orders.order_id 
+                        JOIN items ON items.id = items_orders.item_id;
+                        (joins orders to items with items_orders table in between as a joining table)
+
+            GROUP BY
+                -   SELECT clients.first_name, clients.last_name, sum(billing.amount)
+                    FROM clients
+                    JOIN billing ON clients.id = billing.client_id
+                    GROUP BY clients.id
+                    (collapses all repeat entries for one client into one row and sums all billing amounts)
+                
+                -Not useful without a function like SUM() or AVG() or COUNT() to apply to all fields in focus column, GROUP_CONCAT() at minimum
+                    -   SELECT GROUP_CONCAT(' ', sites.domain_name) AS domains, clients.first_name, clients.last_name
+                        FROM clients
+                        JOIN sites ON clients.id = sites.client_id
+                        GROUP_BY clients.id 
+                        (will display each client into a single row with commas and in this case a space, 
+                            with all domain name entries concatenated into one field)
+                    
+                    -   SELECT clients.first_name, clients.last_name, COUNT(billing.amount)
+                        FROM clients
+                        JOIN billing ON clients.id = billing.client_id
+                        GROUP BY clients.id
+                        (collapses all repeat entries for one client into one row and counts all billing amounts)
+
+
+        3. U: Update (change an existing entry)
+            -   UPDATE table_name SET column_name1 = 'some_value', column_name2='another_value' WHERE condition(s)
+            
+            -i.e. UPDATE `twitter`.`tweets` 
+                SET `tweet` = 'For my basketball clinic with @manilacone 11/4/14, we still have a few slots left for the main dSee you all 11/5/14 Philippines' 
+                WHERE (`id` = '10');
+
+        4. D: Destroy (remove entries permanently)
+            -   DELETE FROM table_name WHERE condition(s)
+                (IMPORTANT: if WHERE condition is not added to the DELETE statement, it will delete all the records on the table!)
+           
+            -i.e. DELETE FROM `twitter`.`tweets` WHERE (`id` = '13');
+

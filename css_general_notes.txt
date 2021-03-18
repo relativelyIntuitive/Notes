@@ -1,0 +1,156 @@
+
+ - CSS GENERAL NOTES -
+    
+   CASCADING-STYLE-SHEET:
+      -Rules for body affect all content IF the property is inheritable, unless content is specified not to
+
+   METHODS OF LINKING A CSS SHEET:
+      1. Inline
+         -Considered to be bad practice
+      2. Internal
+         -Considered to be bad practice
+      3. External
+         -Recommended method
+
+   CSS DEFAULT SELECTOR PRIORITY ORDER:
+      (PROCESSED FROM SELECTOR POINT DOWNWARD IN HTML)
+      0. "*" selects all elements (0 points)
+         -carries no weight, unlike single element selector
+      1. tag   (1 point)
+         -selects all elements w/specific tag
+            (i.e. p{} selects all paragraph elements)
+      2. .class (10 points)
+         -selects all elements w/a shared class value
+            (i.e. li.red{} selects all list elements of the .red class)
+      3. #id (100 points)
+         -selects element w/specific id attribute
+            (i.e. #list{} selects element with "list" id)
+
+   WEIGHT CHART:
+      li            {...}  /* a=0 b=0 c=1 -> specificity =   1 */
+      ul li         {...}  /* a=0 b=0 c=2 -> specificity =   2 */
+      ul ol li      {...}  /* a=0 b=0 c=3 -> specificity =   3 */
+      li.red        {...}  /* a=0 b=1 c=1 -> specificity =  11 */
+      ul ol li.red  {...}  /* a=0 b=1 c=3 -> specificity =  13 */
+      #list         {...}  /* a=1 b=0 c=0 -> specificity = 100 */
+
+   BASIC CSS SELECTOR PROPERTY ORGANIZATION:
+      1. Color
+      2. Size
+      3. Space
+
+   FONT-FAMILIES:
+      1. Named-family
+         -"times", "courier", "arial"
+      2. Generic-family:
+         -"serif", "sans-serif", "cursive", "fantasy", "monospace"
+
+   FONT-SIZE:
+      1. pt (point)
+         -static value
+      2. px (pixel)
+         -static value
+      3. em (responsive measure)
+         -dynamic value
+      4. % (percent)
+         -dynamic value
+   
+   DISPLAY PROPERTY:
+      (not inherited!)
+      1. Inline
+         -<a>, <img>, <span>, <input>, <label>, <select>, <textarea>
+         -Invalid to put block elements inside inline elements
+            (i.e <p> inside of <a>)
+      2. Block
+         -<body>, <div>, <form>, <h1>-<h6>, <p>, <table>, <ul>, <ol>, <li>
+      3. Inline-block
+         -apply to each element that needs the property
+         -also needs width for each block or they will each fill a line
+      4. Flex
+         -creates one flex-box around all children to change
+         -use with justify-content (x) and align-items (y)
+         -use with flex-wrap property to allow contents to wrap to next lines
+         -images must have defalt 'min-width: auto;' set to 'min-width: 0;' or min-width will be image default size
+         -use LOW vmax or vmin value from 1-100 for font to shrink as % of the higher or lower container dimension (max/min)
+         (i.e. 3vmin makes font 3% of the smaller (larger for 3vmax) dimension of its parent container)
+      5. Inline-Flex
+         -creates flex-box around each child element putting all their children in one box each
+   
+   MARGINS:
+      1. Margins apply spacing outside of border
+         -when 2 vertical margins touch, the larger one will be used and the smaller one collapsed
+            (EXCEPT)
+            1. floated elements
+            2. absolutely positioned elements
+            3. inline-block elements
+            4. elements with overflow property not set to visible (won't collapse margins with their children.)
+            5. cleared elements (won't collapse their top margins w/their parent block’s bottom margin.)
+      2. Padding applies spacing inside of border
+
+   CSS3 STUFF:
+      -CSS3 should only be used on non-critical bits of styling, as it is not uniformly supported across all browsers
+      -make sure to use browser prefixes for any features that are not supported by all browsers
+      
+      The following CSS3 features are among the most commonly supported:
+
+      Browser Prefixes:
+         -CSS Browser Prefixes or CSS Vendor prefixes are a way for browser developers to add support for new CSS features,
+            before such feature becomes fully supported by all browsers. 
+            (i.e. "-webkit-" and "-moz-". ) 
+         -  .awesome {
+               -webkit-box-shadow: 10px 10px 5px #333;
+               -moz-box-shadow: 10px 10px 5px #333;
+               box-shadow: 10px 10px 5px #333;
+            }
+
+      Child Selectors (CSS3):
+         1. first-child:
+            -selector applies to all "first-child" elements in HTML of a given tag type for given selector
+               (i.e. p:first-child{} would only select the first <p> element within each parent <div>)
+         2. last-child:
+            -selector applies to all "last-child" elements in HTML of a given tag type for given selector
+            -does NOT apply to elements that are the last-child of their type, but NOT of the parent <div> overall! 
+               (i.e. p:last-child{} would only select the last <p> element within a parent <div> IF it's also the last element in the div)
+         3. nth-child(n):
+            -selector applies to all "nth-child" elements in HTML of a given tag type, for given selector
+            -if the nth-child of the parent <div> is not the given tag type, nothing will be selected. It will NOT skip to the next <p>!
+               (i.e. p:nth-child(3){} if the 3rd-child is not a <p>, nothing will be selected)
+            -use nth-of-type to exclude tags not selected
+         4. nth-of-type(n):
+            -same as nth-child but will skip over other tags
+               (i.e. p:nth-of-type(4) will select the 4th <p> element, not the 4th-child, ignoring other element-types in its count)
+
+      Box Shadow (CSS3):
+         -adds shadow to element with options for the direction, amount of blur, and color of the shadow in that order
+            -  .awesome {
+                  box-shadow: 10px 10px 5px #333;
+               }
+      
+      Opacity (CSS3):
+         -defines an element's opacity. Holds a value of 1 (fully opaque) to 0 (transparent)
+            -  .awesome {
+                 opacity: 0.5;
+               }
+      
+      RGBA (CSS3):
+         -not a CSS property, but a new color model introduced in CSS3
+         -adds the ability to specify a level of opacity along with an RGB color value, in that order
+            -  .awesome {
+                  background-color: rgba(0, 0, 0, 0.8);
+               }
+
+      Multiple Background-Images (CSS3):
+         -CSS3 allows you to apply multiple background images to an element, separated with commas
+            (this is how people create the parallax scrolling effect)
+         -  body {
+               background: url(first_image.png) no-repeat top left,
+               url(second_image.png) repeat-x bottom left;
+            }
+
+      Transitions (CSS3):
+         -allows you to change property values smoothly, over a given duration
+      
+      Transformations (CSS3):
+         -transform property applies a 2D/3D transformation to an element
+            (i.e. rotate, scale, move, skew, etc.)
+

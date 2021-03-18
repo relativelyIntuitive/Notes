@@ -1,0 +1,18 @@
+Servers
+Objectives:
+Understand what a server is
+
+We just learned a little bit about what a server is, including the idea that a server is simply a computer like the one you're using now. Your computer, however, is designed to be able to handle many things, from graphics rendering to storage, video playback and much more. On the other hand, a server's sole purpose is to handle requests and send back some sort of response. In order to do so, a server is designed with much more processing speed, storage, and RAM.
+
+If you visit www.codingdojo.com, your computer will make a request to Coding Dojo's server. Once your request reaches the server, the server will respond by sending back files that can be interpreted by your browser. You may remember the types of files that can be interpreted by any modern browser: HTML, CSS and JavaScript. In addition, of course, browsers can display images, audio files, and video.
+
+Web Server Components:
+Let's look more closely at what's happening on the server side when the client makes a request.
+
+    1. Web Server - The web server receives a request from the client. The webserver asks the logic unit to retrieve some content.
+
+    2. Application - The logic unit receives requests from the web server. Its job is to run appropriate segments of your code according to the request's instructions. If that code requires information from the database, the logic unit will retrieve that data before organizing it and sending back a response to the web server.
+
+    3. Database - The Database is simply a file or a container for document storage like your computer's hard-drive. Its sole purpose is to store files, update files, and retrieve files according to instructions received from the interpreter.
+
+Now that we understand what a web server does, let's build one!

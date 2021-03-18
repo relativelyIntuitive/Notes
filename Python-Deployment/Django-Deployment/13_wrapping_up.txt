@@ -1,0 +1,12 @@
+Wrapping Up
+Objectives:
+Test out our deployed server!
+Highlight common errors
+
+If you don't see any errors from the last step, drumroll...go to your URL! You are on the internet--amazing!!
+
+Common errors and where to start debugging:
+502, bad gateway: there is a problem in your code. Hint: any error starting with 5 indicates a server error
+Your Gunicorn process won’t start: Check your .service file; typos and wrong file paths are common mistakes
+Your NGINX restart fails: Check your NGINX file in the sites-available directory. Common problems include typos and forgetting to insert your project name where indicated.
+Make sure the URL requested is correct (example if your root route is /home, make sure you put /home after the IP)

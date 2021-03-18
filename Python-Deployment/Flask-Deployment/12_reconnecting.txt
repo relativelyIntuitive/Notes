@@ -1,0 +1,9 @@
+Step 9: Reconnecting
+Remember how we said that we would have to change our security settings every time our IP changes? The bad news is that this will happen often. The good news is that it’s easy to change those settings, if you know where to look.
+
+In your AWS console, with your instance selected, scroll down to view some options. Next to security groups, you will see launch-wizard. Click it!
+security groups
+Now you just have to update the IP connected to the instance. In the next window you will see something like this at the bottom of your screen. Click the inbound tab, and then select edit.
+edit security groups
+Now, all that is left to do is let AWS automatically change our IP to the new one. Do this by selecting the dropdown in the SSH row, under source, and select MyIP (it is already selected, but doing so again will refresh your IP to the current one). Once this is done, click save. You’re ready to SSH into your instance again!
+update groups

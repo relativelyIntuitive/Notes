@@ -1,0 +1,478 @@
+
+ - JAVASCRIPT NOTES -
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+GENERAL:
+    -JavaScript is multi-paradigm and we can write it procedurally, functionally, or object oriented-ly or any combination!
+    -JavaScript is run on a single thread with an event-loop that makes things like event-listeners possible
+    -JavaScript is the language, ECMAScript is the standard
+    -ES6 is not fully supported by all interpreters yet
+    -"Objects" can refer to objects with key-value pairs, arrays, variables and classes in JS!
+    -When JavaScript is sent to a browser to run, the interpreter breaks that down into two 
+        1. parses the code to verify it
+        2. runs the code, with hoisting, not necessarily line-by-line
+    -Two types of errors in JS:
+        1. syntax errors 
+            -when the parser finds invalid JavaScript before the code is run
+        2. runtime errors
+            -when your code successfully parses and the error happens while the program is running
+    -JavaScript is function scoped traditionally
+        -any variables, no matter where they're defined, are available throughout the entire scope
+        -new scopes are created by defining functions
+        -has two types of scope: 
+            1. global
+                -available across entire application
+            2. local
+                -only available within it's function
+    -ES6 introduced "const" and "let" for declaring block-scoped variables
+        -block-scoped variables are only available within "{}" code-blocks
+        -"let" allows for the variable value to be reassigned, while "const" does not
+        -avoid "var" whenever possible!
+    -JavaScript hoists BOTH variable declarations and functions!
+        -hoisted "var" variable declarations will be hoisted and hold the value "undefined" until their home line runs
+            -assignment operators act like anchors
+                -they stay put, no matter how the code is rearranged
+                -even when their variable is hoisted!
+            -this does not happen with "let" or "const"
+            -also any "var" declared within functions are not hoisted
+        -standalone function declarations, however, are hoisted with their full contents and useable anywhere in the file
+            -this is because functions create their own scope
+            -don't allow any variables to be hoisted from them
+            -nested functions will NOT be hoisted globally
+    -JS is commented with "//" per line and "/*...*/" start/end tags for multi-line comments
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+REST / SPREAD OPERATOR:
+    - "..." is the referred to as the "rest" or the "spread" operator, depending on the context 
+        -either captures the "rest" of a data set 
+        -or "spreads" the content of an existing structure into a copy
+    *************************************************************************************************
+    -i.e.   let numberStore = [0, 1, 2];
+            let newNumber = 12;
+            let newNumberStore = [...numberStore, newNumber];
+            // spreads numberStore and adds its values individually to newNumberStore
+            // newNumberStore === [0, 1, 2, 12]
+            
+            let numberStore = [0, 1, 2];
+            let newNumber = 12;
+            let newNumberStore = [numberStore, newNumber];
+            // adds numberStore to newNumberStore as an array object, instead of individual values
+            // newNumberStore === [ [0, 1, 2], 12 ]
+        (^ demonstrates the function of the "spread" operator by copying arrays ^)
+        *************************************************************************************************
+        -can be used the same way on objects as well
+    -copies are "shallow" and references to nested objects will still reference the original object
+    *************************************************************************************************
+    -i.e.   const personCopy = { ...person };
+            personCopy === person
+            // => false
+            personCopy.addresses === person.addresses
+            // => true
+        (^ addresses is a list nested in the person object ^)
+        *************************************************************************************************
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+DESTRUCTURING:
+    -Destructuring is a way to extract specific data from objects and arrays without using dot-notation
+    -The following data will be used for the following examples:
+    *************************************************************************************************
+    -i.e.   const person = {
+                firstName: 'Bob',
+                lastName: 'Marley',
+                email: 'bob@marley.com',
+                password: 'sekureP@ssw0rd9',
+                username: 'barley',
+                addresses: [
+                    {
+                    address: '1600 Pennsylvania Avenue',
+                    city: 'Washington, D.C.',
+                    zipcode: '20500',
+                    },
+                    {
+                    address: '221B Baker St.',
+                    city: 'London',
+                    zipcode: 'WC2N 5DU',
+                    }
+                ],
+                createdAt: 1543945177623
+            };
+
+            const animals = ['horse', 'dog', 'fish', 'cat', 'bird'];
+
+            // without destructuring:
+            var email = person.email;
+            var password = person.password;
+            var firstAnimal = animals[0];
+            var secondAnimal = animals[1];
+            var thirdAnimal = animals[2];
+
+            // with destructuring:
+            const { email, password } = person;
+            const [firstAnimal, secondAnimal, thirdAnimal] = animals;
+        (^ uses destructuring to extract multiple specific values from these objects ^)
+        *************************************************************************************************
+        -destructuring looks for the key or element indicated by the variable declaration in the assigned object
+            -does not actually reference given variable name for arrays, just grabs elements in order
+            -"rest" operator can also be used to indicate the "rest" of the items in an array/object
+            *************************************************************************************************
+            -i.e.   // would grab the same first 3 element
+                    const [glop, glip, gleep] = animals
+
+                    // use "," as a placeholder to skip elements
+                    const [ , secondAnimal] = animals
+                    // error will be thrown if you skip to a non-existent position though!
+
+                    // rest operator captures the rest of the animals array as a new array
+                    const [ , secondAnimal, ...otherAnimals] = animals;
+                    // otherAnimals below would print: ['fish', 'cat', 'bird']
+
+                    // rest operator captures the rest of the person object as a new object
+                    const { firstName, lastName, ...attributes } = person;
+                    // attributes would print the whole person object without the first and last name pairs
+                (^ demonstrates how to use comma to skip data and "rest" operator to capture multiple datas ^)
+                *************************************************************************************************
+        -there will be a conflict if a variable of that name already exists
+        *************************************************************************************************
+        -i.e.   // will throw error bc "password" const already exists
+                const password = '12345';
+                const { password } = person;
+
+                // const will be "undefined" bc there is no "hashedPassword" key in "person"
+                const { hashedPassword } = person;
+
+                // will store the "password" value in "hashedPassword"
+                const { password: hashedPassword } = person;
+            (^ demonstrates a way to provide a name other than the one from the object ^)
+            *************************************************************************************************
+            -if the variable wasn't "const" it would have been overwritten though!
+        -nested destructuring is possible as well:
+        *************************************************************************************************
+        -i.e.   // creates "whiteHouse" and "sherlock" variables
+                const { addresses: [whiteHouse, sherlock] } = person;
+            (^ will grab the first 2 objects listed in the array value of the "addresses" key ^)
+            *************************************************************************************************
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+ARROW FUNCTIONS:
+    *************************************************************************************************
+    -i.e.   // anonymous function assigned to a variable
+            var square = function(n) {
+            return n * n;
+            };
+
+            // same function but expressed as ES6 arrow function
+            const square = n => n * n;
+            
+        (^ demonstrates difference in ES5 and ES6 syntax for anonymous functions ^)
+        *************************************************************************************************
+        -Shorthand syntax for anonymous functions
+        -Doesn't need the "function" keyword
+        -Doesn't need curly-braces if it's only one statement
+        -Doesn't need parentheses around the paramer if there is only one
+            -needed for zero parameters though too!
+        -Returns are implicit, but only if there is no code block (single statement functions)
+            -when returning an object, the function body must be set within curly braces and include "return" keyword
+            *************************************************************************************************
+            -i.e.   // first set of curly braces and "return" needed because an object is being returned
+                    const returnObjLonghand = () => {
+                        return { 
+                            firstName: 'John',
+                            lastName: 'Wick'
+                        }
+                    }
+
+                    // below example is bad. brackets of obj are interpreted as brackets of func
+                    const returnObj = () => { firstName: 'John', lastName: 'Wick' }
+
+                    // surrounding the implicit return with parenthesis solves the problem though!
+                    const returnObjFixed = () => ({ firstName: 'John', lastName: 'Wick' });
+
+                    // not needed if returning an array though!
+                    const returnObjLonghand = () => ['John','Wick'];
+                (^ demonstrates differences between returning objects and arrays with arrow funcs ^)
+                *************************************************************************************************
+        -Arrow functions also inherit the scope of their parent
+            -"this" in an arrow func refers to it's parent 
+            -normal functions have their own scope
+                -"this" refers to the function itself
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+TERNARY OPERATOR:
+    -MDN has a good definition:
+        -"The conditional (ternary) operator is the only JavaScript operator that takes three operands: 
+        a condition followed by a question mark (?), then an expression to execute if the condition is truthy 
+        followed by a colon (:), and finally the expression to execute if the condition is falsy. 
+        This operator is frequently used as a shortcut for the if statement."
+    -Basically a simplified "if" statement that only has 2 outcomes
+    *************************************************************************************************
+    -i.e.   // canAfford func uses a ternary statement to determin if an account has enough funds for an item
+            let canAfford = (itemPrice, accountBalance) => {
+                itemPrice > accountBalance
+                    ? `Cannot afford! You are $${itemPrice - accountBalance} short`
+                    : "Can afford";
+            };
+            // can be written on one line as well
+        (^ demonstrates the ternary operator ^)
+        *************************************************************************************************
+    -Nesting ternary statements is possible, but not always a good idea
+    *************************************************************************************************
+    -i.e.   const myVar = 10 < 20
+            ? 5 < 10
+                ? true
+                : false
+            : false
+        (^ this code may be clean but is not intuitively read ^)
+        *************************************************************************************************
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+OOP IN JAVASCRIPT:
+    -The nesting of objects in JS is essential to master
+        -nested inner object is not part of the same place of memory as its' parent
+            -it gets its own memory location that is then referenced by its' parent!
+            -JS has a "garbage-collector" that removes nested objects when their parent object is deleted, if not referenced anywhere else
+    -JavaScript is not class-based like Python, it uses an "object-constructor" instead as a shortcut to create user instances
+        -used to construct ojects! (duh)
+        -functions holding blueprints to create objects that a user defines with args when calling the func
+        -constructor function instance declarations must be led by the "new" keyword
+            -i.e. "const car1 = new Vehicle(...)"
+        -"Class" keyword HAS been added to ES6 though!
+            -see "CLASSES IN JAVASCRIPT" below
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+CLASSES IN JAVASCRIPT:
+
+    -Added with ES6
+    -Classes are NOT HOISTED NO MATTER WHAT
+        -always put at top of code?
+    -The following example will be referenced for following examples lololol
+
+    *************************************************************************************************
+    -i.e.   // classes need a constructor
+            class Vehicle {
+                constructor(manufacturer, model, color) {
+                    this.manufacturer = manufacturer;
+                    this.model = model;
+                    this.color = color;
+                    this.miles = 0;
+                }
+                
+                // adds drive() method that can be called on any Vehicle instance
+                drive() {
+                    this.miles += 10;
+                    console.log(`You drove your ${this.constructor.name} and it now has ${this.miles} miles on it.`);
+                }
+            }
+
+            const firstCar = new Vehicle('Audi', 'A6', 'Silver');
+            car.drive();
+            console.log(car.miles);
+            // prints 10 miles
+
+        (^ defines Vehicle class and creates a Vehicle instance^)
+        *************************************************************************************************
+
+    -Classes in JavaScript can inherit from existing classes using the "extends" keyword
+        -works a bit differently than it does in other languages
+        -"super" keyword allows for calling of the parent class' constructor and passing of parameters
+
+    *************************************************************************************************
+    -i.e.   //super keyword allows the M5 class to create a Vehicle instance
+            class M5 extends Vehicle {
+                constructor(color) {
+                    super('BMW', 'M5', color);
+                    this.hp = 616;
+                }
+
+                printSpecSummary() {
+                    console.log(
+                        `BMW M5 with a 4.4L V8 Twin Turbo engine packin ${this.hp}HP and 553 lb-ft TQ`
+                    );
+                }
+
+                // by using super, we can call the parent method from within the child class
+                longDrive() {
+                    super.drive();
+                    super.drive();
+                    super.drive();
+                    console.log("Check your gas!");
+                }
+            }
+
+            // child INSTANCES can access parent class methods by default though
+            const myM5 = new M5()
+            myM5.drive()
+            console.log(myM5)
+
+        (^ creates an M5 class that inherits from Vehicle class, which becomes its' parent class ^)
+        *************************************************************************************************
+
+    -"instanceof" keyword can be used to check if a given object is an instance of a given class type
+
+    *************************************************************************************************
+    -i.e.   play( target ) {
+                if( target instanceof Unit ) {
+                    // blah blah blah
+                } else {
+                    throw new Error( "Target must be a unit!" );
+                }
+            }
+        (^ example method for an effect card in a game, that needs to verify it's target is a Unit instance ^)
+        *************************************************************************************************
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+FUNCTIONAL-PROGRAMMING IN JAVASCRIPT:
+    -When JavaScript was initially being designed, it was envisioned that the language would work like popular
+     functional languages like Lisp, however at the time Java (an Object Oriented Language) was (and still is)
+      very popular and it was decided to make JavaScript resemble a scripting version of Java. As such
+       JavaScript retains a syntax that at least superficially resembles Java, but functions are (first class)
+        treated like just any other variable and JavaScript also supports writing programs in an OOP style
+         (through prototype inheritance). As such JavaScript is multi-paradigm and we can write it procedurally,
+          functionally, or object oriented-ly or any combination of the above.
+
+    -In the early days of front-end frameworks, AngularJS was designed to apply the MVC pattern (Models Views
+     Controllers) to our front-end and as such a lot of OOP was being used. More recently with React, Vue,
+      and Angular (from version 2 onward) the patterns moved away from MVC to what's known as Component Based
+       Architecture. Many lessons have been learned in this time about how shared state and bi-directional data
+        flow are not necessarily the best way, and many developers using these frameworks have moved in the
+         direction of Functional Programming.
+
+    -Functional Programming is a completely different way of designing our programs, instead of making classes
+     (things that tightly bind both data and functions together) we will be separating the data from the actions.
+    
+    -When using functional programming, our functions should:
+        1. be transparent
+            -every time a function is called with the same inputs it should return the same results 
+        2. be pure:
+            -the function should remain "pure" and the values of the parameter passed in are not allowed to be changed...
+            -we will be making copies of arrays or objects passed in rather than working "in-place"
+                -use "spread" operator to make copies
+        3. avoid side effects:
+            -the function shouldn't make API calls, write to file-systems or databases, or print to console
+        4. never be void:
+            -our functions have to return a value...
+                -if they don't then what they did
+
+        -Sounds incredibly limiting, and it is
+            -but following these patterns will make bugs easy to spot and can result in a performance boost from using immutable data structures.
+        -NOTE: it won't be possible for every function we write in our projects to be "transparent and without
+         side-effects" as getting information from an API or Database, generating random numbers, or getting
+          date times will violate some rules for our functions.
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+COMMON BUILT-IN FUNCTIONS:
+        -The following code will be used for the following examples:
+        *************************************************************************************************
+        -i.e.   const groceryList = Object.freeze([
+                    { "item": "carrots",           "haveIngredient": false },
+                    { "item": "onions",            "haveIngredient": true  },
+                    { "item": "celery",            "haveIngredient": false },
+                    { "item": "cremini mushrooms", "haveIngredient": false },
+                    { "item": "butter",            "haveIngredient": true  }
+                ]);
+            (^ creates an immutable grocery list, for some reason ^)
+            *************************************************************************************************
+
+        - Object.freeze()
+            -makes argued object/array immutable
+            -even prevents things like .pop or direct value changes to const variables!
+                -groceryList[1] can't even be used to change 'carrots' obj
+
+        - ...
+            -spread operator
+            -i.e. "const needThyme = [ ...groceryList, { "item": "thyme", "haveIngredient": false } ];"
+            -makes a copy of the list array and adds a thyme obj to it
+
+        - .concat()
+            -i.e. "const needThyme = groceryList.concat( [ { "item": "thyme", "haveIngredient": false } ] );"
+            -concatenates parent object with argued object
+
+        - .slice()
+            -i.e. "const gotTheThyme = [ ...needThyme.slice(0, 5), { ...needThyme[5], "haveIngredient": true } ];"
+            -slice can take 2 parameters and retrurns an array of the values that have indexes between them
+                -if 2, slices at each index
+                    -i.e. "...needThyme.slice(0, 5)" does not include index 5 bc it slices at the index and needThyme[5] is slightly after is after the exact index location
+                -grabs everything but thyme obj from needThyme array and adds a new thyme obj new value for haveIngredient
+                -stores in new array and returns it
+            -if only 1 arg, slices there and returns everything past it
+                -i.e. "const notNeceCelery = [ ...gotTheThyme.slice(0, 2), ...gotTheThyme.slice(3) ];"
+                    -takes 2 slices from notNeceCelery of every entry but the celery, returning a new array w/o celery
+
+        - .sort()
+            -manipulates the array it was called on instead of creating a new one
+            -converts all values to strings and then uses ASCII to sort them!
+                -can cause unexpected results with numbers, unless you provide callback sorting functions as args
+            *************************************************************************************************
+            -i.e.   // this will throw an error because it cannot rearrange the items array
+                    const items = Object.freeze(["carrots", "onions", "celery", "mushrooms", "butter", "thyme77"]);
+                    items.sort();
+
+                    // the spread operator can be used to get around this by creating a new array to be sorted
+                    const sortedItems = [...items].sort();
+
+                    // sorts the numbers in the given array in ascending order
+                    var points = [40, 100, 1, 5, 25, 10];
+                    points.sort( (a, b) => a-b );
+
+                    // sorts the numbers in the given array in descending order
+                    var points = [40, 100, 1, 5, 25, 10];
+                    points.sort( (a, b) => b-a );
+                    
+                    // sorts the original grocery list of objects by the item attribute values
+                    const sortedGroceries = [...groceryList].sort( (a, b) => a.item > b.item );
+
+                (^ demonstrates different use of .sort() on arrays of strings, numbers and objects ^)
+                *************************************************************************************************
+
+        - .map()
+            -applies an argued callback function to each item in an array and returns that new array
+            -callback function can accept up to 3 parameters:
+                1. current value
+                    -value of the current item being processed
+                2. current index
+                    -index of the current item being processed
+                3. this array
+                    -reference to the entire array being processed
+            *************************************************************************************************
+            -i.e.   // take an array and returns an array of strings resembling HTML list-items
+                    const groceries = ["pearl onions", "cremini mushrooms", "thyme"];
+                    const groceryList = groceries.map( item => `<li>${item}</li>` );
+
+                    // returns an array of cubed numbers
+                    const values = [1, 2, 3, 4, 5];
+                    const cubes = values.map( val => val**3 );
+
+                (^ demonstrates .map() with strings and with numbers ^)
+                *************************************************************************************************
+
+        - .filter()
+            -called on an array and takes an argued callback function
+            -callback function can accept up to 3 parameters:
+                1. current value
+                    -value of the current item being processed
+                2. current index
+                    -index of the current item being processed
+                3. this array
+                    -reference to the entire array being processed
+            -callback must return either true or false boolean value
+            -returns a new array of only the items that returned true when the callback argued them
+            *************************************************************************************************
+            -i.e.   // filters the even numbers into a new array
+                    const values = [1, 2, 3, 4, 5];
+                    const evens = numbers.filter( val => val % 2 === 0 );
+
+                    // filters the grocery items that include the letter "o" into a new array
+                    const groceries = ["pearl onions", "cremini mushrooms", "thyme"];
+                    const oFoods = groceries.filter( item => item.includes("o") );
+
+                    // filters the even numbers into a new array and then cubes them each, returning the results in a new array
+                    const values = [1, 2, 3, 4, 5];
+                    const oddCubes = values.filter( val => val % 2 !==0 ).map( val => val**3 );
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------

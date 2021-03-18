@@ -1,0 +1,60 @@
+Gunicorn
+Objectives:
+Set up gunicorn
+
+You may remember that Gunicorn is our process manager. Let's get it set up.
+
+Let's first test Gunicorn by directing it to our Django project's wsgi.py file, which is the entry point to our application.
+
+(venv) ubuntu@54.162.31.253:~myRepoName$ gunicorn {{project_name}}.wsgi
+If your Gunicorn process ran correctly, you will see something like the following printed to the terminal:
+
+[2016-12-27 05:45:56 +0000] [8695] [INFO] Starting gunicorn 19.6.0
+[2016-12-27 05:45:56 +0000] [8695] [INFO] Listening at: http://0.0.0.0:8000 (8695)
+[2016-12-27 05:45:56 +0000] [8695] [INFO] Using worker: sync
+[2016-12-27 05:45:56 +0000] [8700] [INFO] Booting worker with pid: 8700
+Exit the process by typing ctrl-c.
+
+Deactivate the virtual env by typing deactivate
+
+Now we're going to set up Gunicorn to run as a service. You'll be using systemd as your init system to manage and control aspects of your server including services. The primary advantage of turning Gunicorn into a service is that Gunicorn will start with the server after being rebooted and once configured will just work. To be able to turn Gunicorn on and off, we're going to create a systemd service file and make some changes.
+
+ubuntu@54.162.31.253:~myRepoName$ sudo vim /etc/systemd/system/gunicorn.service
+In the VIM text editor, copy and paste the following code. Don't forget to type i before copying and pasting the lines below!
+
+[Unit]
+Description=gunicorn daemon
+After=network.target
+[Service]
+User=ubuntu
+Group=www-data
+WorkingDirectory=/home/ubuntu/{{myRepoName}}
+ExecStart=/home/ubuntu/{{myRepoName}}/venv/bin/gunicorn --workers 3 --bind unix:/home/ubuntu/{{myRepoName}}/{{projectName}}.sock {{projectName}}.wsgi:application
+[Install]
+WantedBy=multi-user.target
+Now that our service file has been created, we can enable it so it starts on boot.
+
+ubuntu@54.162.31.253:~$ sudo systemctl daemon-reload	# systemctl ends with the letter L, not a number
+ubuntu@54.162.31.253:~$ sudo systemctl restart gunicorn
+ubuntu@54.162.31.253:~$ sudo systemctl status gunicorn
+You should see a green dot next to gunicorn.service and the lines "Booting worker with pid: ....". It should look like this;
+
+
+
+
+
+Note: if any additional changes are made to the gunicorn.service the previous three commands will need to be run in order to sync things up and restart our service.
+
+CHECK: Type ls. If you DO NOT see a {{projectName}}.sock file, double and triple check the file from above (case sensitivity, appropriate spacing, spelling, etc.).
+Troubleshooting Steps and Common Errors:
+If you see output that looks like this when you start your gunicorn service:
+
+
+It is likely that you cloned your repository with sudo or created your virtualenv with sudo. If that is the case, terminate your EC2 instance and start over.
+
+
+
+If you see output that looks like this:
+
+
+Read the error message it gives you. This will often be a typo in one of your configuration files. Another common error is not installing Gunicorn and Django in the same environment. Go over the steps again until you see the green dot output.

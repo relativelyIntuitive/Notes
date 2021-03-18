@@ -1,0 +1,427 @@
+
+ - TERMINAL NOTES -
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    WHAT IS THE TERMINAL?
+        -A command-line interface that connects to the local operating-system
+        -ALL terminals process only one line of code at a time
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    BASH VS. COMMAND PROMPT VS. POWERSHELL:
+        -Same concept, different commands
+        -Mac & most idistributions of Linux  use bash terminals
+        -Windows has Command Prompt (AKA CMD) and PowerShell pre-installed
+            -PowerShell is a more advanced version of CMD and is a scripting language as well as an interface
+                (useful to carry out administrative tasks easier than CMD)
+            -both use the same concepts as a Bash terminal, but different syntax
+            -neither have the same set of commands found on the Mac/Linux bash terminals
+        -gitBash for Windows has a few known issues running Python
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    BASH TERMINALS DEFAULT COMMAND LINE:
+        -   zbiel@Zeebos-Flex MINGW64 /
+            $
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    BASH-TERMINAL COMMANDS:
+        1. Generic:
+                - " sudo [+command] "
+                        -executes argued command with super-user permissions
+
+                - " pwd "
+                        -prints path of currently accessed directory to the terminal
+
+                - " ls "
+                        -prints list of contents of currently accessed directory
+
+                - " ls -a "
+                        -prints list of ALL contents of currently accessed directory, including hidden files
+
+                - " ls -l "
+                        -prints long-form list of the contents of the currently accessed directory
+
+                - " echo [+text] "
+                        -prints following text to the terminal window
+
+                - " cd ~ "
+                        -returns to base directory
+
+                - " cd . "
+                        -accesses current directory, like a refresh
+
+                - " cd .. "
+                        -accesses parent directory of computer
+
+                - " cd / "
+                        -accesses root directory of current directory
+
+                - " cd [+directory] "
+                        -changes the directory that is currently accessed
+
+                - " mkdir [+new_directory_name] "
+                        -creates a new folder in current directory, with given name
+
+                - " touch [+file_name.type] "
+                        -creates argued file in current directory
+
+                - " rm [+file_name.type] "
+                        -removes argued file, not folders
+
+                - " rmdir [+directory_name] "
+                        -removes argued folder if empty
+
+                - " rm -rf [+directory_name] "
+                        -removes argued folder, even if it's not empty
+
+                - " mv [+file_name.type] [+new_file_name.type] "
+                        -renames argued file to second argued name
+
+                - " mv [+file_name.type] [+directory_location/file_name.type] "
+                        -moves argued file to argued location, overwriting w/out prompting if called for
+
+                - " mv -i [+file_name.type] [+directory_location/file_name.type] "
+                        -prompts if overwriting before moving argued file to argued location
+
+                - " cp [+file_name.type] [+new_file_name.type] "
+                        -copies creates a copy of the argued file with the new file name
+
+                - " start [+directory_name] "
+                        -opens argued directory with Graphical User-Interface
+
+                - " code . "
+                        -opens curent directory in code editor
+
+                - " source [+environment_folder_name]/bin/activate "
+                        -keyword for activating a virtual environment
+
+                - " tree . "
+                        -displays tree structure of current directory
+
+                 " cmd //c tree " (on Windows Bash)
+                        -displays tree structure of current directory
+                        -same as tree on Linux???
+
+        2. Software-Specific:
+                -PIP:
+                        - " pip3 " must be used when venv is not active on a BASH terminal
+                                -you may use  " pip " when venv is active instead of  " pip3 "
+
+                        - " pip install [+package] "
+                                -will install the given package in the current environment, global or virtual
+
+                        - " pip install [+package]==[+version] "
+                                -will install the specified version of the given package if you want a certain version
+
+                        - " pip uninstall [+package] "
+                                -will un-install the given package in the current environment, global or virtual
+
+                        - " pip list " 
+                                -will list which packages are installed in the current venv
+
+                        - " pip freeze ] [+requirements.txt] "
+                                -will output the venv's installed packages in a requirements.txt file
+
+                        - " pip show [+package] "
+                                -will list details about the given package
+
+                        - " pip search [+query] "
+                                -will list search results of any packages included the query
+
+                -Python:
+                        - " python3 "
+                                -runs python shell within CMD with it's own commands too
+
+                        - " python(3?) [+file_name] "
+                                -runs python file
+
+                -Django:
+                        - " django-admin startproject [+project_name] "
+                                -creates django project
+
+                        - " python manage.py runserver "
+                                -starts the server on port 8000 as default
+
+                        - " python manage.py startapp [+app_name] "
+                                -creates a new app in the project folder, which you must currently be accessing
+
+                        - " python manage.py shell "
+                                -opens Django shell
+
+                -Node.Js:
+                        -  "  sudo chown -R $(whoami) /usr/local/  "
+                                -grants the ability to write files into  " usr/local/ "
+                                -common issue with Macs blocking the ability
+
+                        -  "  node  "
+                                -launches node shell
+
+                        -  "  node -v  "
+                                -prints currently installed version of Node
+
+                        -  "  node [+file_name.js]  "
+                                -runs entire JS file
+
+                        -  "  nodemon [+file_name.js]  "
+                                -runs entire JS file with Nodemon 
+
+                -NPM
+                        - "  sudo npm install [+package_name] "
+                                -installs specified package if found
+                                -can install multiple packages at once
+                                        - " npm install express mongoose "
+                                -add  " -g "  option after  " install "  to install package globally
+                                        -only if CERTAIN you want it on every NPM project you create!
+
+                        - "  sudo npm install "
+                                -to be used within a folder containing a  " package.json "  file
+                                -will install all dependencies indicated in the file
+
+                        - "  npx create-react-app [+project_name] "
+                                - " npx "  is a tool that comes with NPM 5.2 and higher
+                                -creates a NPM project within the current directory, with the given name
+
+                        - "  npm start "
+                                -starts React dev-server on default port 3000 and opens a tab for it
+
+                        - " npm init -y "
+                                -creates a "package.json" file within the current directory
+
+                        - " npx create-react-app [+app_name]"
+                                -creates a React app within the current directory
+
+                -MongoDB
+
+                        -Navigate to the "/bin" directory of MongoDB
+                                -i.e. " cd c:/"Program Files"/MongoDB/Server/<version_number>/bin/ "
+                                -Then open the shell
+                                        -i.e. " mongo.exe "
+
+                        - " show dbs "
+                                -shows all databases available on the current MongoDB server
+
+                        - " db "
+                                -shows the currently selected database
+
+                        - " use [+db_name] "
+                                -changes selected database to the one specified
+                                -if the db specified doesn't exist, Mongo shell will create a new database and then switch to it
+
+                        - " db.dropDatabase() "
+                                -deletes the currently selected db
+                                -make sure that the proper db is selected first!
+
+                        - " show collections "
+                                -shows all collections in a db
+
+                        - " db.createCollection("[+collection_name]") "
+                                -creates a new collection in the current database
+                                -make sure the proper db is selected first!
+
+                        - " db.[+collection_name].drop() "
+                                -destroys the specified collection
+                                -MUST have the right db selected, that contains the specified collection!
+
+                -Java
+
+                        - " javac "
+                                -displays info on the current Java version
+                                -if the command prints an error to the terminal, the "/bin" folder may need to be added to the user/system "Path" variables
+                                        -common Windows error!
+                                -it is also used to compile a .java file!
+                                        -i.e. " javac HelloWorld.java "
+                                        -this will create a .class file containing "bytecode" that will be run!
+                                                -"bytecode" is computer independent but partially compiled
+
+                        - " java "
+                                -runs the .class file that the " javac " created!
+
+                        - " -Xlint:deprecation "
+                                -flag to add to " javac " terminal command that provides more info on deprecations
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    COMMAND PROMPT TERMINAL DEFAULT LINE:
+        -   C:\Users\zbiel]
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    COMMAND-PROMPT TERMINAL COMMANDS:
+        1. Generic:
+                - " cls "
+                        -clears terminal
+                        
+                - " [+drive letter]: "
+                        -switches to given drive
+
+                - " type nul > [+new_file_name].[+type] "
+                        -creates a new file of a given name and type
+
+                - " del [+file_name] "
+                        -deletes specified file if in current directory
+                        -will ask to confirm first
+
+                - " mkdir [+new_directory_name] "
+                        -creates new directory with the given name
+
+                - " rmdir [+directory_name] "
+                        -deletes specified directory if in current directory
+                        -will not ask to confirm before delete
+
+                - " dir "
+                        -displays contents of the current directory
+
+                - " cd [+directory_name] "
+                        -changes to the indicated directory
+
+                - " cd .. "
+                        -navigates to parent directory
+
+                - " cd - "
+                        -navigates to previous directoy
+
+                - " cd / "
+                        -navigates to the root directory
+
+                - " start . "
+                        -opens current directory in GUI
+
+                - " call [+environment_folder_name]\Scripts\activate "
+                        -keyword for activating a virtual environment
+
+        2. Software-Specific:
+
+                -PIP:
+                        - " pip install [+package] "
+                                -will install the given package in the current environment, global or virtual
+
+                        - " pip install [+package]==[+version] "
+                                will install the specified version of the given package if you want a certain version
+
+                        - " pip uninstall [+package] "
+                                -will un-install the given package in the current environment, global or virtual
+
+                        - " pip list "
+                                -will list which packages are installed in the current venv
+
+                        - " pip freeze ] [+requirements.txt] "
+                                -will output the venv's installed packages in a requirements.txt file
+
+                        - " pip show [+package] "
+                                -will list details about the given package
+
+                        - " pip search [+query] "
+                                -will list search results of any packages included the query
+
+                -Python:
+                        - " python "
+                                -runs python shell within CMD with it's own commands too
+
+                        - " python [+file_name] "
+                                -runs python file
+
+                -Django:
+                        - " django-admin startproject [+project_name] "
+                                -creates a new Django project in the current folder
+
+                        - " python manage.py runserver "
+                                -starts the server on port 8000 as default
+
+                        - " python manage.py startapp [+app_name] "
+                                -creates a new app in the project folder, which you must currently be accessing
+
+                        - " python manage.py shell "
+                                -opens Django shell
+
+                -Node.Js:
+                        -  "  node  "
+                                -launches node shell
+
+                        -  "  node -v  "
+                                -prints currently installed version of Node
+
+                        -  "  node [+file_name.js]  "
+                                -runs entire JS file
+
+                        -  "  nodemon [+file_name.js]  "
+                                -runs entire JS file with Nodemon 
+
+                -NPM:
+                        -  " npm install [+package_name] "
+                                -installs specified package if found
+                                -can install multiple packages at once
+                                        - " npm install express mongoose "
+                                -add  " -g "  option after  " install "  to install package globally
+                                        -only if CERTAIN you want it on every NPM project you create!
+
+                        -  " npm install "
+                                -to be used within a folder containing a  " package.json "  file
+                                -will install all dependencies indicated in the file
+
+                        -  " npx create-react-app [+project_name] "
+                                - " npx "  is a tool that comes with NPM 5.2 and higher
+                                -creates a NPM project within the current directory, with the given name
+
+                        -  " npm start "
+                                -short for " npm run start "
+                                -starts React dev-server on default port 3000 and opens a tab for it
+
+                        - " npm init -y "
+                                -creates a "package.json" file within the current directory
+
+                        - " npx create-react-app [+app_name]"
+                                -creates a React app within the current directory
+
+                -MongoDB
+
+                        -Navigate to the "/bin" directory of MongoDB
+                                -i.e. " cd c:/"Program Files"/MongoDB/Server/<version_number>/bin/ "
+                                -Then open the shell
+                                        -i.e. " mongo.exe "
+
+                        - " show dbs "
+                                -shows all databases available on the current MongoDB server
+
+                        - " db "
+                                -shows the currently selected database
+
+                        - " use [+db_name] "
+                                -changes selected database to the one specified
+                                -if the db specified doesn't exist, Mongo shell will create a new database and then switch to it
+
+                        - " db.dropDatabase() "
+                                -deletes the currently selected db
+                                -make sure that the proper db is selected first!
+
+                        - " show collections "
+                                -shows all collections in a db
+
+                        - " db.createCollection("[+collection_name]") "
+                                -creates a new collection in the current database
+                                -make sure the proper db is selected first!
+
+                        - " db.[+collection_name].drop() "
+                                -destroys the specified collection
+                                -MUST have the right db selected, that contains the specified collection!
+
+                 -Java
+
+                        - " javac "
+                                -displays info on the current Java version
+                                -if the command prints an error to the terminal, the "/bin" folder may need to be added to the user/system "Path" variables
+                                        -common Windows error!
+                                -it is also used to compile a .java file!
+                                        -i.e. " javac HelloWorld.java "
+                                        -this will create a .class file containing "bytecode" that will be run!
+                                                -"bytecode" is computer independent but partially compiled
+
+                        - " java "
+                                -runs the .class file that the " javac " created!
+
+                        - " -Xlint:deprecation "
+                                -flag to add to " javac " terminal command that provides more info on deprecations
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -1,0 +1,51 @@
+Setup
+Objectives:
+Get our local Python project ready for deployment
+
+Before we create our server we have to do some setup first. Choose a Django project with a database and let's get started!
+
+When we are finished, our virtual machine will be set up to serve any Django project. This will enable you to make an easy swap with a new project (like your belt). We'll show you how later.
+
+In this first section, we will be navigating around on our local machine. If you are using Unix (Mac), or Linux, these commands should look familiar to you. If you are on Windows, you will want to use git bash (i.e. not command prompt) for the purposes of deployment.  These commands will also work in git bash.
+
+Make sure the appropriate virtual environment is activated.
+Once the virtual environment is activated, navigate into the correct project directory (same level as manage.py). We need to take a snapshot of all the installed pip modules into a .txt file. We'll use this file to install all of the required pip modules on our remote machine with a single command.
+
+*************************************************************************************************
+(djangoPy3Env) project_name$ pip freeze > requirements.txt
+*************************************************************************************************
+
+Open the requirements.txt file and, if they exist, remove pygraphviz, pydot and anything with MySQL in it. These modules can be tricky to install and require additional installations, so we remove them now to prevent problems later.
+Time to make a git repo! Make sure you're in the project directory (the same level as manage.py). First, let's create a .gitignore file.
+
+(djangoPy3Env) project_name$ touch .gitignore
+As the name implies, your gitignore file tells git to ignore any files, directories, etc. you include in the file.
+
+Open your .gitignore file in your text editor and add these lines:
+
+*************************************************************************************************
+project_name/.gitignore
+.vscode
+env/
+venv/
+__pycache__/
+.vscode/
+db.sqlite3
+*************************************************************************************************
+
+Now initialize a git repository:
+
+*************************************************************************************************
+(djangoPy3Env) project_name$ git init
+(djangoPy3Env) project_name$ git add --all
+(djangoPy3Env) project_name$ git commit -m "initial commit"
+*************************************************************************************************
+
+Create a new GitHub repo on GitHub. Copy the url of the new repository.
+
+In the terminal, run the commands (GitHub also provides these instructions upon repo creation):
+
+*************************************************************************************************
+(djangoPy3Env) project_name$ git remote add origin https://github.com/your_github_username/your_github_repo_name
+(djangoPy3Env) project_name$ git push origin master
+*************************************************************************************************

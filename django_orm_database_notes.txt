@@ -1,0 +1,566 @@
+
+ - DJANGO ORM DATABASE NOTES -
+
+GENERAL:
+-Stands for "object-relational-mapper"
+-Concept of using "Models" to make a database
+    -each class model is a table
+        -every instance of a class is a row of the table
+        -each field of each row is an attribute of the class
+    -"Models" are simply classes that map to db tables, with "fields" as their attributes
+-these Models are the "M" in "MTV"
+    -their purpose is to do the work of interacting with the database, whether retrieving or submitting info
+    -the phrase "skinny controllers and fat models" is often used to describe this design pattern
+        -generally, heavy logic like db queries, should be performed by the Model
+            -if a controller (views.py) needs to perform logic or get information from the db, it should use a Model method to do so
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+MODELS:
+    *************************************************************************************************
+    -i.e.   "APP_NAME\MODELS.PY"
+            from django.db import models
+
+            class Director(models.Model):
+                name = models.CharField(max_length=255)
+                movies = models.ManyToManyField(Movie, related_name="directors")    # doesn't matter which model has the .ManyToManyField()
+                created_at = models.DateTimeField(auto_now_add=True)
+                updated_at = models.DateTimeField(auto_now=True)
+                # movies = list of all movies
+
+            class Movie(models.Model):
+                title = models.CharField(max_length=45)
+                director = models.ForeignKey(Director, related_name="movies", on_delete = models.CASCADE)   # .ForeignKey() field goes to the "many" model
+                description = models.TextField()
+                created_at = models.DateTimeField(auto_now_add=True)
+                updated_at = models.DateTimeField(auto_now=True)
+            (^ creates 2 models, demonstrating the .ForeignKey() value for a one-to-many relationship, and a .ManyToManyField() value for a many-to-many ^)
+            *************************************************************************************************
+        -CONVENTION is to capitalize Model name ("Movie" above)
+        -"Models" file is imported from "models" file so individual models (children) may be created w/out redefining "Model" class (parent)
+            -i.e "Model" class already has a built in "id" field that generates an auto-incremented id for children
+                -besides "id" field, every field from ERD is represented as a class attribute
+                -users id incrementing will be based on users created during the entire life of the db, as old records are saved for audit
+                    -if users with id's 1-3 are deleted, the next user created will continue at id=4, NOT start over at 1
+            -also don't have to write a separate __init__ method for each class
+            -"director" field here is foreign-key referencing the Movie instance's director, which takes 3 necessary arguments
+                -arg#1 references the class of the parent instance
+                -arg#2 specifies the "related_name" field for the parent instance that links to all children
+                    -some devs add a commented line to the parent class to keep track of it
+                    -"Director.objects.movies.all()" returns a list of all the director's movies
+                -arg#3 specifies what to do "on_delete"
+                    -in this case, deletes the other key-linked entry when one is deleted
+
+    -There are many data types for these fields that must be specified
+        -like "title = models.CharField(max_length=45)"
+        -some common data types:
+            - "CharField()"
+                -text that a user may enter. One required parameter, max_length, that is the max length of text that can be saved
+
+            - "TextField()"
+                -like a CharField w/o max length...use with caution or users could exploit
+
+            - "IntegerField()"
+                -holds an integer value
+
+            - "FloatField()"
+                -holds a float value; good for numbers with potentially a varying amount of decimal places
+
+            - "DecimalField()"
+                -good for a number w/fixed amount of decimal places, like currency
+
+                -2 required parameters:
+                    -"max_digits" refers to the total amount of digits (before and after the decimal place)
+                    -"decimal_places" refers to amount of decimal places
+
+            - "FileField()"
+                -holds an uploaded file
+                -post data accessed via request.FILE['<+file_variable>']
+                    -dictionary with a key for each FileField
+
+            - "BooleanField()"
+                -holds boolean value
+
+            - "DateTimeField()"
+                -combination of specific date AND time
+                -takes 2 very useful (optional) parameters
+                    -"auto_now_add=True" adds current date/time when an object is created
+                    -"auto_now=True" automatically updates any time the object is modified.
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+MANAGING DJANGO ORM DATABASE:
+    -ORM contains methods that actually perorm SQL queries
+        -can help address some security concerns by sanitizing user-provided data, preventing SQL injection attacks
+    -Django has it's own database that is automatically created inside the project directory
+        -"db.sqlite3" is the file, DO NOT delete it!
+            -not human-readable
+        -this makes SQL queries to this database unnecessary!
+            -it is still possible though!
+            -allows using pure Python code to query instead of managing cumbersome SQL queries
+                -SQL queries become very long when making complex queries
+        -the database is still written in SQL, but the ORM translates each row in a table to an instance of a Python class
+            -each of the database fields becomes an attribute of the class
+        -migration must occur before the db can be used
+        *************************************************************************************************
+        -i.e.   python manage.py makemigrations
+                python manage.py migrate
+            (^ first line stages and then second line commits the migration ^)
+            *************************************************************************************************
+        -"makemigrations" checks code, verifies that it is proper, then stages the changes
+        -"migrate" commits the changes, building and executing the SQL queries
+        -this process is split into two steps to prevent unnecessary errors from committing bad code
+        -NEVER delete migration files. Just stage and commit changes to them
+            -UNLESS you have no options left. 
+            -Delete these things:
+                -db.sqlite3
+                -your_app/migrations
+                -your_app/__pycache__
+            -re-migrate with the app-name in the command
+                *************************************************************************************************
+                -i.e.   python manage.py makemigrations your_app_name
+                        python manage.py migrate
+                    (^ re-migrates, specifying the app-name ^)
+                *************************************************************************************************
+            -this is very last resort! Database should not be deleted after creation, or its edit history will be lost and impossible to audit!
+        -On altering models after creation/migration:
+            -you can't add a column/field to a database table/model without providing a value for it for every row/instace.
+            -if you try, you will get an error that either specifies a default argument for all existing fields, or for all existing AND future fields
+                -default can be nullable also..."null=True"
+            -make sure to MIGRATE afterwards!
+        -SQLite comes pre-packaged with Django and is useful for development because it is stored as local memory and so loads very fast
+            -not recommended for use when the application is ready for production, but switching databases is very simple
+            -Django ORM models and queries will always be the same no matter which database is in use
+    -Django has it's own shell that is used for interacting with models and making queries
+        *************************************************************************************************
+        -i.e.   python manage.py shell
+            (^ starts Django shell when entered from root project directory ^)
+            *************************************************************************************************
+        -once in the Django shell, all functions and classes in the current project's files can be accessed by importhing the modules (files) that're needed
+            *************************************************************************************************
+            -i.e.   from <+app_name>.models import *
+                (^ imports everything(*) from the models module within an app's directory ^)
+                *************************************************************************************************
+                -importing EVERYTHING (*) is BAD PRACTICE and limitted to test of code that you wrote yourself, for a few reasons:
+                    1. provides the opportunity for namespace collisions (say if you had an existing variable w/same name of an imported one)
+                    2. may be inefficient, if the number of objects imported is big
+                    3. doesn't explicitly document origin of variable/method/class (nice to have this "self documentation" for future viewing of the code)
+            -imports must be re-run EVERY TIME the shell is started, and also once at the top of the "views.py" controller
+        -"DB Browser for SQLite" is a useful tool for browsing SQLite databases that is more user friendly than the shell
+            -various VS extensions also make this possible without having to leave VS
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+CRUD:
+    -Remove the "()" from these methods when they are being used in an HTML template
+    -Output tip:
+        -in the shell, printing whole objects results in something like <Movie Object (1)>
+        -to change how our models display, __str__ method can be overwritten in any class to instead return a string readout of the model like so:
+            *************************************************************************************************
+            -i.e.   classcopy Movie(models.Model):
+                        # fields removed for brevity
+                        def __str__(self):
+                            return f"<Movie object: {self.title} ({self.id})>"
+                (^ outputs the object like "<Movie object: Waking Life (1)>" instead of "<Movie Object (1)> ^)
+                *************************************************************************************************
+            -the __str__ method determines how the object is displayed as a string
+                -"<<+object_class> Object (<+object_id>)>" is the default way the method outputs
+                    -like when it is output to the console in string form!
+
+    *************************************************************************************************
+    -i.e.   "MODELS.PY"
+
+            class Director(models.Model):
+                name = models.CharField(max_length=255)
+                created_at = models.DateTimeField(auto_now_add=True)
+                updated_at = models.DateTimeField(auto_now=True)
+                # movies = a list of the directors movies
+
+            class Movie(models.Model):
+                title = models.CharField(max_length=45)
+                director = models.ForeignKey(Director, related_name="movies", on_delete = models.CASCADE)
+                release_date = models.DateField()
+                duration = models.IntegerField()
+                created_at = models.DateTimeField(auto_now_add=True)
+                updated_at = models.DateTimeField(auto_now=True)
+        (^ model used for following CRUD examples ^)
+        *************************************************************************************************
+
+    1. C - Create
+        (By default, all fields in our models are non-nullable, meaning all fields are required upon creation. See Django documentation on how to change?)
+
+        - .create()
+            *************************************************************************************************
+            -i.e.   Movie.objects.create(title="The Princess Bride", director=Director.objects.get(id=2), author,release_date="1987-09-25",duration=98)
+                (^ returns instance of the model with all values argued ^)
+                *************************************************************************************************
+            -can be stored in a variable also to be used after return
+            *************************************************************************************************
+            -i.e.   newly_created_movie = Movie.objects.create(title="The Princess Bride", director=Director.objects.get(id=2), author,release_date="1987-09-25",duration=98)
+                    print(newly_created_movie.id)
+                (^ creates a new movie, linked to it's director with a foreign-key ^)
+                *************************************************************************************************
+            -foreign-key field can also reference a variable that the parent instance is stored inside 
+
+        -Another way to add a row to our database is by creating an instance of the class and saving it, like so:
+            *************************************************************************************************
+            -i.e.   newly_created_movie = Movie(title="The Princess Bride", director=Director.objects.get(id=2) ,release_date="1987-09-25",duration=98)
+                    newly_created_movie.save()
+                (^ stores an instance in a variable without "creating" it and then saves it to the table, "creating it" ^)
+                *************************************************************************************************
+
+    2. R - Read
+        1. Methods that return a single instance of a class:
+            -when we are working with a single instance, we can access any of the instance's values with dot notation
+                *************************************************************************************************
+                -i.e.   print("Movie 7", one_movie.title)
+                        print("First movie", first_movie.release_date)
+                        print("Last movie", last_movie.description)
+                    (^ prints various values of different instances of the Movie class ^)
+                    *************************************************************************************************
+
+            - .first()
+                -gets the first record in the table (by primary id)
+                *************************************************************************************************
+                -i.e.   first_movie = Movie.objects.first()
+                    (^ returns the instance of the Movie object with the lowest id and stores it in a variable ^)
+                    *************************************************************************************************
+
+
+            - .last()
+                -gets the last record in the table (by primary id)
+                *************************************************************************************************
+                -i.e.   last_movie = Movie.objects.last()
+                    (^ returns the instance of the Movie object with the highest primary id and stores it in a variable ^)
+                    *************************************************************************************************
+
+            - .get()
+                -gets the record in the table with the specified id
+                -this method will throw an error unless only and exactly one record matches the query
+                *************************************************************************************************
+                -i.e.   one_movie = Movie.objects.get(id=7)
+                    (^ returns the instance of the Movie class w/id of 7 and stores it in a variable ^)
+                    *************************************************************************************************
+
+            - .__dict__
+                    -append to a query of a single instance
+                    -returns all the values of a single instance as a dictionary
+                *************************************************************************************************
+                -i.e.   factSheet2 = Movie.objects.get(id=2).__dict__
+                    (^  stores a the returned movie instance as a dictionary in the factSheet2 variable ^)
+                    *************************************************************************************************
+
+            - .aggregate()
+                    -can aggregate all fields with various functions
+                    -returns a dictionary with concatenated keys and function result values
+                        -"<+field_name>__<+aggregateFunc>" = result of func on field
+                *************************************************************************************************
+                -i.e.   from django.db.models import Avg, Max, Min, Sum
+                        Book.objects.aggregate(Avg('price'), Max('price'), Min('price'))
+                        {'price__avg': 34.35, 'price__max': Decimal('81.20'), 'price__min': Decimal('12.99')}
+                    (^ aggregates the average, minimum and maximum price over the whole "Book" table ^)
+                    *************************************************************************************************
+
+            - Joins happen automatically in Django
+                *************************************************************************************************
+                -i.e.   some_book.author.name
+                        some_book.author.id
+                    (^ "some_book" table and "author" table are automatically joined via the book's foreign key to the author ^)
+                    *************************************************************************************************
+
+        2. Methods that return an iterable list of instances of a class
+
+            - __
+                -used for advanced queries like..
+                    - __gt = number or date
+                    - __startswith = "String"
+                    - __contains = "String"
+                    -can link related objects together too
+            - .all()
+                -i.e.   Movie.objects.all()
+                    (^ selects all of the movie instances on the "table" ^)
+
+            - .filter()
+                -takes fields/values as arg(s) and returns a list of all matching instances
+                -can navigate joined tables as well
+                *************************************************************************************************
+                -i.e.   Movie.objects.filter(director=Director.objects.get(id=2), etc)
+                    (^ retrieves a list of all movie instances matching the the argued director value from it's joined table ^)
+                    *************************************************************************************************
+
+            - .exclude()
+                -gets any records not matching the query provided
+                *************************************************************************************************
+                -i.e.   other_movies = Movie.objects.exclude(release_date='2018-11-16')
+                    (^ returns a list of all movies that EXCLUDING those which have a release_date of 2018-11-16 ^)
+                    *************************************************************************************************
+
+            - .values()
+                -returns a list OF DICTIONARIES 
+                -like __dict__???
+                *************************************************************************************************
+                -i.e.   all_movies = Movie.objects.all().values()
+                    (^ returns a list of all movies in dictionary form and stores it in a list variable ^)
+                    *************************************************************************************************
+            
+            - .count()
+                -returns the length of a queryset
+                *************************************************************************************************
+                -i.e.   Director.objects.first().movies.count()
+                    (^ returns count of movies the first director instance has made ^)
+                    *************************************************************************************************
+
+    3. U - Update
+        -"<+instance>.save()"
+            -need to obtain an instance before updating it, like deleting
+            *************************************************************************************************
+            -i.e.   c = ClassName.objects.get(id=1)
+                    c.field_name = 'some new value for field_name'
+                    c.save()"
+                (^ returns an instance, stores it in a variable, updates the "field_name" attribute and then saves it ^)
+                *************************************************************************************************
+
+        -"ClassName.objects.all().order_by("field_name")"
+            -orders by field provided, ascending
+
+        -"ClassName.objects.all().order_by("-field_name")"
+            -orders by field provided, descending
+
+        - .add() & .remove()
+            -updating a many-to-many relationship or one-to-many relationship will automatically become symmetrical
+            *************************************************************************************************
+            -i.e.   this_publisher.books.remove(this_book)
+                    this_book.publishers.remove(this_publisher)
+                (^ each line does the same thing ^)
+                *************************************************************************************************
+            -when one side of the relationship is editted, the other side gets updated to match
+            
+    4. D - Delete
+        -"<+instance(s)>.delete()"
+            -need to obtain instance or list of instances before deleting it/them, like updating
+            *************************************************************************************************
+            -i.e.   c = ClassName.objects.get(id=1)"
+                    c.delete()"
+                (^ returns an instance, stores it in a variable and then deletes it ^)
+                *************************************************************************************************
+
+    -queries can be used to pass context to templates as well!
+        *************************************************************************************************
+        -i.e.   "VIEWS.PY"
+                def index(request):
+                    context = {"directors": Director.objects.all()}
+                    return render(request, "index.html", context)
+
+                "INDEX.HTML"
+                <h1>Director List</h1>
+                <ul>
+                {% for director in directors %}
+                    <li>{{director.name}}
+                    <ul>
+                        {% for movie in director.movies.all %}	
+                        <li><em>{{movie.title}}</em></li>
+                        {% endfor %}
+                    </ul>
+                    </li>
+                {% endfor %}
+                </ul>
+            (^ retrieves a list of all directors, then loops through them to create a list for each, populating them by looping through their movies ^)
+            *************************************************************************************************
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+VALIDATIONS:
+
+    *************************************************************************************************
+    -i.e.   "MODELS.PY"
+            from django.db import models
+
+            class BlogManager(models.Manager):
+                def basic_validator(self, postData):
+                    errors = {}
+                    # add keys and values to errors dictionary for each invalid field
+                    if len(postData['name']) < 5:
+                        errors["name"] = "Blog name should be at least 5 characters"
+                    if len(postData['desc']) < 10:
+                        errors["desc"] = "Blog description should be at least 10 characters"
+                    return errors
+
+            class Blog(models.Model):
+                name = models.CharField(max_length=255)
+                desc = models.TextField()
+                created_at = models.DateTimeField(auto_now_add = True)
+                updated_at = models.DateTimeField(auto_now = True)
+                objects = BlogManager() 
+
+            "VIEWS.PY":
+            from django.shortcuts import render, HttpResponse, redirect
+            from django.contrib import messages
+            from .models import Blog
+
+            def update(request, id):
+                # pass the post data to the method we wrote and save the response in a variable called errors
+                errors = Blog.objects.basic_validator(request.POST)
+                    # check if the errors dictionary has anything in it
+                if len(errors) > 0:
+                    # if the errors dictionary contains anything, loop through each key-value pair and make a flash message
+                    for key, value in errors.items():
+                        messages.error(request, value)
+                    # redirect the user back to the form to fix the errors
+                    return redirect('/blog/edit/'+id)
+                else:
+                    # if the errors object is empty, that means there were no errors!
+                    # retrieve the blog to be updated, make the changes, and save
+                    blog = Blog.objects.get(id = id)
+                    blog.name = request.POST['name']
+                    blog.desc = request.POST['desc']
+                    blog.save()
+                    messages.success(request, "Blog successfully updated")
+                    # redirect to a success route
+                    return redirect('/blogs')
+            
+            "INDEX.HTML"
+            {% if messages %}
+            <ul class="messages">    
+                {% for message in messages %}    
+                    <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>    
+                {% endfor %}
+            </ul>
+            {% endif %}
+
+        (^ creates a validator method, ^)
+        *************************************************************************************************
+    -Validator MUST go before the definition of the class that it validates!
+    -Validator inherits from "models.Manager" instead
+        -will not make this class into a table!
+            -db does NOT need migration after altering a "models.Manager" class!
+    -Validator creates empty dictionary and possible errors to fill it with, returning it either empty or filled at the end
+    -"objects" attribute defaults to allowing .all() and .get() to be used
+        -methods of the BlogManager class become available through .objects, such as ".basic_validator()" in this case
+    -".basic_validator() is called on the current "request.POST" in the views.py module and fills the "errors" variable with any errors returned by it
+        -if error's are found, user is notified via Django's "messages" framework and then redirected to the edit page to fix them
+        -otherwise, the data is updated as usual
+    -The HTML conditional must be placed at the point in the HTML where you want any found errors to be shown
+    -"Regular Expressions" or "RegEx's" are series' of characters that define a search pattern
+        *************************************************************************************************
+        -i.e.   "MODELS.PY"
+                import re	# the regex module
+
+                class BlogManager(models.Manager):
+                    def basic_validator(self, postData):    
+                        errors = {}
+                        EMAIL_REGEX = re.compile(r'^[a-zA-Z0-9.+_-]+@[a-zA-Z0-9._-]+\.[a-zA-Z]+$')
+                        today = date.today()
+
+                        if not EMAIL_REGEX.match(postData['email']):    # test whether a field matches the pattern            
+                            errors['email'] = "Invalid email address!"
+
+                        if postData['bday'] > str(today)
+                            errors['bdayFuture'] = "No time travel allowed!"
+
+                        return errors
+            (^ uses a regex to check the given email, and converts the date to a string to check if the bday is valid  ^)
+            *************************************************************************************************
+            -"re" model must be imported
+            -"r'^[a-zA-Z0-9.+_-]+@[a-zA-Z0-9._-]+\.[a-zA-Z]+$' " is the Python regex for email validation
+                -the proceeding "r" indicates that what follows is a "raw string", and that ALL characters should be taken literally
+            -".match()" 
+                -method will return "None" the argued data does not match the pattern
+            -"<+string>.isalpha()"
+                -returns a boolean based on whether or not the given string is made entirely of alphabet letters
+            -"time.strptime(<+string>, <+format>)"
+                -converts the argued string into a time expressed in the argued format
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+HASHING & ENCRYPTION:
+    1. (bcrypt) Hashing:
+        -1-way process
+            -there is no way to decode hashed data
+            -often used for password storage and validation
+        -data is "hashed" without producing a key
+        -same data will always produce the same "hash"
+            -data can be hashed to see if it matches stored hashed data
+        -problem would be that common passwords can be hashed and then their hashes checked against the db
+
+            -MD5() hashing algo solution (outdated):
+                -"salts" passwords by adding a random string to their ends before hashing so that hackers would need the "salt" to decipher
+                -if they broke into the server and figured out the "salt" string they could guess and check password hashes like normal though
+                -each user should have their own "salt" so that hackers have to guess each password hash for EACH user!
+                    -if the dictionary is longer that a few hundred users, the hacking algo would take a veeerrrryyyyy long time
+                -MD5 is a fast algo, but it works by slowing down the hackers
+                    -it would be more effective if it was slower, like Bcrypt
+
+            -Bcrypt solution (best):
+                -must install with pip!
+                    -"pip install bcrypt"
+                -generates unique salt per password
+                -otherwise the same also, but the hashing algo is designed to be slow
+                *************************************************************************************************
+                -i.e.   >>> import bcrypt
+                        >>> hash1 = bcrypt.hashpw('test'.encode(), bcrypt.gensalt()).decode()
+                        >>> print(hash1)
+                        $2b$12$Wdc2qwiP6u0WdQdKwmer7.DMIcY6q76GxvrJgaodnpRDmpP8mwkDa
+                    (^ creates a salt to apply to "test" before hashing the sum ^)
+                    *************************************************************************************************
+                -"bcrypt.gensalt()" generates a salt for the second arg of the bcrypt.hashpw() method call
+                    -the salt generated can be stored as a variable to be argued instead of the method call, if you want to use it over again
+                -all strings in Python are "unicode" by default, but all cryptographic functions only work on "byte" strings 
+                    -the hashing function result must be converted from "byte" to "unicode"
+                    -".encode()" converts the "unicode" string into a "byte" string
+                    -".decode()" converts the returned "byte" string into "unicode"
+                        -i.e.   $2b$12$Wdc2qwiP6u0WdQdKwmer7.DMIcY6q76GxvrJgaodnpRDmpP8mwkDa
+                            -"2b" between first 2 $'s represents the Bcrypt ID, "2b"
+                            -"12" beween second 2 $'s tells how many rounds of hashing were done, 12 in this case
+                                -this is what results in Bcrypt being so intentionally slow
+                            -the next 22 characters before the "." represent the 128-bit salt
+                            -the rest represents the 184-bit hash
+                -"bcrypt.checkpw()" takes 2 hashed args to compare
+                    -the order of arguments matters - the first is the input being tested and the second is the value that was already hashed
+                    -both args must be the same data to get a match
+                    -returns a boolean based on whether or not they match
+                -the following examples do not include validations, but of course they would be validated IRL
+                    *************************************************************************************************
+            i.e.    "VIEWS.PY"
+
+                    def register():
+                        password = request.POST['password']
+                        pw_hash = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
+                        print(pw_hash)
+                        User.objects.create(username=request.POST['username'], password=pw_hash)
+                        return redirect("/")
+
+                        # include some logic to validate user input before adding them to the database!
+                        # create the hash
+                        # prints something like b'$2b$12$sqjyok5RQccl9S6eFLhEPuaRaJCcH3Esl2RWLm/cimMIEnhnLb7iC'
+                        # be sure you set up your database so it can store password hashes this long (60 characters)
+                        # make sure you put the hashed password in the database, not the one from the form!
+                        # never render on a post, always redirect!
+
+                    def login():
+                        user = User.objects.filter(username=request.POST['username'])       
+                        if user:        
+                            logged_user = user[0] 
+                            if bcrypt.checkpw(request.POST['password'].encode(), logged_user.password.encode()):
+                                request.session['userid'] = logged_user.id
+                                return redirect('/success')
+                        return redirect("/")
+
+                        # why are we using filter here instead of get?
+                        # see if the username provided exists in the database
+                        # note that we take advantage of truthiness here: an empty list will return false
+                        # assuming we only have one user with this username, the user would be first in the list we get back
+                        # of course, we should have some logic to prevent duplicates of usernames when we create users
+                        # use bcrypt's check_password_hash method, passing the hash from our database and the password from the form
+                        # if we get True after checking the password, we may put the user id in session
+                        # never render on a post, always redirect!
+                        # if we didn't find anything in the database by searching by username or if the passwords don't match, 
+                        # redirect back to a safe route
+                        *************************************************************************************************
+
+    2. Encryption:
+        -2-way process
+            -"encrypted" data can be decoded
+            -often used for payment-method storage and validation
+        -Data is "encrypted" and a "key" is generated
+            -the "key" can be used to decode the data
+

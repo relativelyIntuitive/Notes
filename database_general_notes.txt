@@ -1,0 +1,171 @@
+
+ - DATABASE GENERAL NOTES -
+
+    DEVELOPMENT PROCESS:
+        -Wire-frame, Clickable-Prototype, then ERD last
+        -Every ERD should already have a specific wire-frame and clickable-prototype in existence
+        -{Design, UI/UX | Front-End(view), "middle-layer", Back-End(controller) | Database(model)}
+                       ^  ("full-stack developer" falls between these marks)   ^
+
+    TWO DATABASE TYPES:
+        1. Relational (SQL)
+            -Gathers the same required information from every user?
+                -More structured, but ensures adequate information is available 
+            -Examples:
+                -MySQL
+                -Oracle
+                -SQLite
+                -Postgres
+                -Microsoft SQL Server
+        2. Non-Relational (NoSQL)
+            -Gathers whatever information the user wants to provide?
+                -More flexible, but may not gather proper information
+            -Examples:
+                -MongoDB
+    
+    SOME SIMPLE DATA TYPES:
+        1. VARCHAR([+number of characters]):
+            -Stores non-numeric values up to 255 characters
+                (only takes up the space needed for the specific amount of characters)
+            -Should be used for values that have different character lengths
+
+        2. CHAR([+number of characters]):
+            -Also stores non-numeric values, but will always take up the space required for the argued amount of characters, regardless of the data
+            -Useful for when the data all consists of the same amounts of characters
+                (i.e. state abbreviations)
+
+        3. INT:
+            -Used to store integers
+            -Usually for identifier columns like SSN or phone-number, but also for whole-number counters or zip-codes
+            -Signed or Unsigned:
+                1. Unsigned: Can store integer values from 0 up to 4294967295
+                    (positive integers only)
+                2. Signed: Can store integer values from -2147483648 up to 2147483647
+                    (positive and negative integers)
+
+        4. BIGINT:
+            -Used to store huge integers
+            -Rarely used except for massive columns
+                (facebooks user ID column goes above billions)
+            -Signed or Unsigned:
+                1. Unsigned: Can store integer values from 0 up to 18446744073709551615
+                    (positive integers only)
+                2. Signed: Can store integer values from 9223372036854775807 to -9223372036854775808
+                    (positive and negative integers)
+
+        5. TINYINT:
+            -Used for numbers that will be relatively small
+                (i.e. level number from 1-9 or rating from 1-5)
+            -Signed or Unsigned:
+                1. Unsigned: Can store integer values from 0 up to 255     
+                    (positive integers only)  
+                2. Signed: Can store integer values from -128 to 127
+                    (positive and negative integers)
+
+        6. FLOAT:
+            -Used to store floating point numbers, that need decimals
+                (i.e. "item_cost")
+
+        7. TEXT:
+            -Used to store any amount of text that VARCHAR() is too small to handle
+                (i.e. descriptions, messages, comments)
+        
+        8. DATETIME:
+            -Used to store a date and time in the format of: YYYY-MM-DD hh::mm::ss
+                (i.e. "created_at" and "updated_at")
+
+
+    ERD (ENTITY-RELATIONSHIP-DIAGRAM): 
+        -Used to design how a database looks and behaves
+        -Consists of tables and the relationships between them
+            -Only one table is used for for Non-Relational databases
+        -Tuples are another name for the rows on a table
+    
+    RELATIONSHIP TYPES:
+        1. One-to-One:
+        [USER]-----[ADDRESS]
+            -Database has users
+            -Every user has 1 address
+            -Every user is linked to only one address that is linked only to them
+                (i.e. user and credit card, user and email addresse, product and image etc)
+
+        2. One-to-Many:
+        [USER]-|--<<[POSTS]
+            -Most common relationship
+            -Database has users
+            -Database has posts
+            -Every user can make many posts
+            -Every post can only be created by one user
+                (i.e. user and orders, states and cities, posts and comments  etc.)
+
+        3. Many-to-Many:
+        [USERS]>>--<<[PRODUCTS]
+            -Database has users
+            -Database has products
+            -Every user can buy many products
+            -Every product can be bought by many users
+                (i.e. users and interests, actors and movies, businesses and cities etc.)
+            -Many-to-many relationships must be translated to one-to-many relationships through joiner/connector tables
+                -joining table consists of 2 primary-keys, one referenced by each of its 2 parent tables 
+                -joining table called "Purchase" used to join users and products to create a purchase
+                    (one user and possibly many products per "purchase" etc.)
+                -joining table called "Sale" used to join sellers and products to create a sale
+                    (one seller and possibly many products per "sale" etc.)
+
+    KEY TYPES:
+        1. Super-Keys:
+            -Every table needs to have at least 1 super-key column named ID which is not a candidate-key
+                -tuple value should increment by 1 each tuple
+                -tuple value should not start at 0 
+
+        2. Candidate-Keys:
+            -Tuple attribute that is unique and non-null for all tuples on the table
+            -Every table has to have at least one candidate-key column
+            -All candidate keys are super-keys
+                (i.e. email-column)
+                (i.e. not gender or city columns)
+            -One candidate-key column will be selected to be used by other tables to reference tuples
+
+        3. Primary-Keys:
+            -The only candidate-key column that has been chosen to be used by other tables to reference tuples
+                (i.e. often ID super-key)
+            
+        4. Alternate/Secondary-Keys:
+            -Any candidate-key column that has not been chosen to be used as a primary-key
+                (i.e. email or address)
+
+        5. Foreign-Keys:
+            -A foreign-key is a field/collection of fields in one table that refers to an ID in another table
+                (the primary-key of another table is what is referenced by a foreign-key)
+            -Child-table contains the foreign-key that references its parent-tables primary-key
+            -Parent-table containins the primary-key that is referenced by the foreign key in its child-table
+        
+        6. Composite-Keys:
+            -Used when there are no candidate-keys on a table
+            -Combination of keys that is used in lieu of a candidate-key
+
+    DATABASE NORMALIZATION:
+        - Why Normalize?
+            -When tables and their relationships are normalized, data is not repeated
+                -Results in more efficient use of storage space
+            -Normalization also makes databases more modular, so a wider variety of custom tables can easily be created
+        - Forms of Normalization:
+            1. Each column entry should contain only one value!
+                -i.e. Names should be broken into first/last columns
+                -i.e. Addresses should be seperated into sub-columns or referenced with a foreign key to reduce noise       
+            2. Non-primary, foreign-key data must have unique values 
+                -i.e. if movie category values are repeated, primary/foreign-keys would be used to pull/pass categories from/to another table
+            3. Combine dependent non-key columns into 1 column that is filled with foreign keys
+                -i.e. publisher_name and publisher_rank columns on books table combined into publisher_id column 
+                    (full of foreign-keys referencing a publishers table w/name and rank columns)
+        - Conventions:
+            -It will be easier for other developers to understand your database if conventions are followed
+            -ORM (object-relational-mappers) software can automate many queries if certain conventions are followed
+                (most ORMs adhere to industry-standard conventions)
+            1. Make the parent table name plural and all lowercase
+            2. Use ID as the primary-key
+                (also make auto incremented)
+            3. Name foreign-keys singular_table_name_id when referencing a primary-key in another table's name 
+                (i.e. parent table named parents, child-table named "parent_id")
+            4. Use "created_at" and "updated_at" columns for timestamping in EVERY table created
+    

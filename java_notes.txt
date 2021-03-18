@@ -1,0 +1,1403 @@
+
+- JAVA NOTES -
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+GENERAL:
+
+    -Java statements MUST end with a ";" semi-colon!
+    -Java files are named with PascalCase by convention
+        -i.e. "HelloWorld.java"
+        -a.k.a. UpperCamelCase
+    -BUT method names are lowerCamelCase!
+        -AND verbs instead of nouns!
+            -i.e. " getValues() "
+    -Java has a well-developed ecosystem and API
+    -Java is backwards-compatible!
+    -Java is useful for almost any kind of application!
+        -games, websites, desktop, mobile, enterprise apps, etc!
+    -Java is object oriented
+    -every function must be in a class
+        -all functions in Java are technically methods!
+        -all methods in Java must be lowerCamelCase
+            -AND verbs instead of nouns!
+                -i.e. " getValues() "
+    -Java is a "compiled" language
+        -means that it gets compiled before it's run
+            -the compiler will analyze AND optimize code
+                -looks for repetitive code to optimize, making the program faster
+            -the compiler will create "bytecode" files out of your code, and then they are executed using the JRE
+                -"JRE" = "Java-Runtime Environment" 
+    -Java is considered a "strongly-typed" language
+        -a variable's data type can NOT be changed on the fly
+            -must be set at declaration!
+    -Java is considered a "statically-typed" language
+        -data type is set and memory is set aside for a variable at compile time
+            -"dynamically-typed" languages don't do this until the declaration statement runs during execution and the memory allocation for each variable changes as needed
+                -Java, C, Swift are statically typed --- JS, Python, Ruby are dynamically typed
+            -this costs speed
+    -Java is case sensitive!
+    -Double/single quotes are DIFFERENT in Java!
+        -double quotes represent a string literal
+        -single quotes are considered a character!
+    -Java uses "//" to comment out a line of code just like JS
+    - " javac " command in terminal will display information about the installation
+        -if the command prints an error to the terminal, the "/bin" folder may need to be added to the user/system "Path" variables
+            -common Windows error!
+        -it is also used to compile a .java file!
+            -i.e. " javac HelloWorld.java "
+            -this will create a .class file containing "bytecode" that will be run!
+                -"bytecode" is computer independent but partially compiled
+    - " java " command is used to run the bytecode!
+        -i.e. " java HelloWorld "
+            -runs the .class file that the "javac" created!
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+PROJECT STRUCTURE:
+
+GENERAL:
+
+    -Project name should be PascalCase
+    -Using an IDE like Spring can help keep organized
+    -Projects are made of packages
+        -all lowercase
+        -no special characters AT ALL
+        -packages should use "reverse domain" naming convention
+            -i.e. " com.codingdojo " 
+            -ALSO good practice to reapeat the parent project name after the reverse domain
+                -i.e. " com.codingdojo.projectone
+            -any amount of extra namespaces can be added for extra organization as needed
+                -i.e. " com.codingdojo.oopfundamentals.codesamples.projectone "
+        -classes are then created within the package
+            -MUST add package heading to the top of all classes that are a part of it
+                -this is what allows them to be imported into other classes in the package???
+                -starts with " package " keyword
+                -i.e. " package com.[+packagename].[+projectname]; "
+                    -i.e. " package com.codingdojo.projectone; "
+                -IDEs like Spring will do this for you!
+
+    *************************************************************************************************
+    -i.e.   // "src," "bin," both "com" folders, "codingdojo" and "village88" folders only exist for structuring!
+            ProjectOne
+                    ├───.settings
+                    ├───bin
+                    │   └───com
+                    │       ├───codingdojo
+                    │       │   └───projectone
+                    │       └───village88
+                    │           └───projectone
+                    └───src
+                        └───com
+                            ├───codingdojo
+                            │   └───projectone
+                            └───village88
+                                └───projectone
+
+        (^ demonstrates basic project structure with two packages, "codingdojo" and "village88" ^)
+        *************************************************************************************************
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+CLASSES IN JAVA:
+
+GENERAL:
+
+    -Classes can be used by other classes in their directory without importing
+    -Classes have 3 kinds of variables:
+        1. Member Variables:
+            -a.k.a. fields, attributes, etc.
+            -object attributes/fields
+            -these should almost ALWAYS be declared as private to prevent direct access to the field
+                -getters and setters will be used to do these things
+        2. Local Variables:
+            -variables in methods/code blocks that aren't member variables
+        3. Parameter Variables:
+            -variables that are declared with a method
+    -Each class file can contain multiple classes, but only one of them can be public
+
+BASIC STRUCTURE:
+
+    *************************************************************************************************
+    -i.e.   // *HelloWorld.java*
+            public class HelloWorld {
+                public static void main(String[] args) {
+                    System.out.println("Hello World");
+                }
+            }
+
+        (^ demonstrates structure of a basic Hello World class ^)
+        *************************************************************************************************
+
+        -Class name "HelloWorld" must match the .java file's name
+        -Classes can contain many methods
+        -"main()" is a the "entry-point" method that the Java interpreter will look for
+            -required for any executable-Java file that is intended to be run from the command line
+                -for any "test files!"
+                -not for files that just define classes to be used by other files
+            -here, the "main()" method contains 3 modifiers:
+                1. "public"
+                    -the "access modifier" of the "main()" method
+                        -"private" methods are only accessible for use WITHIN the class they are members of
+                        -"protected" methods are accessible to subclasses but not other classes
+                    -"public" methods are accessible from any other class or method in the project
+                    -many classes can exist within one .java file, but ONLY ONE can be public!
+                        -public class' name MUST be the same as the file name!
+                        -should also be named with a noun!
+                2. "static"
+                    -indicates that the "main()" method belongs to/is called from the class itself rather than an instance of the class
+                    -member variables can be static too!
+                        -very useful for creating an attribute that an overridden constructor increments every time an instance is made
+                            -this attribute can then be called on the class itself OR an instance of it!
+
+                                *************************************************************************************************
+                                -i.e.   // *Human.java*
+                                        public class Human {
+                                            private static int numHumans;
+
+                                            public Human() {
+                                                numSamurai ++;
+                                            }
+
+                                            public static void howMany() {
+                                                System.out.println(numHumans);
+                                            }
+                                        }
+
+                                        // *HumanTest.java*
+                                        Human Zack = new Human();
+                                        Human Zeeb = new Human();
+
+                                        // would print "2"
+                                        Human.howMany();
+
+                                    (^ demonstrates the basic use of static variables and methods ^)
+                                    *************************************************************************************************
+
+                3. "void"
+                    -the "return type" of the "main()" method
+                        -indicates that nothing is being returned
+                        -if a statement such as " return "Hello World" was added to the "main()" method, "void" would instead be "String"
+        -"System is class that comes with ALL Java programs
+            -".out" is a variable of that class that is being used to return an object of the "PrintStream" class
+                -".println()" is a method of this "PrintStream" class that is used to print to the console
+
+IMPORTED CLASSES:
+
+    -Java includes many built-in classes and methods
+        -they must be imported though to be used!
+            -i.e. " import [+class]; "
+            -don't forget the semi colon!
+
+    *************************************************************************************************
+    -i.e.   // *ImportDemo.java*
+            // "Date" is a method in the "java.util" package!
+            import java.util.Date;
+            public class ImportDemo {
+                // ".getCurrentDate()" can be called on any "ImportDemo" instance
+                public String getCurrentDate() {
+                    Date date = new Date();
+                    return "Current date is: " + date;
+                }
+            }
+
+            // *ImportDemoTest.java*
+            public class ImportDemoTest {
+                public static void main(String[] args) {
+                    ImportDemo iD = new ImportDemo();
+                    // executes ".getCurrentDate()" method on "iD" instance of "ImportDemo" class and assigns its return value to "currentDate"
+                    String currentDate = iD.getCurrentDate();
+                    System.out.println(currentDate);
+                }
+            }
+
+        (^ demonstrates importing with the "Date" class and a custom class ^)
+        *************************************************************************************************
+
+        -user defined classes do not need an import statement if they are being used by another source file in the SAME DIRECTORY
+            -otherwise they do!
+            -i.e. " new [+ClassConstructor] " creates a new instance of a class
+
+        -"test" files are used to test class files with an executable "main()" method
+            -test/running info should ALWAYS be seperated from the class info like this!
+            -running the "javac" compiler command on a test file will compile the source files for ANY classes used within!
+
+MEMBER VARIABLES:
+
+    -A.K.A. fields, attributes, etc.
+    -These should almost ALWAYS be declared as private to prevent direct access to the field
+        -getters and setters will be used to do these things
+            -may seem repetitive to write them but it is crucial to building good and extensible Java apps
+    -"this" keyword is used to reference member variables specifically
+        -usefull especially when the containing methd also takes a parameter of the same name as the attribute
+            -i.e. " this.color = color; " below
+            -can NOT implicitly set one variable to the value of a param like some other languages
+                -i.e. " color = color; " would NOT work below! 
+                    -UNLESS the member variable and param have different names
+                        -i.e. " color = colorParam; " would work
+
+    *************************************************************************************************
+    -i.e.   // *Vehicle.java*
+            class Vehicle {
+                private int numberOfWheels;
+                private String color;
+
+                // getter
+                public int getNumberOfWheels() {
+                    return numberOfWheels;
+                }
+
+                // setter
+                public void setNumberOfWheels(int number) {
+                    numberOfWheels = number;
+                }
+
+                // getter
+                public String getColor() {
+                    return color;
+                }
+
+                // setter
+                public void setColor(String color) {
+                    this.color = color;
+                }
+            }
+
+            // *VehicleTest.java*
+            class VehicleTest {
+                public static void main(String[] args) {
+                    Vehicle bike = new Vehicle();
+                    Vehicle car = new Vehicle();
+                    bike.setNumberOfWheels(2);
+                    bike.setColor("red");
+                    int bikeWheels = bike.getNumberOfWheels();
+                    String bikeColor = bike.getColor();
+                    car.setNumberOfWheels(4);
+                    car.setColor("green");
+                    int carWheels = car.getNumberOfWheels();
+                    String carColor = car.getColor();
+                    System.out.println("Bike object - Wheels: " + bikeWheels + ", Color: " + bikeColor);
+                    System.out.println("Car object - Wheels: " + carWheels + ", Color: " + carColor);
+                }
+            }
+
+            // output
+            Bike object - Wheels: 2, Color: red
+            Car object - Wheels: 4, Color: green
+
+        (^ demonstrates basic use of getters and setters for member variables ^)
+        *************************************************************************************************
+
+        -"this" keyword is also useful when you want a default constructor method with default attribute values
+            -"this()" can be used to reference all other constructors with the same name
+                -args are passed to "this()" to match the signature with the right constructor
+
+        *************************************************************************************************
+        -i.e.   // default constructor MUST be the first one declared in the class!
+                public class Person {
+                    private int age;
+                    private int cmHeight;
+                    private String name;
+
+                    public Person() {
+                        this(20, "John Doe", 171);
+                    }
+                    
+                    public Person(int age, String name, int cmHeight) {
+                        this.age = age;
+                        this.name = name;
+                        this.cmHeight = cmHeight;
+                    }
+
+                    // rest removed for brevity...
+
+                }
+
+            (^ demonstrates overloading with "this" to create a default constructor ^)
+            *************************************************************************************************
+
+OBJECT SUPERCLASS:
+
+    -ALL objects are descendants of the "Object" superclass
+        -called a "superclass" because it's at the top of the class hierarchy
+            -any class with subclasses that extend/inherit them can be called a "superclass"
+        -you can access all the inherited "Object" class methods!
+            -"this" keyword MUST be used
+    -Some of the most commonly used "Object" superclass methods:
+
+        - " .getClass() "
+            -returns a "Class" object that represents the object's current class
+
+        - " .equals() "
+            -compares 2 objects for equality and returns a boolean
+            -checks equality of values, not memory location like "==" would???
+
+        - " .toString() "
+            -returns a string representation of the object
+            -can be overridden if necessary!
+
+    *************************************************************************************************
+    -i.e.   // *Person.java*
+            class Person {
+                private int age;
+                private String name;
+                public Person(int ageParam, String nameParam) {
+                    this.age = ageParam;
+                    this.name = nameParam;
+                }
+                public void objectMethods(Person anotherObject) {
+                    System.out.println("Class name: " + this.getClass().getSimpleName());
+                    System.out.println("toString: " + this.toString());
+                    System.out.println("Equals: " + this.equals(anotherObject));
+                }
+            }
+
+            // *PersonTest.java*
+            class PersonTest {
+                public static void main(String[] args) {
+                    Person person1 = new Person(10, "Person1");
+                    Person person2 = new Person(5, "Person2");
+                    person1.objectMethods(person2);
+                }
+            }
+
+        (^ demonstrates basic use of "Object" superclass methods ^)
+        *************************************************************************************************
+
+SUBCLASSES / EXTENDING CLASSES:
+
+    -Created classes can "extend" any other classes to inherit all of their member variables and methods!
+        -these classes are called subclasses
+            -"Human" class below is a subclass of "Mammal" class!
+
+    *************************************************************************************************
+    -i.e.   // *Mammal.java*
+            class Mammal{
+                private boolean sleeping = false;
+
+                public void regulateTemperature() {
+                    System.out.println("My temperature is just right now.");
+                }
+
+                public void startSleeping() {
+                    sleeping = true;
+                    System.out.println("ZzZz");
+                }
+
+                public boolean isSleeping(){
+                    return sleeping;
+                }
+            }
+
+            // *Human.java*
+            public class Human extends Mammal{
+                public void goToWork(){
+                    System.out.println("I'm going to work, something only humans can do.");
+                }
+            }
+
+            // *HumanTest.java*
+            class HumanTest {
+                public static void main(String[] args) {
+                    Human h = new Human();
+                    h.regulateTemperature();
+                    h.startSleeping();
+                    h.goToWork();
+                    boolean sleeping = h.isSleeping();
+                    
+                    if (sleeping){
+                        System.out.println("The human is sleeping!");
+                    }
+                }
+            }
+
+            // output:
+            My temperature is just right now.
+            ZzZz
+            I'm going to work, something only humans can do.
+            The human is sleeping!
+
+        (^ demonstrates basic class extension ^)
+        *************************************************************************************************
+
+        -methods from the parent class can be extended / overridden as well!
+            -just write a method with the same signature and return type as the target method
+                -this will overwrite the inherited method from the super
+                -call the method on "super" keyword to call the original method on the super class!
+
+    *************************************************************************************************
+    -i.e.   // *Human.java*
+            class Human extends Mammal {
+                // ...continued from above example
+                public void startSleeping() {
+                    System.out.println("Toss and turn");
+                    super.startSleeping();
+                }
+            }
+
+        (^ demonstrates overriding an inherited method and how to call the original method still ^)
+        *************************************************************************************************
+
+INTERFACES:
+
+    -Similarities to classes:
+        -PascalCased naming convention
+        -written similarly
+        -can contain any number of methods
+        -uses ".java" extension
+        -bytecode is created in a ".class" file
+        -interfaces are part of packages and the bytecode that corresponds must be a part of a matching directory structure
+    -Differences to classes:
+        -cannot be instantiated
+            -therefore contains no "instance fields"
+                -all interface fields must be static and final!
+        -does not contain any constructors
+        -interfaces are not extended by classes, they are implemented by them
+        -interfaces can extend multiple interfaces
+            classes can only extend one class, but can implement multiple interfaces
+    -3 types of interface methods!
+        1. " default "
+                -new with Java 8
+                -do not need implementation
+        2. " Static "
+                -Static methods are interface member methods
+                -implemented on the interface level and are called on the interface instead of the class
+                    -this aspect new to Java 8
+                    -means that static interface methods can NOT be overridden
+                    -can only call them on the interface that they were declared in
+        3. " Abstract "
+                -methods declared without implementation
+                -implicit, and do NOT need a method type in their declaration
+                    -will also implicitly BE public themselves
+    -Interfaces may contain constant declarations as well
+        -implicitly public, static, and final
+            -a " final " variable cannot be reassigned and is "constant"
+    - " implements " keyword must be used in the class definitions to implement an interface
+        -a class that implements an interface MUST implement ALL methods that were defined in the interface definition, besides defaults and statics
+
+    *************************************************************************************************
+    -i.e.   // *OperateBicycle.java*
+            public interface OperateBicycle {
+                // constant that is public, static, and final
+                double myConstant = 3.0;
+
+                // default method that does not need implementation
+                default void sayHello() {
+                    System.out.println("Hello everybody");
+                }
+
+                // static method that does not need implementation
+                static void staticMethod() {
+                    System.out.println("Hello from the static method of the interface");
+                }
+
+                // interface-conformity class-method requirements, the methods that take arguments???
+                void speedUp(int increment);
+                void applyBrakes(int decrement);
+            }
+
+            // *Bicycle.java*
+            class Bicycle implements OperateBicycle {        
+                private int speed;
+                public Bicycle() {
+                    speed = 0;
+                }
+                // a static method that calls on the interface static method
+                public static void staticMethod() {
+                    OperateBicycle.staticMethod();
+                }
+                // implementing speedUp
+                public void speedUp(int increment) {
+                    speed += increment;
+                }
+                // implementing applyBrakes
+                public void applyBrakes(int decrement) {
+                    speed -= decrement;
+                }
+                public int getSpeed() {
+                    return speed;
+                }
+            }
+
+            // *BicycleTest.java*
+            class BicycleTest {
+                public static void main(String[] args) {
+                    Bicycle b = new Bicycle();
+                    // print constant
+                    System.out.println(Bicycle.myConstant);
+                    b.sayHello();
+                    Bicycle.staticMethod();
+                    b.speedUp(3);
+                    b.applyBrakes(2);
+                    System.out.println(b.getSpeed());
+                }
+            }
+
+            // *output*
+            3.0
+            Hello everybody
+            Hello from the static method of the interface
+            1
+
+        (^ demonstrates basic structure and implementation of interfaces ^)
+        *************************************************************************************************
+
+INTERFACES VS ABSTRACT CLASSES:
+
+    -Use abstract classes when:
+        -you want to share code among several closely related classes
+        -you expect that classes that extend your abstract class have many common methods or fields, or require access modifiers other than public
+            -i.e. protected and private
+        -you want to declare non-static or non-final fields
+            -this enables you to define methods that can access and modify the state of the object to which they belong
+    -Use interfaces when:
+        -you expect that unrelated classes would implement your interface
+            -i.e. the interfaces Comparable and Cloneable are implemented by many unrelated classes
+        -you want to specify the behavior of a particular data type, but aren't concerned about who implements its behavior
+        -you want to take advantage of multiple inheritances of type
+
+ABSTRACT CLASSES:
+
+    -Purpose of abstract classes:
+        -abstract classes are extended by other classes, but NEVER instantiated!
+        -i.e. "Mammal" class would only exist to provide base qualities to animal classes that represent mammals
+            -you would not want some generic "Mammal" instance that doesn't represent a mammal species subclass!
+    -Similarities to interfaces:
+        -can NOT be instantiated
+        -member methods may or may not have implementation
+            -these abstract methods can NOT be used by non-abstract classes 
+    -Differences to interfaces:
+        -fields are not static and final by default
+            -fields aren't constants!
+        -methods may have all 3 levels of visibility
+            1. public
+                -interfaces are ALL implicitly public!
+            2. protected
+            3. private
+        -multiple interfaces can be implemented by a class, but only one class can be extended by a class
+            -even if the class extended is abstract!
+
+    *************************************************************************************************
+    -i.e.   // *AbstractClass.java*
+            public abstract class AbstractClass {
+                public void randomMethod() {
+                    System.out.println("This is a random method that is implemented in this class");
+                }
+                // abstract method
+                public abstract void abstractMethod();
+            }
+
+            // *SubClassOne.java*
+            public class SubClassOne extends AbstractClass{
+                // we MUST implement the abstract method otherwise we will get an error.
+                public void abstractMethod() {
+                    System.out.println("This is our method from subclass one");
+                }
+            }
+
+            // *SubClassTwo.java*
+            public class SubClassTwo extends AbstractClass{
+                // we must implement the abstract method otherwise we will get an error.
+                public void abstractMethod() {
+                    System.out.println("This is our method from subclass two");
+                }
+            }
+
+        (^ demonstrates basic use of abstract methods from an abstract class by classes that extend it ^)
+        *************************************************************************************************
+
+    -Differences from regular classes
+        -abstract classes are NEVER instantiated, only extended
+        -regular classes MUST implement ALL methods from an interface it is implementing
+            -abstract classes do not need to!
+                -they can implement a few and then leave it to it's subclasses to implement the rest!
+
+        *************************************************************************************************
+        -i.e.   // *InterfaceDemo.java*
+                public interface InterfaceDemo {
+                    void methodOne();
+                    void methodTwo();
+                }
+
+                // *AbstractDemo.java*
+                public abstract class AbstractDemo implements InterfaceDemo {
+                    public void methodOne() {
+                        System.out.println("Hello from the abstract demo");
+                    }
+                }
+
+                // *ClassDemo.java*
+                public class ClassDemo extends AbstractDemo {
+                    public void methodTwo() {
+                        System.out.println("Hello from the class demo");
+                    }
+                }
+
+                // *AbstractTester.java*
+                class AbstractTester {
+                    public static void main(String[] args) {
+                        ClassDemo c = new ClassDemo();
+                        c.methodOne();
+                        c.methodTwo();
+                    }
+                }
+
+                // *output*
+                Hello from the abstract demo
+                Hello from the class demo
+
+            (^ demonstrates abstrat class implementing only one interface method and it's subclass implementing the second ^)
+            *************************************************************************************************
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+METHODS IN JAVA:
+
+GENERAL:
+
+    -ALL functions in Java are technically methods as they are defined in a class somewhere!
+    -Methods are just functions that are housed in an object
+
+SYNTAX OF METHODS:
+
+    1. method declaration
+        -consists of:
+            1. access level
+            2. return type
+                -MUST be one of the following:
+                    1. a class
+                    2. a primitive
+                    3. a void
+                        -for when nothing is returned!
+            3. method name
+            4. any parameter variables
+                -array type is noted with the same syntax as when declaring
+                    -i.e. " int[] newArray " for an integer array
+                    -arrays MUST be argued as another variable when arguing to call method!
+                        -i.e. " someMethod(arrayVar) "
+                        -can NOT pass as a literal 
+                            -i.e. " someMethod([1,4,5,2]) "
+                -each with their own type specified also!
+
+    2. code body
+        -instructions to run
+
+    3. signature
+        -basically shorthand for a method
+        -exists so that two methods can be given the same name!
+            -called "overloading" methods
+        -consists of:
+            1. method name
+            2. method parameter types
+
+        *************************************************************************************************
+        -i.e.   // signature: " fizzBuzz(int) "
+                public String fizzBuzz(int number){
+                    ...
+                }
+
+                // signature: " fizzBuzz(String, int) "
+                public String fizzBuzz(String number int numberTwo){
+                    ...
+                }
+
+            (^ demonstrates structure of method signatures ^)
+            *************************************************************************************************
+
+            -when fizzBuzz() is called, the arguments passed to it will determine with method is invoked
+
+CONSTRUCTORS & OVERLOADING METHODS:
+
+    -Overloading methods is useful for allowing different sets of arguements to be passed to methods with the same name
+        -ANY method can be overloaded
+        -the method's "signature" (see previous "syntax of methods" section) determines which method is invoked when called
+            -uses arguements given to match to the method with the matching parameters
+        -very useful for providing choices of constructor function
+    -Constructor functions are used by a class to create instances
+        -MUST have the same name as the class
+        -can take parameters
+        -useful when default attributes must be set or arguments must be accepted on instantiation
+
+    *************************************************************************************************
+    -i.e.       // creates a Vehicle class that has two different constructor methods by the same name, but different params
+                class Vehicle {
+                private int numberOfWheels;
+                private String color;
+
+                // ex. new Vehicle()
+                public Vehicle() {
+                }
+
+                // ex. new Vehicle("someColor")    
+                public Vehicle(String color) {
+                    // setting the color attribute to the value from the color parameter
+                    this.color = color;
+                }
+
+                // ex. new Vehicle("someColor", 4)    
+                public Vehicle(String color, int num) {
+                    this.color = color;
+                    this.numberOfWheels = num;
+                }
+
+                // ...
+                // getters and setters removed for brevity
+                // ...
+            }
+
+        (^ demonstrates basic method overloading ^)
+        *************************************************************************************************
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+VARIABLES IN JAVA:
+
+GENERAL:
+    -Variables in Java ALL require a "type declaration" upon initialization
+        -this helps with speed and safety
+            -speed because every variable of a certain type requires the SAME amount of memory!
+                -Java allocates ONLY what is needed for that type upon initialization
+            -safety in that an error will occur when trying to assign a value of the wrong data-type to the variable
+                -error will occur BEFORE running the code as well!
+    -Declaration syntax is " [+type] [+variableName]; "
+        -variables can be declared just like this, without a value, or with one as expected:
+            -i.e. "int ourInt = 400; "
+    -Assignment to a variable is just like most other languages
+        -i.e. " [+variableName] = [+value] "
+
+DATA TYPES:
+
+    -There are many data types in Java, but they are all still considered either:
+        1. Primitive Types:
+            -primitive data types are lowerCamelCase
+            -primitive types can ONLY hold data
+                -can NOT contain "null", but Object types can!
+            -primitive types are much more quickly manipulated than Object types
+            -some common types:
+                - "int"
+                    -holds an integer, between -2,147,483,648 and 2,147,483,647 (~2 billion)
+                - "long"
+                    -holds a larger integer, up to 2^63 (~2 quintillion!)
+                - "boolean"
+                    -holds either "true" or "false" value
+                - "double"
+                    -holds floating point numbers like 3.14159265
+                    -"float" exists too, but "double" is almost always better
+                        -more precise???
+
+        2. Object Types:
+            -object data types are PascalCase
+            -object types are an instance of a class
+                -usually hold data and methods
+                    -reference types, and do not "hold" data, but hold pointers that lead to the data!
+                        -they can point to nothing (null), while primitive types can't!
+                -much larger memory capacity than primitive types
+                -can't be manipulated as quickly as primitive types, only use when necessary
+                    -i.e. using "Integer" instead of "int" will make all operations involving the instance take much longer!
+            -some common types:
+                - "Integer" class
+                    -wraps a value of the primitive type "int" into an object
+                - "Long" class
+                    -wraps a value of the primitive type "long" in an object
+                - "Boolean" class
+                    -wraps a value of the primitive type "boolean" in an object
+                - "Double" class
+                    -wraps a value of the primitive type "double" in an object
+                - "Character" class
+                    -wrapps a value of the primitive type "char" in an object
+                - "String"
+                    -represents a sequence of characters
+                - "BigInteger"
+                    -represents an integer that can be ANY size at all!
+
+TYPE CASTING:
+
+    -"Type casting" is provided by Java to allow more flexibility in spite of being statically typed
+    -This table MUST be used to cast types properly!
+        -"casting down" from a bigger range to a smaller range often causes unexpected results!
+
+    *************************************************************************************************
+    TYPE:       SIZE IN BYTES:  RANGE:
+    byte        1 byte          -128 to 127
+    short       2 bytes         -32,768 to 32,767
+    int         4 bytes         -2,147,483,648 to 2,147,483,647
+    long        8 bytes         -9,223,372,036,854,775,808 to 9,223,372,036,854,775,807
+    float       4 bytes         approximately ±3.40282347E+38F
+    double      8 bytes         approximately ±1.79769313486231570E+308
+    char        2 bytes         0 to 65,536
+    boolean     n/a             true or false
+    *************************************************************************************************
+
+    -Type casting is either "implicit" or "explicit"
+        1. Explicit casting:
+
+        *************************************************************************************************
+        -i.e.   class Casting {
+                    public static void main(String[] args) {
+                        double d = 35.25;
+                        double dd = 35.99;
+                        
+                        // casting the double d into a int
+                        int i = (int) d;
+                        
+                        // casting the double dd into a int
+                        int ii = (int) dd;
+
+                        // both will truncate the post-decimal digits and print "35"
+                        System.out.println(i); 
+                        System.out.println(ii);
+                    }
+                }
+
+            (^ demonstrates use of explicit casting when "casting down" ^)
+            *************************************************************************************************
+
+            -explicit casting MUST be used when "casting down!"
+                -like from a double to an int
+                    -casting to an int will always drop off any post-decimal digits
+                        -does NOT round! Truncates!
+
+        2. Implicit casting
+
+            *************************************************************************************************
+            -i.e.   class Casting {
+                        public static void main(String[] args) {
+                            int i = 35;
+
+                            // implicitly casts "i" from int to float
+                            float f = i;
+
+                            // implicitly casts "f" from float to string, then prints "35.0"
+                            System.out.println("The number is: " + f);
+                        }
+                    }
+
+                (^ demonstrates use of implicit casting when "casting up" ^)
+                *************************************************************************************************
+
+                -Java will implicitly cast for you depending on the context
+                    -whenever the target type has a range large enough
+                    -like when "casting up!"
+                    -works with string concatenation like above!
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+ARRAYS IN JAVA:
+
+GENERAL:
+
+    -Arrays in Java are either "Arrays" or "ArrayLists"
+        -Arrays have a permanent capacity that is determined or set at initialization
+        -ArrayLists do not!
+
+ARRAYS:
+
+    -Fixed-size sequential collection of elements of the SAME TYPE with a zero-based index
+    -Must be declared, initialized and filled
+        -can be done seperately or all at once
+        -capacity of the array instance is set at initialization and can NOT be changed!
+    -Regular "Arrays" can NOT be printed as a whole WITHOUT importing "Arrays" and arguing them to "Arrays.toString()"
+        -default ".toString()" method will otherwise be used and print a "memory" location instead otherwise!
+    -Arrays have many of their own methods
+                -i.e. " .length " returns length
+                    -NOT " .length() " which is for strings only!
+
+        *************************************************************************************************
+        -i.e.   import java.utils.Arrays
+
+                int[] testArray;
+                System.out.println(Arrays.toString(testArray));
+
+            (^ demonstrates how to print regular "Arrays" ^)
+            *************************************************************************************************
+
+        -"ArrayLists" can be printed without these extra steps
+
+        *************************************************************************************************
+        -i.e.   // seperately:
+                // initialization sets array length to 5 PERMANENTLY
+                int[] myArray;
+                myArray = new int[5];
+                myArray[0] = 4;
+                myArray[1] = 8;
+                myArray[2] = 8;
+                myArray[3] = 5;
+                myArray[4] = 9;
+
+                // all at once:
+                // array length capacity set by number of values
+                // use "{}" curly braces JUST to enclose values
+                int[] myArray = {4, 8, 8, 5, 9};
+
+            (^ demonstrates basic declaration, initialization and filling of an array ^)
+            *************************************************************************************************
+
+ARRAYLISTS:
+
+    -Can grow or shrink in size unlike regular Java "Arrays"
+    -Still sequential zero-based index collection of elements
+    -MUST be imported to be used!
+        -i.e. " import java.util ArrayList; "
+    -Uses "generics" to indicate what types of data the ArrayList can hold
+        -"generics" are enclosed in a "diamond"
+            -i.e. " <> " is informally called a diamond!
+        -i.e. " <Integer> " below indicates that the ArrayList can only hold Integers
+        -if no generics included, ANY data type could be added!
+            -they should ALMOST ALWAYS be used!
+            -set it to <Object> if you want it to accept all object types, but don't leave it off!
+    - " .add() " & " .get() " methods must be used to add and remove elements from an ArrayList
+    -Can be printed as wholes without any extra .toString() steps like "Arrays" require!
+    -ArrayLists have many unique methods available
+        -i.e. " .size() " works just like " .length "
+
+    *************************************************************************************************
+    -i.e.   // inputs and initializes an ArrayList
+            import java.util.ArrayList;
+            ArrayList<Integer> myArray = new ArrayList<Integer>();
+
+            // " .add() " & " .get() " are used to add and remove elements
+            myArray.add(10);
+            int num = myArray.get(0);
+
+            // using <Object> generic allows ALL Object class instances in the ArrayList
+            ArrayList<Object> list = new ArrayList<Object>();
+            list.add(10);
+            list.add("Hello");
+            list.add(new ArrayList<Integer>());
+            list.add(new Double(12.0));
+            // [10, "Hello", [], 12.0]
+            System.out.println(list);
+
+        (^ demonstrates basic manipulation of ArrayLists ^)
+        *************************************************************************************************
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+MAPS IN JAVA:
+
+GENERAL:
+
+    -"Maps" are a data type in Java that hold key-value pairs
+        -like dictionaries in Python, objects in JS, etc.
+    -"HashMaps" are the most commonly used implementation of maps in Java
+
+
+HASHMAPS:
+
+    -HashMap pairs are unordered
+        -doesn't usually matter
+        -use a different implementation of maps if order is needed
+    -MUST be imported
+        -i.e. " import java.util.HashMap; "
+    -Data type for EACH HALF of the pair MUST be explicitly declared with generics in a diamond
+    -A "Set" MUST be used to gather a "Set" of the HashMap's keys to allow for iteration
+        -"Sets" are what Java calls "interfaces"
+            -MUST be imported
+                -i.e. " import java.util.Set; "
+            -"Sets" are collections that contain no duplicates by definition
+    -HashMaps have many built-in functions
+
+    *************************************************************************************************
+    -i.e.   // imports HashMap and Set classes
+            import java.util.HashMap;
+            import java.util.Set;
+
+            // creates HashMap instance
+            HashMap<String, String> userMap = new HashMap<String, String>();
+
+            // adds 2 pairs to the HashMap
+            userMap.put("nninja@codingdojo.com", "Nancy Ninja");
+            userMap.put("ssamurai@codingdojo.com", "Sam Samurai");
+            userMap.put("wwizard@codingdojo.com", "Walter Wizard");
+
+            // retrieves a pair from the HashMap and stores it in a variable
+            String name = userMap.get("nninja@codingdojo.com");
+
+            // creates a "Set" instance filled with all the HashMap's keys
+            Set<String> keys = userMap.keySet();
+
+            // iterates and prints the key-value pairs from the HashMap
+            for(String key : keys) {
+                System.out.println(key);
+                System.out.println(userMap.get(key));    
+            }
+
+        (^ demonstrates basic interaction with a HashMap ^)
+        *************************************************************************************************
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+STRING CLASS IN JAVA:
+
+GENERAL:
+
+    -Strings are objects in Java
+        -like all other objects in Java, they belong to a class
+    -Instances of String class are immutable
+        -once created, they can NOT be modified!
+    -Most direct way to declare a String instance:
+        -i.e. " String [+variableName] = "Hello world!";
+
+METHODS:
+
+    - " Integer.toString() "
+        -called on Integer class itself
+        -argue an integer
+        -will convert the argued int to a String
+
+    - " .length() "
+        -called on a String instance
+        -returns integer representing the amount of characters in the string
+
+    - " .concat() "
+        -called on one String instance to concatenate it with an argued string
+        -returns a new String instance
+        -the "+" plus sign works the same way!
+
+    - " .format() "
+        -another way to concatenate Strings!
+        -static method, called on "String" class itself! NOT on instances of it!
+            -i.e. "String ninja = String.format("Hi %s, you owe me $%.2f !", "Jack", 25.0);
+                - " %s " is expecting a string
+                - " $%.2f " is expecting a float-type value with 2 digits after the decimal
+                -the arguments after the string will satisfy these modulus "%" variables in order
+
+    - " .indexOf() "
+        -called on a String instance and searches it from left-right for the argued "target" string
+        -returns the index number where the target string is FIRST found and starts, or "-1" if not found
+
+    - " .trim() "
+        -called on a String instance
+        -returns a String without any trailing or leading empty spaces if they were present
+
+    - " .toLowerCase() " & " .toUpperCase() "
+        -called on a String instance
+        -returns an instance of the String but in all upper/lower case
+
+    - " .equals() "
+        -called on a String instance and argues a second String instance
+            -checks if the two sequences match
+            - " == " will only check if the String instances are the same OBJECT!
+
+    - " .substring() "
+        -called on a String instance and argues 1/2 indexes to slice
+            -will slice before the first index argued, and before the second index argued
+                -returns the characters between the 2 slices
+                -just slices at the fist and returns rest of String if no second arg given
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+CONDITIONALS IN JAVA:
+
+GENERAL:
+
+    -A condition will ALWAYS return "true" or "false"
+    -As long as something has value, it can be used in a condition
+
+IF-ELSE CONDITIONALS:
+
+    -Same syntax as JS???
+        -BUT you can NOT compare two different data types!
+
+    *************************************************************************************************
+    -i.e.   boolean defenderGuarding = true;
+            boolean closeToBasket = true;
+
+            if(defenderGuarding == true) {
+                System.out.println("Pass The Ball");
+            } else if(closeToBasket == true) {
+                System.out.println("Shoot The Ball");
+            } else {
+                System.out.println("Dribble The Ball");
+            }
+
+        (^ demonstrates basic use of if-else conditionals ^)
+        *************************************************************************************************
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+LOOPS IN JAVA:
+
+GENERAL:
+
+    -Loops repeat code based on conditionals
+    -There are "while loops", "for loops", and "enhanced for loops" in Java
+        -think of "for loops" as specialized "while loops"
+
+WHILE LOOPS:
+
+    -Depend on incrementor variable declared outside of the loop
+        -the loop itself MUST make some progress towards the condition becoming false each iteration, or it will be infinite!
+
+    *************************************************************************************************
+    -i.e.   int i = 0;
+            while(i < 7)
+            {
+                System.out.println("foo");
+                i++;
+            }
+
+        (^ demonstrates basic while-loop syntax ^)
+        *************************************************************************************************
+
+FOR LOOPS:
+
+    -Incrementor variable is declared within the loops settings
+
+    *************************************************************************************************
+    -i.e.   for (int i = 0; i < 7; i++){
+                System.out.println("bar");
+            }
+
+        (^ demonstrates basic for-loop syntax ^)
+        *************************************************************************************************
+
+ENHANCED FOR LOOPS:
+
+    -Basically like "for...in" loops and "for...or" loops in JS
+    -Will execute the code-body statements once for every element in the array, with a variable being assigned each array in turn
+
+    *************************************************************************************************
+    -i.e.   // "name" represents the "element container"; "dynamicArray" represents the "collection" to be iterated
+            for(String name : dynamicArray){
+                System.out.println("hello " + name);
+            }
+
+        (^ demonstrates the basic enhanced for-loop syntax to iterate an array ^)
+        *************************************************************************************************
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+EXCEPTIONS:
+
+GENERAL:
+
+    -It is good practice to have a system in place for handling exceptions in certain situations
+    -Java does not encourage the use of "try/catch" blocks for exception handling, but they can be used
+
+TRY/CATCH STATEMENTS:
+
+    -Should only be used in exceptional situations, not as a default
+        -Java does not encourage their use???
+    -"Tries" a block of code and "catches" any "exceptional" events that arise
+    -"try" block will break operation and execute "catch" block as soon as an exception arises
+        -the success message in the try block below will NOT run if ".deliverMessage()" causes an exception
+
+    *************************************************************************************************
+    -i.e.   // *OutOfGasException.java*
+            import java.util.Random;
+
+            class OutOfGasException extends Exception{
+                class UnreliableFriend {
+                    public boolean deliverMessage() throws OutOfGasException{
+                        Random r = new Random();
+                        boolean hasGas = r.nextBoolean();
+                        if (hasGas){
+                            return true;
+                        }
+                        throw new OutOfGasException();
+                    }
+                }
+            }
+
+            // *DeliverMessage.java*
+            class DeliverMessage{
+                public static void main(String[] args){
+                    UnreliableFriend friend = new UnreliableFriend();
+                    try{
+                        friend.deliverMessage();
+                        System.out.println("The message was delivered!");
+                    } catch (OutOfGasException e){
+                        System.out.println("Hey, uh, so, I ran out of gas..");
+                        // back-up plan here.
+                    }
+                }
+            }
+
+        (^ demonstrates basic exception handling using try/catch statements ^)
+        *************************************************************************************************
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+ANNOTATIONS:
+
+GENERAL:
+
+    -Serve a similar purpose to comments
+        -BUT they are also read by the compiler / build tools
+    -Possible to write them yourself, but uncommon
+        -unless you are a framework developer
+        -if you decide to write them yourself, you MUST use:
+            -the javac compiler
+            -the "javax" packages "annotation.processing" and "annotation.model"
+
+    *************************************************************************************************
+    -i.e.   // *Human.java*
+            class Human {
+                private String name;
+                public String getName(){
+                    return name;
+                }
+                public void setName(String n){
+                    name = n;
+                }
+            }
+
+            // *Developer.java*
+            public class Developer extends Human{
+                @Override
+                public String getName(){
+                    return "Developer!";
+                }
+            }
+
+        (^ demonstrates basic use of " @Override " annotation ^)
+        *************************************************************************************************
+
+SOME COMMON ANNOTATIONS:
+
+    - " @Override "
+            -explicitly indicates that the following method is overriding a parent method
+
+    - " @Deprecated "
+            -will add notification when the following method is used to indicate that it is being phased out and should not be used
+            -does not disable the method, just adds deprecation warning to it
+            - " -Xlint:deprecation "
+                    -flag to add to " javac " terminal command that provides more info on deprecations
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+POJOS AND JAVA BEANS:
+
+GENERAL:
+
+    -"POJO"
+        -"plain-old Java objects"
+    -"JavaBeans"
+        -a.k.a. "Entity Beans", "Enterprise Java Beans"
+        -Java EE components (specifically Enterprise Java Beans) hat persist data in a datastore (db)
+        -POJOs that conform to a series of rules:
+            1. member variables MUST be private, but accessible using get and set
+            2. MUST have a zero-argument constructor
+            3. MUST implement the serializable interface
+                -can import the path at the top of the file and then implement with the name
+                    -i.e. " import java.io.Serializable "
+                        -then reference "Serializable" by immplementation in class declaration
+                            -i.e. " class Human implements Serializable {...} "
+                -OR import directly from the implementation
+                    -i.e. " class Human implements java.io.Serializable {...} "
+
+        *************************************************************************************************
+        -i.e.   // bad bean:
+                class Human {
+                    private String name;
+                    
+                    public Human(String name){
+                        this.name = name;
+                    }
+                    
+                    public void setName(String n){
+                        name = n;
+                    }
+                    public String getName(){
+                        return name;
+                    }
+                }
+
+                // good bean:
+                // added " Serializable " interface implementation
+                class Human implements java.io.Serializable {
+                    private String name;
+
+                    // added zero-argument constructor with default name
+                    public Human(){
+                        this("Adam");
+                    }
+
+                    public Human(String name){
+                        this.name = name;
+                    }
+
+                    public void setName(String n){
+                        name = n;
+                    }
+
+                    public String getName(){
+                        return name;
+                    }
+                }
+
+            (^ demonstrates basic JavaBean class ^)
+            *************************************************************************************************
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+TRIES:
+
+GENERAL:
+
+    -Tree-like data structures that are efficient at reTRIEving information
+        -usually...???
+    -Store sequences of characters or words
+    -A perfect example is google's search-history auto-complete feature
+
+    *************************************************************************************************
+    -i.e.   // *Node.java*
+            package com.codingdojo.tries;
+            import java.util.HashMap;
+            public class Node {
+                public HashMap<Character, Node> children;
+                public boolean isCompleteWord;
+
+                public Node() {
+                    this.children = new HashMap<Character, Node>();
+                    this.isCompleteWord = false;
+                }
+            }
+
+            // *Trie.java*
+            package com.codingdojo.tries;
+            public class Trie {
+                public Node root;
+
+                public Trie() {
+                    this.root = new Node();
+                }
+
+                public void insertWord(String word) {
+                    // gets the root node;
+                    Node currentNode = this.root;
+
+                    // iterates over every character in the word
+                    for(int i = 0; i < word.length(); i++) {
+                        // currentLetter is just the character / letter at the iteration
+                        Character currentLetter = word.charAt(i);
+                        // ask if the current letter is in the map of the current node
+                        Node child = currentNode.children.get(currentLetter);
+                        if(child == null) {
+                            child = new Node();
+                            currentNode.children.put(currentLetter, child); 
+                        } 
+                        currentNode = child;
+                    }
+                    currentNode.isCompleteWord = true;
+                }
+            }
+
+            // *TrieTest.java*
+            package com.codingdojo.tries;
+            public class TrieTest {
+                public static void main(String[] args) {
+                    Trie trie = new Trie();
+                    trie.insertWord("car");
+                    trie.insertWord("card");
+                    trie.insertWord("chip");
+                    trie.insertWord("trie");
+                    trie.insertWord("try");
+                }
+            }
+
+        (^ demonstrates basic use of the Trie structure ^)
+        *************************************************************************************************
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------

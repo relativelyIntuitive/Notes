@@ -1,0 +1,29 @@
+
+- GIT NOTES -
+
+        FORKING/CLONING:
+            1. Fork: Remote, server-side copy of a repository, distinct from the original.
+                -Forking a repository that you don't own creates a copy of it on your GitHub profile
+            2. Clone: Not a fork. A clone is a local copy of some remote repository.
+                -You can clone a fork to get a copy of it on your local machine
+                -   git clone [+URL of repository]
+                    (clones repository to currently accessed directory)
+
+        STAGING/COMMITTING/UPDATING:
+            0. Check Status: Displays status of working directory and staging area
+                -best to check before staging, committing, or UPDATING
+                -   git status
+                    (displays status)
+            1. Staging: adds files to "staging area" 
+                -staging area is a waiting room for files to be committed
+                -   git add [+file name] 
+                    (adds files to staging area)
+                -   git add .
+                    (adds all changed files to staging area)
+            2. Commiting: every file in staging area will be updated with changes
+                -creates another local-version of project, then clears staging area
+                -   git commit -m 'some message here for commit name'
+            3. Update the state
+                -updates the repo that's tied to local copy
+                -   git push origin master
+            

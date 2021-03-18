@@ -1,0 +1,48 @@
+Step 6: Gunicorn
+Now, we need a wsgi.py file, which will help Gunicorn, our process manager, know how to interact with the application. We will use vim as our text editor to make our files.
+
+(venv) ~/myRepoName$ vim wsgi.py                     // this will open the new, empty file for us
+We will need the following code in our wsgi.py file (this assumes that you named your server file server.py, if you named it something different you will have to put that name in place of server in the code below):
+
+from server import app as application
+if __name__ == "__main__":
+    application.run()
+Now, we need to direct Gunicorn to our project's wsgi.py file, which is the entry point to our application.
+
+(venv) ~/myRepoName$ gunicorn --bind 0.0.0.0:5000 wsgi:application
+If your Gunicorn process ran correctly, you will see something like the following printed to the terminal:
+
+[2016-12-27 05:45:56 +0000] [8695] [INFO] Starting gunicorn 19.6.0
+[2016-12-27 05:45:56 +0000] [8695] [INFO] Listening at: http://0.0.0.0:5000 (8695)
+[2016-12-27 05:45:56 +0000] [8695] [INFO] Using worker: sync
+[2016-12-27 05:45:56 +0000] [8700] [INFO] Booting worker with pid: 8700
+If you have any error messages, read them carefully - you may need to install anything that was not already included in your requirements.txt file. Run the command again, reading your error messages, until you get the output you see above.
+
+If that looks good, you may shut it down with ctrl + C, because we're still not done!
+
+Deactivate the virtual environment with:
+
+(venv) ~/myRepoName$ deactivate
+Now, we need a systemd service unit file. This will automatically start Gunicorn when the server boots.
+
+A word on naming conventions:  Wherever you see {{project}}, replace it with the name you call your Flask project. It does not matter what you choose, as long as you are consistent. We suggest choosing something short and easy to remember. Wherever you see {{repo name}}, replace that with the name of your GitHub repo. It will be the same name as the directory that is created when you git clone your repo. It could well be that your repo name and your project name are the same.
+
+sudo vim /etc/systemd/system/{{project}}.service
+In this file you just created, we will need the following (everywhere where you see {{username}}, replace that with the username you created for your server):
+
+[Unit]
+Description=Gunicorn instance to serve {{project}}
+After=network.target
+[Service]
+User={{username}}
+Group=www-data
+WorkingDirectory=/home/{{username}}/{{repo name}}
+Environment="PATH=/home/{{username}}/{{repo name}}/venv/bin"
+ExecStart=/home/{{username}}/{{repo name}}/venv/bin/gunicorn --workers 3 --bind unix:{{project}}.sock -m 007 wsgi:application
+[Install]
+WantedBy=multi-user.target
+After we create this file, we need to enable it, so that it starts when the server boots:
+
+sudo systemctl start {{project}}
+sudo systemctl enable {{project}}
+After running these lines, you should see your {{project}}.sock file in your project, on the same level as server.py. If not, you probably have a typo in the systemd service unit file.

@@ -1,0 +1,52 @@
+
+ - HTTP NOTES -
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+GENERAL:
+
+    -Stands for "Hypertext Transfer Protocol"
+    -Application protocol for distributed, collaborative, hypermedia information systems that allows users to communicate data on the World-Wide Web
+    -Native HTML forms can ONLY make GET and POST request
+        -JavaScript is needed to make any other kind!
+        -some web frameworks allow devs to "fake" the other HTTP verbs by passing a hidden form input
+            -framework processes the form depending on the request type indicated by the hidden input
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+HTTP-REQUEST METHODS:
+
+    1. GET
+        -Used for passing insensitive information
+        -Query parameters sent as part of the URL
+            -so it's visible to the user!
+            -don't pass sensitive info like this!
+        -These requests can be cached as well
+        -They are also stored normally in browser history
+        -They can be bookmarked!
+            -advantage
+
+    2. POST
+        -Used for passing sensitive information
+        -Sent "behind the scenes" inside the HTTP request body
+            -never cached
+            -don't log to browser history
+            -can NOT be bookmarked
+            -used for registration, authentication, authorization, and CRUD 
+        -No restriction on amount of data that they can send!
+            -advantage!
+        -Most common HTTP-request method
+
+    3. PUT
+        -Used for updating whole sensitive information
+        -Work the same as POST requests
+            -but specifically used to update whole entities in the database
+    4. PATCH
+        -Used for updating pieces of sensitive information
+        -Works the same as POST and PUT requests
+            -but specifically used to update a piece of an entity in the database
+    5. DELETE
+        -Used for deleting sensitive information
+        -Used to delete entities from the database
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------

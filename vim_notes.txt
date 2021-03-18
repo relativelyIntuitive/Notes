@@ -1,0 +1,28 @@
+
+ - VIM NOTES -
+
+GENERAL:
+    -VIM is a terminal based file editor
+    -The vim command can be used either to:
+        -edit existing files
+        -create and open a new blank file
+    -VIM has no GUI
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+VIM COMMANDS:
+    - "i"
+        -enter INSERT mode
+        -should see "–INSERT–" at the bottom left corner of terminal
+        -use your arrow keys to move the cursor to where you want to edit and make your changes
+    -Esc key
+        -exit INSERT mode
+    - ":"
+        -when not in INSERT mode, enters the vim command interface
+        -should now see a colon at the bottom left corner of terminal
+    -"w" and Enter
+        -save
+    -"wq" and Enter key
+        -save and quit
+    -"q!" and Enter key
+        -quit without saving

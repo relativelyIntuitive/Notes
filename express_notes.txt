@@ -1,0 +1,170 @@
+
+ - EXPRESS NOTES -
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+GENERAL:
+
+    -Express.js is a framework written in JavaScript which acts as an interface to Node's server functionality
+        -allows creation of a robust server with more or less whatever architecture the dev chooses
+        -there are also many other server frameworks for Node
+            -i.e. Hapi, Koa, Fastify
+            -Express is extremely popular
+    -"Faker.js" is very useful for generating randomized field data to test APIs
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+CREATING A SERVER WITH EXPRESS:
+
+    -The following code will be referenced in the following steps:
+
+        *************************************************************************************************
+        -i.e.   const express = require("express");
+                const app = express();
+                const port = 8000;
+
+                // req is shorthand for request
+                // res is shorthand for response
+                app.get("/api", (req, res) => {
+                    res.json({ message: "Hello World" });
+                });
+
+                // this needs to below the other code blocks
+                app.listen( port, () => console.log(`Listening on port: ${port}`) );
+
+            (^ shows the format of a basic server.js file using Express ^)
+            *************************************************************************************************
+
+    1. Install Express:
+        -"npm install express" within project directory to install
+
+    2. Create a server.js file within the root project directory
+
+    3. Import the express module using JavaScript's require() statement, and then invoke express
+        -Use JS "require()" statement to import express into a const variable ("express" in above example)
+            -this is how any other modulers will be imported to the server.js file as well
+                -i.e. " const faker = require("faker"); "
+                    -will import faker module if you have it installed
+                        -very useful for generating randomized field data
+            -then reference that variable with another ("app" in above example)
+                -use this secondary variable to call HTTP methods
+        -Specify the port to be used here as well!
+            -i.e. " const port = 8000; "
+            -only for convenience purposes
+
+    4. Create routes for HTTP requests
+        -"app" calls the indicated method if the argued route is a match
+        -These request methods take 2 args
+            1. corresponding route
+                -ALWAYS start each route to an api with "/api" 
+                -avoids route collisions with React's client-side routing
+                -Just good practice!
+            2. callback function to call when the route is used
+
+    5. Prepare to run the server
+        -".listen()" method runs the server on the specified port
+        -Has 2 parameters
+            1. port to create the server on
+            2. optional callback function to run if the server starts successfully 
+
+    6. Run the server!
+        - " node server.js " in terminal
+            -run from within the directory that holds the "server.js" file
+        - " ctrl + c " macro in terminal will stop the server
+
+    7. Make sure "Nodemon" is installed if the server should automatically restart when the code updated!
+        -Still MUST manually refresh the browser though!
+        -Might as well install globally
+        -i.e. " npm install -g nodemon "
+            -"-g" option makes it install globally
+                -otherwise, would only install on the current project being accessed in the terminal
+            -may need to use "sudo" if on mac!
+                -i.e. "sudo npm install -g nodemon "
+                    -or without "-g" option for non-global install!
+        -Use " nodemon server.js " to run the server to utilize Nodemon!
+            -server will now auto-refresh when code changes are saved!
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+ACCESSING POST DATA:
+
+    -Requires another setting in the server.js file
+        -allows POST data to be pulled out of the request object
+        -requires "express.urlencoded()" and "express.json()" Express middleware functions to be used
+            -they are responsible for providing and parsing the request.body data
+            -MUST be above any HTTP requests!
+
+        *************************************************************************************************
+        -i.e.   // we can hard code some users like this
+                // later on we will want to store users in a database
+                const users = [
+                    { firstName: "Reimu",  lastName: "Hakurei"    },
+                    { firstName: "Marisa", lastName: "Kirisame"   },
+                    { firstName: "Sanae",  lastName: "Kochiya"    },
+                    { firstName: "Sakuya", lastName: "Izayoi"     },
+                    { firstName: "Momiji", lastName: "Inubashiri" }
+                ];
+
+                // make sure these lines are above any app.get or app.post code blocks
+                app.use( express.json() );
+                app.use( express.urlencoded({ extended: true }) );
+
+                // shows how to use a hard-coded database for testing this example
+                app.get("/api/users", (req, res) => {
+                    res.json( users );
+                });
+
+                app.post("/api/users", (req, res) => {
+                    // req.body will contain the form data from Postman or from React
+                    console.log(req.body);
+                    // we can push it into the users array for now...
+                    // later on this will be inserted into a database
+                    users.push(req.body);
+                    // we always need to respond with something
+                    res.json( { status: "ok" } );
+                });
+
+            (^ shows how to set up access to POST-request data^)
+            ************************************************************************************************
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+ROUTE PARAMETERS:
+
+    -Route parameters must be prefixed with a ":" colon just like in React
+        -the parameter will then be available within the "req.params" object
+
+        ************************************************************************************************
+        -i.e.   // Getting data
+                app.get("/api/users/:id", (req, res) => {
+                    // we can get this `id` variable from req.params
+                    console.log(req.params.id);
+                    // assuming this id is the index of the users array we could return one user this way
+                    res.json( users[req.params.id] );
+                });
+
+                // Updating data
+                app.put("/api/users/:id", (req, res) => {
+                    // we can get this `id` variable from req.params
+                    const id = req.params.id;
+                    // assuming this id is the index of the users array we can replace the user like so
+                    users[id] = req.body;
+                    // we always need to respond with something
+                    res.json( { status: "ok" } );
+                });
+
+                // Deleting data
+                app.delete("/api/users/:id", (req, res) => {
+                    // we can get this `id` variable from req.params
+                    const id = req.params.id;
+                    // assuming this id is the index of the users array we can remove the user like so
+                    users.splice(id, 1);
+                    // we always need to respond with something
+                    res.json( { status: "ok" } );
+                });
+
+        (^ shows how to use route parameters to get, update, and delete specific data ^)
+        ************************************************************************************************
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+

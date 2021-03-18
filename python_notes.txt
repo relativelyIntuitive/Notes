@@ -1,0 +1,561 @@
+
+ -PYTHON NOTES-
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+GENERAL:
+    -Uses "#" to comment a line
+    -Uses colons to start code blocks, and 4-space-indentation or tab-indentation to determine where they end
+        (spaces are preferred. Python 3 allows for mixing of both, but Python 2 should be spaces exclusively!)
+        -enable "render whitespace" on the code editor to show spaces as pale dots to check consistency
+    -Each code-block must contain at least one line of indented code, or the "hanging code-block" will 
+        cause syntax error
+        -"pass" statement is used to ignore hanging code-blocks during development and is rarely seen in final products
+            (useful when you know you need a block, but aren't sure what to put inside it)
+    -Variables in Python are declared without keywords like var, let and const!
+    -Data can be swapped in one-line statements in Python!
+    *************************************************************************************************
+        -i.e.   arr = [1,3,5,7]
+                arr[0], arr[1] = arr[1], arr[0]
+            (^ swaps arr[0] and arr[1] ^)
+            *************************************************************************************************
+    -"Sequences" exist instead of arrays
+        (tuples and lists)
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+VIRTUAL ENVIRONMENTS (venvs) AND PYTHON:
+    
+    -General:
+        -Venvs are like Windows Sandbox
+        -Help keep projects and their dependencies organized
+        -Each venv will have its own set of packages installed and can have a specific version of Python installed too
+            -allows multiple versions of Python to be installed on one machine and easy switching between them
+        -Best practice for any sizable project is to create a specific venv for each project
+    
+    -Pip:
+        -pip (package in python) is the package manager included with Python
+            -There are many package managers for installing third-party packages, but pip works fine for most things
+                    (package managers are generally able to find and install the right version of a package from a terminal command, so you don't have to)
+    
+    -Creating:
+        -navigate to the directory that you want to creat the main venv folder in
+        *************************************************************************************************
+        -i.e.   python -m venv py3Env
+            (CMD)
+
+        -i.e.   python3 -m venv py3Env
+            (BASH)
+            *************************************************************************************************
+
+    -Activating:
+        -navigate to the directory that the main venv folder is located in
+        *************************************************************************************************
+        -i.e.   call <+venv_folder_name>\Scripts\activate
+            (CMD)
+
+        -i.e.   source <+venv_folder_name>/Scripts/activate
+            (BASH)
+            *************************************************************************************************
+        -(<+venv_folder_name>) will preceed the command line when activated
+    
+    -Deactivating:
+        -"deactivate" command will deactivate the venv
+        -closing the terminal will also deactivate the venv
+
+    -Pip commands:
+        -"pip3" must be used when venv is not active on a BASH terminal
+            (you may use "pip" when venv is active instead of "pip3")
+        -"pip install <+package>"
+            (will install the given package in the current environment, global or virtual)
+        -"pip install <+package>==<+version>"
+            (will install the specified version of the given package if you want a certain version)
+        -"pip uninstall <+package>"
+            (will un-install the given package in the current environment, global or virtual)
+        -"pip list" 
+            (will list which packages are installed in the current venv)
+        -"pip freeze > <+requirements.txt>"
+            (will output the venv's installed packages in a requirements.txt file)
+        -"pip show <+package>"
+            (will list details about the given package)
+        -"pip search <+query>"
+            (will list search results of any packages included the query)
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+OPERATORS:
+    1. Arithmetic
+        - +
+            (subtract)
+        - +=
+            (add and then assign sum)
+        - -
+            (subtract)
+        - -=
+            (subtract and then assign difference)
+        - *
+            (multiply)
+        - *=
+            (multiply and assign the product)
+        - ** 
+            (to the power of)
+        - /
+            (divide by)
+        - /=
+            (divide by and assign the quotient)
+        - //
+            (divide by and then convert to integer)
+        - %
+            (modulus, divide by and then return remainder...WEIRD IN JAVASCRIPT, MAY REQUIRE ROUNDING)
+
+    2. Logical:
+        - ==
+            -Checks if the two operands are equal in value
+
+        - !=
+            -Checks if the two operands are not equal in value 
+
+        - >
+            -Checks if the value of the left-operand is greater-than the value of the right-operand
+
+        - <
+            -Checks if the value of the left-operand is less-than the value of the right-operand
+
+        - >=
+            -Checks if the value of the left-operand is greater-than or equal-to the value of the right-operand
+
+        - <=
+            -Checks if the value of the left-operand is greater-than or equal-to the value of the right-operand
+
+        - and
+            -Checks that each expression on the left and right are both True
+
+        - or
+            -Checks if either the expression on the left or right is True
+
+        - not
+            -Reverses the True-False value of the operand
+                (i.e. not True => False)
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+DATA TYPES:
+
+    1. Primitive (most languages have these in common)
+        1. Booleans
+            -True or False value
+                (MUST be capitalized in Python!)
+        2. Strings
+            -literal text
+            -see next section below for formatting
+        3. Numbers
+            -integers, floating-point numbers(decimals) and complex numbers
+        4. None
+            -empty, no type, like null in JS
+            -can NOT be used as if it were a 0
+
+    2. Composite (composed of primitive types)
+        1. Tuples
+            -i.e.   tuple1 = (1, 7, True, "string",)
+                (the trailing comma that seperates list items is commonly acceptable to place after the last item as well, in Python)
+            -like arrays in JS, but values are ALWAYS IMMUTABLE
+            -contains a group of values
+            -value types can be mixed
+            -indexed starting from 0
+            -can also be nested in other tuples, lists, or dictionaries as well
+        2. Lists
+            -i.e.   list1 = [1,7, True, "string",]
+                (the trailing comma that seperates list items is commonly acceptable to place after the last item as well, in Python)
+            -like arrays in JS, but values are always MUTABLE
+            -like tuples except they are ALWAYS MUTABLE!
+            -usually used to store a collection of related data
+            -indexed starting from 0
+            -can also be nested in other tuples, lists, or dictionaries as well
+            -some list methods:
+                -use list.append(value) to add a value to the end of a list
+                -use list.insert(index, value) to add a value at the specified index, pushing other values aside
+                    -index can be negative to indicate position from the end
+                        (-1 index will insert into the last index in the list)
+                -use list.extend(list/tuple) to append the values of another list/tuple to the end of the targeted list
+                -use list.reverse() to reverse the list
+        3. Dictionaries
+            *************************************************************************************************
+            -i.e.   dic = {
+                        key: value,
+                        key: value,
+                        etc...
+                    }
+                (if keys/values are text, don't forget quotes!)
+                *************************************************************************************************
+            -like objects in JS
+            -group of key-value pairs
+            -indexed by keys that must be unique within the dictionary
+            -entry values can be primitive or composite data
+                (i.e. a key with a list as its paired value)
+            -entries accessed to view or alter using bracket notation
+                *************************************************************************************************
+                -i.e.   dic1['keyName'] 
+                    (^ accesses the paired value of keyName ^)
+                    *************************************************************************************************
+            -has many built in methods
+            -some methods:
+                - .keys() accesses keys
+                - .values() accesses values
+                - .items() accesses key-value pairs
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+CUSTOM CLASSES:
+    -Variables are "instances" of built-in classes
+    -The above data types are built-in classes, but you can define your own
+    -A class is like a blueprint that ensures the consistent creation of instances
+    -Classes can have attributes and methods
+        -attributes are shared by all instances of a certain class-type
+            (i.e. name, email and balance for a User class)
+        -methods are functions that all instances of a certain class can perform and can access the attributes
+            (i.e. making a deposit is a function specific to a certain user)
+    -User class is the most common, as it is defined in almost all applications
+    - "__init__" is a "magic-method" that is used to define a class
+    -Parameters that must be filled as arguments upon the creation of an instance follow "__init__"
+    -"Self" will always be the first parameter of every method and attribute within a class
+        -The "self" parameter includes all the information about the individual object that has called the method
+        -When we call on a method from an instance, its instance and all of its attributes are passed in as "self"
+        -This is known as the " implicit passing of self"
+    -Parameters other than "self" can also be left out and attributes given a value
+        (i.e. self.account_balance = 0)
+    *************************************************************************************************
+    -i.e.   class User:
+                def __init__(self, name, email_address):
+                    self.name = name
+                    self.email = email
+                    self.account_balance = 0
+                def make_deposit(self, amount):
+                    self.account_balance += amount
+                    return self
+        (^ defines a class and its attributes, also a method ^)
+
+    -i.e.   guido = User("Guido van Rossum", "guido@python.com")
+            monty = User("Monty Python", "monty@python.com")
+        (^ creates 2 new instances of class-type "User" ^)
+        *************************************************************************************************
+    -Attributes/methods of an instance can then be accessed using dot notation
+        (i.e. guido.email /// guido.make_deposit(500)
+    -Methods can be chained with dot-notation as long as the methods being chained return themselves at the end
+        *************************************************************************************************
+        -i.e.   def make_deposit(self, amount):
+                    self.account_balance += amount
+                    return self
+            (^ last line is needed in order for the method to allow others chained after it ^)
+            *************************************************************************************************
+    -Classes can be associated with eachother
+        *************************************************************************************************
+        -i.e.   self.account = BankAccount(int_rate=0.02, balance=0)
+            (^ creates a BankAccount instance and links it to the user as the attribute .account ^)
+            *************************************************************************************************
+        -this way the User instance can have multiple accounts, as the .balance attribute belongs to each 
+            account instead
+        -can access the .account just like any other attribute, except it has its own attributes too
+            *************************************************************************************************
+            -i.e.   def make_deposit(self, amount):
+                        self.account.deposit(amount)
+                        print(self.account.balance)
+                (^ chain the accounts attributes as expected ^)
+                *************************************************************************************************
+        -must use a User method that references the account to alter bank account attributes, 
+            cannot chain to account method through.account attribute at runtime
+            (i.e. guido.make_deposit(500), NOT guido.account.deposit(500) if .deposit() is a method of the account)
+        -the classes MUST be in the same file so that the referenced is recognized
+            (modularization allows for seperate files to be associated though)
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+STRING FORMATTING:
+
+    -Use single or double-quotes around a string literal
+    -Strings can be concatenated with the "+" sign, but only with other strings!
+        (str() function, f-string interpolation or formatting can concatenate strings with other data_types)
+
+        1. f-strings:
+            *************************************************************************************************
+            -i.e.   f"My name is {name} and I am {age} years old."
+                (^ interpolates string w/contents of anything in the {} placeholders being converted to str type ^)
+                *************************************************************************************************
+            -this is the best method
+
+        2. str() function
+            *************************************************************************************************
+            -i.e.   str(value) + " yoyoyo"
+                (^ "casts" argued value as a string and concatenates it with given string ^)
+                *************************************************************************************************
+            -not the recommended method, but useful to know
+
+        2. .format():
+            *************************************************************************************************
+            -i.e.   "My name is {} and I am {} years old.".format(name, age)
+                (^ interpolates string, filling empty placeholders with listed items at end, in order ^) 
+                *************************************************************************************************
+            -this is the legacy method, still common to see though
+            
+        3. %-formatting:
+            *************************************************************************************************
+            -i.e.   "My name is %s and I am %d years old." % (name, age)
+                (^ interpolates string, replacing the "%" placeholders with listed items at end, in order ^)
+                *************************************************************************************************
+            -placeholders data type must be explicit, "%s" is a string and "%d" is a number
+            -"%" at the end seperates the string from the values to be inserted
+            -even older than .format() method, but still in use
+
+    -Strings in Python have many built-in methods
+        - string.upper(): returns a copy of the string with all the characters in uppercase.
+        - string.lower(): returns a copy of the string with all the characters in lowercase.
+        - string.count(substring): returns number of occurrences of substring in string.
+        - string.split(char): returns a list of values where string is split at the given character. Without a 
+            parameter the default split is at every space.
+        - string.find(substring): returns the index of the start of the first occurrence of substring within string.
+        - string.isalnum(): returns boolean depending on whether the string's length is > 0 and all characters are 
+            alphanumeric (letters and numbers only). Strings that include spaces and punctuation will return False for 
+            this method. Similar methods include .isalpha(), .isdigit(), .islower(), .isupper(), and so on. All return 
+            booleans.
+        - string.join(list): returns a string that is all strings within our set (in this case a list) concatenated.
+        - string.endswith(substring): returns a boolean based upon whether the last characters of string match 
+            substring.
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+SEQUENCES:
+    -Tuples & Lists AND Single-Linked-Lists (see SLL Algos notes)
+    -Have quite a few built in functions
+    -Some built-in functions that work for both types:
+        (see DATA TYPES above for type specific functions)
+        -Slicing:
+            -Sequences can be sliced using [x:y]
+            -returns a slice of the sequence including index x, up to but not including index y
+            *************************************************************************************************
+            -i.e.   my_tuple[2:5] 
+                (^ returns a slice of the sequence including the items at indexes 2, 3 & 4 ^)
+                *************************************************************************************************
+        - max(sequence)
+            -returns the largest value in the sequence
+        - sum(sequence)
+            -returns the sum of all values in sequence
+        - map(function, sequence)
+            -applies the function to every item in the sequence you pass in. Returns a list of the results
+        - min(sequence)
+            -returns the lowest value in a sequence
+        - sorted(sequence)
+            -returns a sorted list of the sequence's values
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+FUNCTIONS:
+
+    *************************************************************************************************
+    -i.e.   def funcName(input):
+                |code...
+                |code...
+                |code...
+                *************************************************************************************************
+
+    -Functions are defined with "def" keyword
+    -MUST use "return" if you want the function to return a value
+    -Default parameters can be set like so:
+        *************************************************************************************************
+        -i.e.   def beCheerful(name='', repeat=2):
+                    print(f"good morning {name}\n" * repeat)
+                beCheerful()
+            (^ prints "good morning" twice, as no arguments are made to override the defaults ^)
+            *************************************************************************************************
+    -If arguments are made explicitly, the order doesnt matter!
+        -i.e.   beCheerful(repeat=4, name='Zeebo')
+            (^ works because arguments are defined explicitly! ^)
+    -There are many built-in Python functions
+    -Some generic built-in functions:
+        - print()
+            -i.e.   print("blah blah blah")
+            -print is a function in Python 3 and requires parentheses, unlike in previous versions
+                (parentheses will still work with Python 2, but Python 3 will not work without them)
+            -will output any data class type
+
+        - type()
+            -i.e.   type(2.76)
+                (^ outputs <class 'float'> ^)
+            -outputs the data class type of the argued value
+            -to check type as part of condition, use as keyword, not string
+                -(i.e. if type(var) == list NOT if type(var) == "list")
+
+        - len()
+            -i.e.   len(list1)
+                (^ outputs the length of the argued data ^)
+            -only works on data class types that have a length attribute
+                (like strings, tuples, lists and dictionaries, NOT numbers or booleans!)
+        
+        - round()
+            -i.e.   round(2.7697)
+                (^ rounds up to 3 ^)
+
+            -i.e.   round(2.7697, 2)
+                (^ rounds up to 2.77...2nd decimal place ^)
+            -takes optional second argument for the decimal place to round to
+                (default is integer rounding without second args)
+
+        - strftime()
+            -i.e.   strftime("%Y-%m-%d %H:%M %p", gmtime())
+            -"time" module must be imported for these methods to works
+                (i.e. "import time" at top of file)
+            -func takes a string of one or more format codes as arg#1 and returns a formatted string
+                (the "%" denotes format codes)
+            -arg#2 in this case sets the timezone to gmtime()
+
+        - random.randint(a, b)
+            -must "import random" to use
+            -takes two args
+            -generates a random integer between the two args
+                (a <= int <= b)
+
+        - type-casting/explicit type-conversion functions:
+            -i.e. str(value1)
+                (^ converts argued value to a string ^)
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+LAMBDA FUNCTIONS:
+    -Python's version of anonymous functions
+    -i.e.   lambda num1, num2: num1+num2
+    -Can take any amount of args
+    -Doesn't take up any memory unless it is in use
+    -Mostly handy to be used as a callback function that won't be used again
+    -Can be used for:
+        -item in list
+        -callback function
+        -variable value
+        -returned by another function
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+CONDITIONAL STATEMENTS:
+
+    1. If/Elif/Else statements:
+        *************************************************************************************************
+        -i.e.   if <+condition>:
+                    code...
+                elif <+condition>:
+                    code...
+                else:
+                    code...
+            (^ does not need "elif" or "else" statement ^)
+            *************************************************************************************************
+
+    2. Ternary Operations
+        -syntax is: <+result if true> if <+condition> else <+result if false>
+        -i.e.   print('Coding Dojo' if stacks >= 3 else 'You are not Coding Dojo!')
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+LOOPS:
+
+    1. For...in...range() loops:
+        *************************************************************************************************
+        -i.e.   for i in range(start, stop, increment/decrement):
+                    |code...
+                    |code...
+                    |code...
+            *************************************************************************************************
+        -iterates through range() and assigns current iteration number to iterator variable
+        -Colon starts code-block
+        -Len([+object]) will give you the length of the object
+        -Stops BEFORE running the stop iteration
+            (use -1 if you want it to run on 0 when decrementing)
+        -Use a number to increment or decrement, without reference to the variable
+            (3 increments by 3, -1 decrements by 1, etc.)
+        -Can leave out the start position and incrementor, if you want to start at 0 and increment by 1
+            (can not leave out the start unless the incrementor is also left out)
+        -Can use to iterate through a list like this:
+            *************************************************************************************************
+            -i.e.   x = [1,"string", 3]
+                    for i in range(0, len(x), 1):
+                        print(x[i])
+                (^ this will iterate the array and print each value ^)
+                *************************************************************************************************
+
+        -Allows you to reassign the index values, shorter for...in loop will not
+            ( x[i] = 6 will only work with a range() in the for...in loop)
+
+    2. For...in loops:
+            *************************************************************************************************
+            -i.e.   for i in listName:
+                    |code...
+                    |code...
+                    |code...
+                    *************************************************************************************************
+
+            -iterates through list/tuple and assigns current element to iterator variable
+            -READ ONLY FOR LISTS/TUPLES! DOES NOT allow editting elements this way! MUST use for...in...range() for that! 
+                (can't alter tuple values anyways, so might as well always use this method for tuples)
+            -Can be used for Dictionaries as well, with the key being assigned to the iteration variable
+                *************************************************************************************************
+                -i.e.   for k in dicName:
+                            |code...
+                            |code...
+                            |code...
+                            *************************************************************************************************
+
+                -key-values must be accessed like you would with an index
+                    (dicName[k] would output the value matched with the given key)
+                -there are a few other ways to iterate through dictionaries with for...in loops
+                    *************************************************************************************************
+                    -i.e.   for key in capitals.keys():
+                                print(key)
+                        (^ prints each key ^)
+                        *************************************************************************************************
+                    *************************************************************************************************
+                    -i.e.   for val in capitals.values():
+                                print(val)
+                        (^ prints each value ^)
+                        *************************************************************************************************
+                    *************************************************************************************************
+                    -i.e.   for key, val in capitals.items():
+                                print(key, "=", val)
+                        (^ prints each key-value pair with " = " between them^)
+                        *************************************************************************************************
+
+    3. While loops:
+        *************************************************************************************************
+        -i.e.   while <+condition>:
+                    |code...
+                    |code to progress towards False...
+                    *************************************************************************************************
+        -any iterator variables must be declared outside of the loop
+        -must make some progress on each iteration towards the condition becoming False
+            (avoids infinite loops!)
+        -while loops can include an "else" statement in Python!
+            *************************************************************************************************
+            -i.e.   y = 3
+                    while y > 0:
+                        print(y)
+                        y -= 1
+                    else:
+                        print("Final else statement")
+                (^ prints "3 2 1 Final else statement" when the condition is evaluated to be False ^)
+                *************************************************************************************************
+            -"else" statement is only executed if the loop is runs through normally, without a break/continue
+        -"break" keyword will exit the loop containing it
+            *************************************************************************************************
+            -i.e.   for val in "string":
+                        if val == "i":
+                            break
+                        print(val)
+                (^ prints "s t r" ^)
+                *************************************************************************************************
+            -will only exit the inner loop if it is nested
+        -"continue" keyword will return to the top of the loop, skipping all code remaining in the current iteration
+            *************************************************************************************************
+            -i.e.   for val in "string":
+                        if val == "i":
+                            continue
+                        print(val)
+                (^ prints "s t r n g" ^)
+                *************************************************************************************************
+            -useful when you want to skip specific iteration(s), but still keep looping to the end after
+            
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------

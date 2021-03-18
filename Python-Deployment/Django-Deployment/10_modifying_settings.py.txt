@@ -1,0 +1,54 @@
+Modifying Settings
+Objectives:
+Update our deployed settings.py file
+
+IMPORTANT
+Anywhere you see {{myRepoName}} – replace that whole thing INCLUDING the {{}} with your outer folder name (same as GitHub repository name).
+Anywhere you see {{projectName}} – replace that whole thing INCLUDING the {{}} with the project folder name (the name of your Django project).
+Anywhere you see {{yourEC2.public.ip}} – replace that whole thing INCLUDING the {{}} with the public IP address of your newly created server.
+If you named your repo something different from your project, the repo name and project name may be different, but it is okay if they are the same.
+
+Navigate into your main project directory, where settings.py lives.
+
+*************************************************************************************************
+(venv) ubuntu@54.162.31.253:~/myRepoName$ cd {{projectName}}
+*************************************************************************************************
+
+We're going to use a built-in text editor (VIM) in the terminal to update the code in settings.py.
+
+*************************************************************************************************
+(venv) ubuntu@54.162.31.253:~/myRepoName/projectName$ sudo vim settings.py
+*************************************************************************************************
+
+You'll need to add a line that allows you to serve static content. You'll also need to modify a couple of lines, as follows. Don't forget to type i to enter insert mode.
+
+*************************************************************************************************
+# inside settings.py
+# modify these lines
+DEBUG = False
+# keep the quotes!
+ALLOWED_HOSTS = ['{{yourEC2.public.ip}}']
+# add this line at the bottom; don't replace any existing lines!
+STATIC_ROOT = os.path.join(BASE_DIR, "static/")
+Save and quit. (esc, :wq, enter)
+*************************************************************************************************
+
+Navigate back to the folder that holds manage.py. Make sure your virtual environment is still activated!
+
+*************************************************************************************************
+(venv) ubuntu@54.162.31.253:~/myRepoName/projectName$ cd ..
+*************************************************************************************************
+
+Gather all of the static files in your project into one location:
+
+*************************************************************************************************
+(venv) ubuntu@54.162.31.253:~myRepoName$ python manage.py collectstatic
+# type yes when prompted
+*************************************************************************************************
+
+If you ignored your db and/or migrations files, this is a great time to also make and run migrations, just as you would have done on your local machine!
+
+*************************************************************************************************
+(venv) ubuntu@54.162.31.253:~myRepoName$ python manage.py makemigrations
+(venv) ubuntu@54.162.31.253:~myRepoName$ python manage.py migrate
+*************************************************************************************************

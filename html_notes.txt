@@ -1,0 +1,105 @@
+
+- HTML NOTES -
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    REQUEST/RESPONSE CYCLE:
+        1. Client-Side (Front-End):
+            -Request sent to DNS server
+            -DNS looks up IP address with HTTP request
+        2. Server-Side (Back-End):
+            -If request was successfell, HTTP 200 code
+            -Server uses database to handle request, and reply
+            -Server itself may be coded in any language
+            -Response always sent to client in HTML, CSS, and JavaScript
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    HEAD VS. BODY:
+        -All HTML documents need both
+        -The head is for metadata mainly
+        -The body is the visual structure of the page that is rendered by the browser
+        -The head is loaded before the body
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    TAGS & ELEMENTS:
+        -Tags are used to build HTML
+        -Tags in body are used to creat elements
+        -Elements have attributes, such as a src for an image or script, href for a link, or style for css
+        -Elements can be given any custom element that is not a reserved keyword
+            -i.e. secondary-source = "image_file.png" for an image that needs a second source
+                (such as when it is switched to a different image by a jQuery function)
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    TIERED ELEMENTS:
+
+        -Forms:
+            -Made up of <label> / <input> pairings 
+            *************************************************************************************************
+            -i.e.   <h1>Index Page</h1>
+                    <h3>Create a User</h3>
+                    <form action='/users' method='post'>
+                        {% csrf_token %}
+                        <label for='name_box'>Name:</label> 
+                        <input id='name_box' type='text' name='name'>
+                        <label for='email_box'>Email:</label> 
+                        <input id='email_box' type='text' name='email'>
+                        <button type='submit'>Create User</button>
+                    </form>
+                (^ creates a form with a name and email input ^)
+                *************************************************************************************************
+            -"action" attribute:
+                -sets the route that will PROCESS the form. Not display it
+
+            -"method" attribute:
+                -likely want it to be a POST request, but GET is the default if not set
+
+            -"csrf_token":
+                -allows Django to add a hidden input field and value that helps our server recognize genuine requests
+                -if you forget this, Django outputs an error message if you attempt to submit a form without a CSRF token
+
+            -"<input>" elements:
+                -elements that gather data from the user
+                -"name" attribute should be unique
+                -"type" determines whether it's a text box, dropdown, etc
+                    -"hidden" is a type that submits a "value" attribute
+                        -whatever the "value" attribute is set to within in the HTML tag will be submitted for that input
+                            -i.e.   <input type="hidden" name="action" value="register">
+                                (^ passes 'register' value when its form submits, under 'action' name ^)
+                        -useful for when 2 forms share the same "action" route and request "method" attributes
+                            (i.e. login and register page both posting and routing to user dashboard)
+                        -cannot be seen on the rendered page, BUT visible and changeable in pages source!
+                            (be careful what you use them for, as they can be editted by hackers)
+
+            -"<label>" elements:
+                -paired with input
+                -HTML value between tags determines it's text
+                -match "for" attribute to <input>'s "id" attribute
+
+            -a way to submit the form
+                -"<input type='submit'>"
+                -"<button type='submit'>Submit</button>"
+                -"NOT <input type='button'>"
+
+
+        -Tables:
+            *************************************************************************************************
+            -i.e.   <table>
+                        <tr>
+                            <th>Firstname</th>
+                            <th>Lastname</th>
+                            <th>Age</th>
+                        </tr>
+                        <tr>
+                            <td>Jill</td>
+                            <td>Smith</td>
+                            <td>50</td>
+                        </tr>
+                    </table>
+                (^ creates a table with a heading row and a data row, each 3 cells wide ^)
+                *************************************************************************************************
+
+        FOR LOOPS AND CONDITIONALS:
+            -See flask_notes.txt

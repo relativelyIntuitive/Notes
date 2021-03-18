@@ -1,0 +1,97 @@
+ 
+ - CSS RESPONSIVE WEB DESIGN NOTES -
+
+    ADAPTIVE VS. RESPONSIVE WEB-DESIGN:
+        1. Adaptive: Relies on determining what size screen that's being used
+            and then providing the user with a single static version of the site that is not responsive.
+                -Usually designed for the 6 most common screen widths
+                    (320, 480, 760, 960, 1200, 1600) 
+                -Usually more to create, since 6 different layouts are needed, but less possible mistakes to make
+        2. Responsize: Mobile-centric designs that generally put content ahead of style to make one version of 
+            the website that will respond to the size of the viewer's display and display itself accordingly
+                -Content is the #1 priority here, as it will usually fill a small screen.
+                -Designed starting from the smallest or mid-size and then working through the other sizes
+                    to make sure that it works on bigger devices as well
+                -Most modern websites use responsive designs
+                -Uses a defined set of "break-points" to determine when to switch layouts
+                    (breakpoints are screen-width measurements. Those below are suggested ranges)
+                    (Phone	- Width less than or equal to 480px)
+                    (Tablet - Width between 481px and 1023px)
+                    (Desktop - Width greater than or equal to 1024px)
+                -Uses responsive units to determine size-values
+                    (% - width determined by screen-size)
+                    (em - multiplier of the size of the element's parent)
+                    (rem - multiplier of the default font-size of the user's browser)
+
+    MEDIA-QUERIES:
+        -   @media only screen and ([+max/min-width: ?px])
+                -@media rule is used to detect information about the device being used to access the website
+                -checks if user device is a "screen" in this case, but can be used for so much more
+                -checks the width of the screen against 
+                the given condition, and executes code in the block if condition evaluates to true
+        -Media-queries for screen width must be organized from smallest to largest, as CSS rules are applied 
+            from top to bottom and you want to make sure that the conditions are checked in the proper order
+                0. .navbtn class default rules:
+                    -   .navbtn {
+                            width: 200px;
+                            height: 150px;
+                        }
+                1. Phone rules-query:
+                    -   @media only screen and (max-width: 480px) {
+                            .navbtn {
+                                background-color: yellow;
+                            }
+                        }
+                2. Tablet rules-query
+                    -   @media only screen and (min-width: 481px) {
+                            .navbtn {
+                                background-color: blue;
+                            }
+                        }
+                3. Desktop rules-query
+                    -   @media only screen and (min-width: 1024px) {
+                            .navbtn {
+                                background-color: red;
+                            }
+                        }
+    
+    GRID SYSTEM:
+        -Alternative to the "Lego method" that is used for designing responsive web-pages
+        -Divides the screen evenly into columns and rows with a total width of 100%
+            (12 columns is the standard grid layout for designing a responsive page)
+            (there is not actual grid, percent values are just determined by the size of the imagined grid)
+        -Grid shrinks/grows as the browser window is resized
+        -A class for each of the (3) screen-types is created and they are ALL given to 
+            every element whose properties need changing when the browser resizes
+                (the rulesets for these size classes are only initiated when one of their media-query conditions evaluates to true)
+                (ensure that the media-query conditions are organized properly, this way,
+                    only the ruleset for one size-class will ever be active at a time)
+        -EXAMPLE SIZE AND GRID LAYOUT DETERMINING RULESETS:
+            -From top to bottom, if size is 1050px, the small ruleset is never applied, because the condition is not met. 
+                Then the medium ruleset is applied, as it's condition is met. 
+                    The large ruleset's condition is then met as well and as the CSS is read from top-to-bottom, it is applied over the medium ruleset
+                        (example rules for a 4-COLUMN table below, but up to 12-column tables are often used!)
+                        1. Phone-rules query
+                            -   @media only screen and (max-width: 480px) {
+                                    .sm-4 {             =---> (applied to elements like paragraphs that should take up all 4 columns in small mode)
+                                        width: 100%;
+                                    }
+                                    .sm-0 {             =---> (applied to elements like sidebars that should disappear in small mode) 
+                                        display: none;
+                                    }
+                                }
+                        2. Tablet-rules query
+                            -   @media only screen and (min-width: 481px) {
+                                .   med-2 {             =---> (applied to elements that should take up 2 columns in medium mode)
+                                        width: 50%;
+                                    }
+                                }
+                        3. Desktop-rules query
+                            -   @media only screen and (min-width: 1024px) {
+                                    .lg-1 {             =---> (applied to elements that should take up only 1 column each in large mode)
+                                        width: 25%;
+                                    }
+                                    .lg-3 {             =---> (applied to elements that should take up 3 columns in large mode)
+                                        width: 75%;
+                                    }
+                                }

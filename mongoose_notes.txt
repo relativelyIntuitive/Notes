@@ -1,0 +1,500 @@
+
+ - MONGOOSE NOTES -
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+GENERAL:
+
+-"Mongoose" is a library that is used to connect MongoDB to Node and Express
+    -Mongoose simplifies the making of MongoDB queries with its own library of methods
+        -allows more structure to be given to data with the addition of models and schemas
+    -Mongoose is a layer between the application and db makes validations and complex queries more effective
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+SETTING-UP MONGOOSE:
+
+1. Initialize a "package.json" file and Install Dependencies:
+    -Navigate to project root folder
+    -" npm init -y "
+    -" npm install mongoose express "
+
+2. Require (import) Mongoose:
+    -i.e. " const mongoose = require('mongoose'); "
+        -MUST add to top of ANY files that use Mongoose
+
+3. Server:
+    -Navigate to the "server.js" file
+        -server DOES NOT need to require Mongoose!
+            -only the .config and .routes files need to be required!
+        -hardly needs any code!
+            -b/c we modularized the project from the start!
+
+    *************************************************************************************************
+    -i.e.   *SERVER.JS*
+            const express = require("express");
+            const app = express();
+            const port = 8000;
+
+            // This will fire our mongoose.connect statement to initialize our database connection
+            require("./server/config/mongoose.config");
+
+            app.use(express.json(), express.urlencoded({ extended: true }));
+
+            // This is where we import the users routes function from our user.routes.js file
+            const AllUserRoutes = require("./server/routes/users.routes");
+            AllMyUserRoutes(app);
+
+            app.listen(port, () => console.log(`Listening on port: ${port}`));
+
+        (^ demonstrates basic server.js file with Mongoose ^)
+        *************************************************************************************************
+
+4. Connect to MongoDB with Mongoose:
+    -Navigate to "/server/config/mongoose.config.js" to connect to MongoDB
+        -create ALL server folders and this file if you haven't already!
+            -see "SERVER-FOLDER STRUCTURE MODULARIZATION" section of "node_js_notes.txt"
+    -Use "mongoose.connect()" method to connect to the MongoDB!
+        -if you attempt to connect to a db that doesn't exist, Mongoose will create the db for you!
+            -but not until you create the first document in the db!
+
+        *************************************************************************************************
+        -i.e.   *MONGOOSE.CONFIG.JS*
+                const mongoose = require("mongoose");
+
+                // the "useNewUrlParser" & "useUnifiedTopology" oprions are passed to get rid of deprecation messages in the terminal???
+                mongoose.connect("mongodb://localhost/[+name_of_your_db]", {
+                    useNewUrlParser: true,
+                    useUnifiedTopology: true,
+                })
+                    .then(() => console.log("Established a connection to the database"))
+                    .catch(err => console.log("Something went wrong when connecting to the database", err));
+
+            (^ demonstrates the basic use of ".connect()" method ^)
+            *************************************************************************************************
+
+5. Create your Mongoose Schema and Model:
+    -Mongoose adds "schemas" to provide more structure to MongoDB
+        -these "schemas" turn into models for our collections
+            -these models specify keys, types, and even validations for documents in a specific collection
+    -Mongoose also handles appropriate naming for you when it communicates with MongoDB!
+    -Navigate to "/server/models/[+model_name].model.js"
+    -Be sure to import Mongoose!
+    -Use ".Schema()" method to create schema objects
+        -store results in a variable
+        -takes an object as an argument
+            -the obj defines the format for each new document put in the collection 
+        -optional second arg can be used to add created/updated timestamps!
+            -" { timestamps:: true } "
+                -false by default
+            -other options? 
+    -Use ".model()" method to create models from the schema
+        -store results in a variable
+            -this variable is what will be exported by the file!
+            -effectively exports a constructor function to create new User objects
+                -this allows the function to be imported to any file!
+        -takes 2 arguments
+            1. model type for reference
+            2. schema to use for creation
+
+    *************************************************************************************************
+    -i.e.   *USERS.MODEL.JS*
+            const mongoose = require("mongoose");
+
+            // Creates a schema to make user models
+            const UserSchema = new mongoose.Schema(
+                {
+                    name: String,
+                    age: Number
+                },
+                { timestamps: true }
+            );
+
+            // Essentially creates a "User" constructor function 
+            const User = mongoose.model("User", UserSchema);
+
+            // Exports the User constructor
+            module.exports = User;
+
+        (^ demonstrates the use of Mongoose to create model schemas ^)
+        *************************************************************************************************
+
+6. Use the Mongoose Models for CRUD:
+    -Navigate to "/server/controllers/[+model_name].controller.js"
+        -this folder houses all logic for creating, retrieving, updating and deleting users
+            -these files DO NOT need to require (import) Mongoose!
+                -instead, requires (imports) the specific exported variable that it will control from the proper model.js file!
+                -the controller file does not actually use any Mongoose methods
+                    -it only calls them by referencing the model functions that it imports!
+                    -uses them as tools for CRUD
+    -Define your controller functions for the specific model!
+        -each controller function should contain a CRUD method executed on "User"
+            -each of these CRUD methods will have 2 methods appended to them via JSON that will execute depending on the CRUD result
+                1. ".then()"
+                    -takes a callback-func argument that executes only if the CRUD operation was a success
+                2. ".catch()"
+                    -takes a callback-func argument that executes only if the CRUD operation failed
+
+        *************************************************************************************************
+        -i.e.   *USERS.CONTROLLER.JS*
+                // "User" becomes a constructor function for creating User objects
+                const User = require("../models/users.model");
+
+                module.exports.findAllUsers = (req, res) => {
+                    User.find()
+                        .then(allDaUsers => res.json({ users: allDaUsers }))
+                        .catch(err => res.json({ message: "Something went wrong", error: err }));
+                };
+
+                module.exports.findOneSingleUser = (req, res) => {
+                    User.findOne({ _id: req.params.id })
+                        .then(oneSingleUser => res.json({ user: oneSingleUser }))
+                        .catch(err => res.json({ message: "Something went wrong", error: err }));
+                };
+
+                module.exports.findRandomJoke = (req, res) => {
+                    Joke.estimatedDocumentCount({}, (err, jokeCount) => {
+                        const randomNum = Math.floor(Math.random() * jokeCount);
+                        
+                        Joke.findOne().skip(randomNum)
+                            .then(randomJoke => res.json({ joke: randomJoke }))
+                            .catch(err => res.json({ message: "Something went wrong", error: err }));
+                    });
+                };
+
+                module.exports.createNewUser = (req, res) => {
+                    User.exists({ name: req.body.name })
+                        .then(userExists => {
+                            if (userExists) {
+                                return Promise.reject("User already exists!")
+                            }
+                            return User.create(req.body);
+                        })
+                        .then(newlyCreatedUser => res.json({ user: newlyCreatedUser }))
+                        .catch(err => res.json({ message: "Something went wrong", error: err }));
+                };
+
+                module.exports.updateExistingUser = (req, res) => {
+                    User.findOneAndUpdate({ _id: req.params.id }, req.body, { new: true })
+                        .then(updatedUser => res.json({ user: updatedUser }))
+                        .catch(err => res.json({ message: "Something went wrong", error: err }));
+                };
+
+                module.exports.deleteAnExistingUser = (req, res) => {
+                    User.deleteOne({ _id: req.params.id })
+                        .then(result => res.json({ result: result }))
+                        .catch(err => res.json({ message: "Something went wrong", error: err }));
+                };
+
+            (^ demonstrates basic definition of controller functions ^)
+            *************************************************************************************************
+
+7. Routing:
+    -Navigate to "/server/routes/[+model_name].routes.js"
+        -routes files are responsible for all routes that deal with the specified model
+            -these files DO NOT need to require (import) Mongoose
+                -they just need to import the exports from the controller file for the specified model!
+        -routes are matched from the top of the list downward
+            -routes of the same request type MUST be in the proper order!
+            -if the "findRandomUser" GET request was after the "findOneSingleUser" request, the "random" in the url would be mistaken as the ":id" param!
+
+    *************************************************************************************************
+    -i.e.   *USER.ROUTES.JS*
+            // "UserController" variable holds the user.controller.js exports, and can access those methods
+            const UserController = require("../controllers/users.controller");
+
+            module.exports = app => {
+                app.get("/api/users", UserController.findAllUsers);
+                app.get("/api/users/random", UserController.findRandomUser);
+                app.get("/api/users/:id", UserController.findOneSingleUser);
+                app.post("/api/users/new", UserController.createNewUser);
+                app.put("/api/users/update/:id", UserController.updateExistingUser);
+                app.delete("/api/users/delete/:id", UserController.deleteAnExistingUser);
+            };
+
+        (^ demonstrates the creation of model specific routes ^)
+        *************************************************************************************************
+
+    8. Test it!
+        -Navigate to root project folder where "server.js" should be stored
+        -" nodemon server.js "
+            -runs the server
+        -Make requests with Postman to test each route!
+            -MUST submit request bodies in JSON!?
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+COMMON MONGOOSE COMMANDS:
+
+-Listed in this section are some of the most common Mongoose commands
+    -they essentially simplify MongoDB CRUD operations
+    -full list of Mongoose commands: http://mongoosejs.com/docs/index.html
+
+-Defining a User Schema:
+    *************************************************************************************************
+    -i.e.   *USER.MODEL.JS*
+            // Create a Schema for Users, defining the expected data type of each attribute value 
+            const UserSchema = new mongoose.Schema({
+                name: { type: String },
+                age: { type: Number }
+            }, { timestamps: true })
+
+            // create a constructor function for our model and store in variable 'User'
+            const User = mongoose.model('User', UserSchema);
+
+        (^ demonstrates creation of basic "User" schema ^)
+        *************************************************************************************************
+
+-Finding All Users:
+    *************************************************************************************************
+    -i.e.   // Retrieve an array of all documents in the "User" collection
+            User.find()
+                .then(users => {
+                    // logic with Users results
+                })
+                .catch(err => res.json(err));
+                    // if there's an error and the record was not saved, this (err) will contain validation errors.
+
+        (^ demonstrates basic retrieval of an entire Collection ^)
+        *************************************************************************************************
+
+-Finding all Users where their name is Jessica:
+    *************************************************************************************************
+    -i.e.   // Retrieves an array of documents matching the query object criteria
+            User.find({name:'Jessica'}) 
+                .then(usersNamedJessica => {
+                    // logic with usersNamedJessica results
+                })
+                .catch(err => res.json(err));
+                    // if there's an error and the record was not saved, this (err) will contain validation errors.
+
+        (^ demonstrates retrieval of all "User" documents with a "name" filter of "Jessica" in this case ^)
+        *************************************************************************************************
+
+-Finding one User by _id:
+    *************************************************************************************************
+    -i.e.   // Retrieves 1 document (the first record found) matching the query object criteria
+            User.findOne({_id: '5d34d361db64c9267ed91f73'})
+                .then(user => {
+                    // logic with single user object result
+                })
+                .catch(err => res.json(err));
+                    // if there's an error and the record was not saved, this (err) will contain validation errors.
+
+        (^ demonstrates retrieval of document by _id ^)
+        *************************************************************************************************
+
+-Retrieving 1 random User:
+    -".count()" is deprecated
+        -use ".estimatedDocumentCount()" by default
+            -better for larger projects
+            -doesn't fully scan each document
+                -just uses _id
+        -use ".countDocuments()" for smaller projects if you like
+    -BOTH ".estimatedDocumentCount()" and ".countDocuments()" take 2 parameters
+        -param 1 is a filter to narrow the count, can be empty for all docs to be coounted
+        -param 2 is a callback that takes 2 args
+            1. to be argued by any potential error
+            2. to be argued by the result of the count if successfull
+    -use the count to generate a random number and then use the random number to perform a "findOne()" and "skip()" to a random doc!
+
+    *************************************************************************************************
+    -i.e.   // Retrieves 1 random document by querying all and then skipping a random amount
+            module.exports.findRandomJoke = (req, res) => {
+                Joke.estimatedDocumentCount({}, (err, jokeCount) => {
+                    const randomNum = Math.floor(Math.random() * jokeCount);
+                    
+                    Joke.findOne().skip(randomNum)
+                        .then(randomJoke => res.json({ joke: randomJoke }))
+                        .catch(err => res.json({ message: "Something went wrong", error: err }));
+                });
+            };
+
+        (^ demonstrates retrieval of document by _id ^)
+        *************************************************************************************************
+
+-Create a User:
+    -create a new document to store in the User collection and save it to the DB
+    -req.body is an object containing all the User document data
+        -"req.body" would come from the POST request, maybe made by Postman
+        -if "req.body" was an object literal it would look like this:
+            -i.e. " req.body = {"name": "Bob Ross", "age": 42} "
+
+    *************************************************************************************************
+    -i.e.   // Create a new document to store in the 'User" collection and save it to the DB
+            const bob = new User(req.body);
+            bob.save()
+                .then(newUser => {
+                    // logic with succesfully saved newUser object
+                })
+                .catch(err => res.json(err));
+                    // if there's an error and the record was not saved, this (err) will contain validation errors.
+
+            // (Simplified w/destructuring) Create a new document to store in the User collection and save it to the DB
+            const { userData } = req.body;
+            User.create(userData)
+                .then(newUser => {
+                    // logic with succesfully saved newUser object
+                })
+                .catch(err => res.json(err));
+                    // if there's an error and the record was not saved, this (err) will contain validation errors.
+
+        (^ demonstrates creation of a document, "User" in this case ^)
+        *************************************************************************************************
+
+-Delete all Users:
+    *************************************************************************************************
+    -i.e.   // Delete all documents of the "User" collection
+            User.remove()
+                .then(deletedUsers => {
+                    // logic (if any) with successfully removed deletedUsers object
+                })
+                .catch(err => res.json(err));
+                    // if there's an error and the record was not saved, this (err) will contain validation errors.
+
+        (^ demonstrates deletion of all "User" docs within the collection, but NOT the collection itself ^)
+        *************************************************************************************************
+
+-Delete one User:
+    *************************************************************************************************
+    -i.e.   // Delete 1 document that matches the query object criteria
+            User.remove({_id: '5d34d361db64c9267ed91f73'})
+                .then(deletedUser => {
+                    // logic (if any) with successfully removed deletedUser object
+                })
+                .catch(err => res.json(err));
+
+        (^ demonstrates deletion of one "User" doc, which should be targetted by its _id ^)
+        *************************************************************************************************
+
+-Update one Document:
+    *************************************************************************************************
+    -i.e.   // Update 1 document that matches the query object criteria (first found)
+            User.updateOne({name:'Bob Ross'}, {
+                name: 'Ross Bob',
+                $push: {pets: {name: 'Sprinkles', type: 'Chubby Unicorn' }}
+            })
+                .then(result => {
+                    // logic with result -- note this will be the original object by default!
+                })
+                .catch(err => res.json(err));
+
+            // Alternate method of updating a single document (first found)
+            User.findOne({name: 'Bob Ross'})
+                .then(user => {
+                    user.name = 'Rob Boss';
+                    user.pets.push({name: 'Sprinkles', type: 'Chubby Unicorn'});
+                    return user.save();
+                })
+                .then(saveResult => res.json(saveResult))
+                .catch(err => res.json(err));
+
+        (^  ^)
+        *************************************************************************************************
+
+-Validate for Uniqueness Before Creating a New Document:
+    *************************************************************************************************
+    -i.e.   User.exists({name: req.body.name})
+                .then(userExists => {
+                    if (userExists) {
+                        // Promise.reject() will activate the .catch() below.
+                        return Promise.reject('Error Message Goes Here');
+                    }
+                    return User.create(req.body);
+                })
+                .then(saveResult => res.json(saveResult))
+                .catch(err => res.json(err));
+
+        (^ demonstrates validation of document uniqueness using the ".exists()" method ^)
+        *************************************************************************************************
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+VALIDATIONS WITH MONGOOSE:
+
+-JavaScript validations can get messy
+-Validations with Mongoose are easy!
+    -add validations like attributes in the schema definitions
+        -many available!
+            -https://mongoosejs.com/docs/validation.html
+
+    *************************************************************************************************
+    -i.e.   // "required" and "maxlength" are both validation parameters
+            const mongoose = require("mongoose");
+
+            const UserSchema = new mongoose.Schema(
+            {
+                first_name: {
+                    type: String,
+                    required: [true, "First name is required"],
+                    minlength: [6, "First name must be at least 6 characters long"]
+                },
+                last_name: {
+                    type: String,
+                    required: [true, "Last name is required"],
+                    maxlength: [20, "Last name must be no more than 20 characters long"]
+                },
+                age: {
+                    type: Number,
+                    min: [1, "You must be at least 1 or older to register"],
+                    max: [150, "You must be at most 149 years old to register"]
+                },
+
+                // one line works too!
+                email: { type: String, required: [true, "Email is required"] }
+            },
+
+            { timestamps: true }
+            );
+
+            const User = mongoose.model("User", UserSchema);
+
+            module.exports = User;
+
+        (^ demonstrates basic use of Mongoose validations ^)
+        *************************************************************************************************
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+NESTED DOCUMENTS WITH MONGODB AND MONGOOSE:
+
+-Because MongoDB is NoSQL, joins are not used!
+    -"nested documents" are the analog to relational fields
+        -MongoDB stores data as JSON objects, so any data type can be used for their values
+            -like arrays and nested objects! 
+        -a nested document is a mongoose schema that contains a field with the value being a completely separate mongoose schema
+            -this is used to mimic relational fields!
+
+        *************************************************************************************************
+        -i.e.   // "TransactionSchema" must be defined first, since it is referenced by "BankAccountSchema"
+                *BANK.MODEL.JS*
+                const TransactionSchema = new mongoose.Schema(
+                    {
+                        amount: { type: Number, required: true },
+                        vender: { type: String, required: true }
+                    },
+                    { timestamps: { createdAt: true } }
+                );
+
+                const BankAccountSchema = new mongoose.Schema(
+                    {
+                        accountType: { type: String, required: true },
+                        balance: { type: Number, default: 0 },
+                        transactions: [TransactionSchema]
+                    },
+                    { timestamps: true }
+                );
+
+                *USER.MODEL.JS*
+                const UserSchema = new mongoose.Schema(
+                    {
+                        fName: String,
+                        lName: String,
+                        email: String,
+                        password: String,
+                        bankAccounts: [BankAccountSchema]
+                    },
+                    { timestamps: true }
+                );
+
+            (^ demonstrates basic document nesting, w/each User having 1+ accts, and each acct having 1+ transactions ^)
+            *************************************************************************************************

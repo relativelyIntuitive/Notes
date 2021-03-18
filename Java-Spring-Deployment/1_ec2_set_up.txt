@@ -1,0 +1,45 @@
+Deploying your Spring Boot to Amazon
+
+Prerequisites:
+Basic Terminal knowledge
+Basic Java and Spring knowledge
+AWS Free Tier account. You can sign up at: http://aws.amazon.com/free/
+
+Overview:
+To successfully deploy our Spring Boot application, we will need to install the following technologies on our server:
+    Java JDK
+    Apache Web Server
+    MySQL Database
+
+Setting Up our EC2 Instance:
+
+1.Once your AWS account is created, let's log in to the console at aws.amazon.com/console. Choose EC2 under the Compute Category.
+
+2.In the EC2 dashboard, let's click the large blue button that says "Launch Instance"
+
+3.Now, we need to choose an Amazon Machine Image (AMI). The machine that we will be using is Ubuntu Server 16.04. This machine should be offered by Amazon for free.
+
+4.Now, we get to choose how powerful we want this instance to be. Let's go with the t2.micro version, which is free. Go ahead and click on "Next: Configure Instance Details".
+
+5.We will be using mostly default configurations but is good to know what you are able to customize. For our purposes, we won't need to change anything. Go ahead and click "Next: Add Storage".
+
+6.This is where we want to specify how much storage we want. We will only need 8 GB for now. Go ahead and click on "Next: Tag Instance".
+
+7.We can give our instance a name by "tagging" it. It is up to you if you want to name it. Go ahead and click on "Next: Configure Security Group".
+
+8.In the Configure Security Group page, you have the option to create a new security group. A security group is a set of firewall rules that control the traffic for your instance. Under this Security Group, the default allowed traffic is SSH with a TCP protocol, this means that we can only access this instance via SSH (PUTTY for windows users) or the Terminal for macs. For web traffic, we also want to add the HTTP protocol. Go ahead and click on "Review and Launch".
+
+9.Go ahead and click Launch to create our configured EC2 instance.
+
+10.Next, need to create and download a new key pair. This is a private KEY that will allow us to connect to our server securely.
+
+11.Once you have the pem file downloaded, move it to a convenient directory of your choice.
+
+12. In your terminal, navigate to the directory where the pem file is located and change the permissions by running "chmod 400 <<theNameOfYourKey>>.pem".
+
+13. Using ssh, we will connect to our instance by running "ssh -i <<theNameOfYourKey>>.pem ubuntu@<<yourPublicIpAddress>>"
+    -Your system will ask you if you want to continue connecting. Type in yes.
+    -Note: You can find both, public and private IPs, in the EC2 dashboard.
+
+14. Once connected to the server, run "sudo apt-get update" and "sudo apt-get -y upgrade"
+    -This will make sure that our system. is up to date. If you see a pink screen to update menu.lst, choose the default option to keep the local version currently installed.

@@ -1,0 +1,32 @@
+Process Managers
+Objectives:
+Understand what a process manager is
+Learn about Green Unicorn as a process manager
+In general, the process manager performs the following roles:
+
+Restarts the app automatically if it crashes
+
+Gains insights into runtime performance and resource consumption
+
+Modifies settings dynamically to improve performance
+Load Balancing
+
+Green Unicorn, AKA Gunicorn, performs these roles by acting as an intermediary between incoming requests and your Django app. While you were testing your app on your local machine, it was ok to use Django’s built-in, light-weight testing server, but that server wasn’t designed to be used in a deployment environment.
+
+Gunicorn, on the other hand, is designed to handle incoming requests that will need to be routed to the interpreter. This includes any route you've added to urls.py. We'll learn more about our other server, Nginx, which will be serving static files such as images.
+
+Gunicorn needs a way to communicate with our app. When creating a new Django project you may have noticed that a document called wsgi.py is automatically generated. What you need to know is that your wsgi.py file is the glue that connects the Gunicorn server to your Django app. It’s how Gunicorn knows where to look for all that good code you wrote!
+
+Note: How WSGI works, what it is, and why it’s needed is a bit outside our scope here. In order to truly understand what WSGI does, you’ll need to dig into some more complex topics. To try to explain it briefly here would be a disservice. As always, when you read about or hear of something new, be curious. Go out there and learn more. A good place to start is by reading the Python docs on the topic.
+
+Chances are that when you deploy an app you’ve been developing in a local environment, you need to use some kind of process manager, regardless of the technology stack. Some common combinations include Unicorn for Rails, pm2 for NodeJS, and Apache for PHP.
+
+There are three basic functions you will need to set up when you add Gunicorn to your project. To add this functionality, Gunicorn needs some instructions on how to do the following:
+
+    1. Which socket to connect to?
+
+    2. What to do if a process fails?
+
+    3. How many workers to set up? 
+
+Armed with these instructions, Gunicorn takes over the job of ensuring that your app keeps running if an error occurs, directing traffic to the appropriate port, and running concurrent processes. In short, Gunicorn makes sure your deployment server runs more smoothly.

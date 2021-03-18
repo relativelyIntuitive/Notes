@@ -1,0 +1,19 @@
+Step 8: Wrapping Up
+We will remove the Nginx default site display from directory sites-enabled, by running the following in your terminal.
+
+sudo rm /etc/nginx/sites-enabled/default
+Now, all that is left to do is restart your Nginx server.
+
+sudo service nginx restart
+If your server restarted correctly, you will see the new command line, and your app is deployed! Go to the public domain and your app should be there.
+
+If you see anything other than your app, review your server file for errors.
+
+To exit the remote server, type:
+
+exit
+Common errors and how to find them:
+502, bad gateway: there is a problem in your code. Hint: any error starting with 5 indicates a server error
+Your Gunicorn process won’t start: Check your .service file; typos and wrong file paths are common mistakes
+Your NGINX restart fails: Check your NGINX file in the sites-available directory. Common problems include typos and forgetting to insert your project name where indicated.
+Make sure the URL requested is correct (example if your root route is /home, make sure you put /home after the IP)

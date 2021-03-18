@@ -1,0 +1,33 @@
+Step 3: Creating an EC2 server instance
+Note: You’ll need an AWS account, which you can sign up for here. It’s free for a year, so long as you don’t have more than 1 (free-tier) instance up at a time!
+Login to AWS Console at https://aws.amazon.com/
+Once you have logged in you will see your dashboard page:
+dashboard ec2
+Launch a new instance from the EC2 Dashboard, as shown below:
+launch instance
+Select Ubuntu Server 16.04 option.
+select server
+Select t2.micro option and click Review and Launch
+select review and launch
+Security settings
+Click the Edit security groups link in the lower right corner
+edit security groups
+SSH option should be there already. Reset SSH source from the dropdown menu to MyIP. This is the ip address of your current location. If you go home, for example, you will have to set this again to get it to be your home ip.
+edit ssh rule
+Click the add a rule button twice to add HTTP and HTTPS, source set to Anywhere, and then click Review and Launch:
+add http and https rules
+You’ll be asked to create a key file. This is what will let us connect and control the server from our local machine.
+
+Name your pem key whatever makes the most sense to you. The image below shows the pem key name as "django_pem", but "flask_pem" would be a smarter choice. Give it a generic name, not the name of your project, as we will be re-using this instance.
+
+The key will automatically be saved to your downloads folder when you click Download Key Pair, but you will want to move it. See the next item for more information on this critical step.
+download pem key
+
+This next part is very important! Put your pem key in a file that has no chance of EVER being pushed to github. You should not send this file via email, or in any other way make it publicly available:
+choose safe location for pem key
+
+After launching your instance, you will see a rather confusing screen with some information, as shown below. In order to move on, scroll to the bottom of the page and confirm that you would like to view your instance.
+click view instance at bottom of page
+
+Once you have several instances running, you will want to be able to identify what your different instances are for. We have the option of naming our instance, so let’s do so now by clicking on our instance’s name column as shown.
+name your instance

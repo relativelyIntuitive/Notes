@@ -1,0 +1,21 @@
+Step 7: Nginx
+Now, we just need to configure nginx to handle requests made by the server. Let's create a new file in sites-available.
+
+sudo vim /etc/nginx/sites-available/{{project}}
+In this file, we will need the following:
+
+server {
+    listen 80;
+    server_name {{your public ip}};
+    location / {
+        include proxy_params;
+        proxy_pass http://unix:/home/{{username}}/{{repo name}}/{{project}}.sock;
+    }
+}
+Now, we need to link this nginx configuration to our sites-enabled directory.
+
+sudo ln -s /etc/nginx/sites-available/{{project}} /etc/nginx/sites-enabled
+Test nginx for errors:
+
+sudo nginx -t
+If we get a message saying that everything is (syntactically) ok, then we are almost done!

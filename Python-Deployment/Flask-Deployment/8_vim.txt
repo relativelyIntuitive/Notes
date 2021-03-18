@@ -1,0 +1,10 @@
+VIM
+If you have used VIM before, skip to the next tab.
+
+VIM is a terminal based file editor. We will use it to change the necessary files in order to get our project running. In the following instructions, you'll be using the vimcommand to enter the editor. The vim command can be used either to edit existing files or create and open a new blank file. Once you have entered the editor interface, press i to enter INSERT mode. You should see –INSERT– at the bottom left corner of your terminal. Now use your arrow keys to move the cursor to where you want to edit and make your changes.
+
+Once you are done, press the esc key to exit INSERT mode. Type a colon to enter the vim command interface. You should now see a colon at the bottom left corner of your terminal. Now, type wq and press return to write (save) and quit.
+
+If you want to quit without saving, type q! after the colon.
+
+If you'd like to save without quitting, type w after the colon.

@@ -1,0 +1,1718 @@
+
+- SPRING BOOT NOTES -
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+GENERAL:
+
+    -Spring is a framework that is large and consists of several modules
+        -Spring MVC is one of them
+            -allows building web apps using Java
+        -Spring Boot is a framework used to configure and set up Spring applications easily
+            -Spring projects require several dependencies to work
+                -Spring boot configures them for you with the help of Apache Maven!
+                    -MUST be installed to configure and install the dependencies
+        -Spring Boot and Spring MVC are often referred to interchangeably
+            -This is colloquial
+            -Due to Spring Boot's tight coupling with Spring MVC
+    -Flow of operations:
+        1. Incoming Request:
+            -The DispatcherServlet (Front Controller) analyzes the incoming request and dispatches it to the appropriate controller
+            -It uses handlers to delegate the request
+            -Annotations such as @Controller and @RequestMapping allow the Front Controller to correctly hand off the request
+        2. Creating the Model
+            -The Controller's job is to handle the request, interpret user input and transform it into a model
+            -Depending on the request, the controller may have to talk to a service to retrieve, insert, update or delete some information from the database
+            -Once this process is done, a model is returned to our controller
+        3. View Template
+            -The View template is reponsible for rendering what the client sees by using the model object
+            -Once that process is done, everything is returned to the Front Controller to package it as a response
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+STARTING A PROJECT:
+
+    1. Create new "Spring Starter Project" in STS
+        -conventions for project info:
+            1. name Field: 
+                -i.e. " [+yourprojectname] "
+                    -this will be your project name all lowercased.
+            2. group Field:
+                -i.e. " com.[+company].[+yourprojectname] "
+                    -this will be a combination of your company and your project. For now, you can put your name in its place.
+            3. artifact Field: <yourprojectname>
+            4. description Field: Short description about your project
+            5. package Field: Same as the group field.
+
+    2. On "dependencies" screen, search and select "Spring Web" for now
+        -this is how Spring Boot uses Spring MVC!
+
+    3. Start the server!
+        -right click the project in the STS package explorer
+            -select "Run As --> Spring Boot App"
+        -runs the app on default port 8080
+        -visit "localhost:8080" to test!
+            -should see "Whitelabel Error Page", this is normal!
+        -to stop the server, use the red square button in the STS header
+            -the red square + green arrow button restarts the server
+            -server MUST be restarted any time that changes are made to the code
+
+    4. Project Structure:
+        ├── src
+        │   ├── main (where MVC, templates, and static resources will go)
+        │   │   ├── java 
+        │   │   │   └── com
+        │   │   │       └── relativelyintuitive
+        │   │   │           └── hellospringboot
+        │   │   │               └── HellospringbootApplication.java
+        │   │   └── resources
+        │   │       ├── application.properties
+        │   │       ├── static
+        │   │       └── templates
+        │   └── test (where test code will go)
+        │       └── java
+        │           └── com
+        │               └── relativelyintuitive
+        │                   └── hellospringboot
+        │                       └── HellospringbootApplicationTests.java
+
+    5. Open the .java file in the package created in the "src/main/java" directory
+        -Hotkey to add dependency import lines
+            -Windows: " ctrl + shift + o "
+            -Mac: " command + shift + o "
+
+        *************************************************************************************************
+        -i.e.   // *HellospringbootApplication.java*
+                package com.relativelyintuitive.hellospringboot;
+                import org.springframework.boot.SpringApplication;
+                // ADD Importing dependencies
+                import org.springframework.boot.autoconfigure.SpringBootApplication;
+                import org.springframework.web.bind.annotation.RequestMapping;
+                import org.springframework.web.bind.annotation.RestController;
+
+                @SpringBootApplication
+                // ADD Annotation
+                @RestController
+                public class HellospringbootApplication {
+                        public static void main(String[] args) {
+                                SpringApplication.run(HellospringbootApplication.class, args);
+                        }
+
+                        // ADD Annotation
+                        @RequestMapping("/")
+                        // ADD Method that maps to the request route above
+                        public String hello() {
+                                return "Hello World!";
+                        }
+                }
+
+            (^ demonstrates basic setup of root route for Spring Web server ^)
+            *************************************************************************************************
+
+    6. Restart the server and then test the root URL!
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+REQUESTS AND ROUTING WITH SPRING:
+
+GENERAL:
+
+    -Must exist on their own line
+        -do NOT need semi-colons after!
+    -Spring uses annotations to handle routing
+        -annotations are a form of metadata that can be added to source code
+            -not Spring specific, they exist as part of the Java language.
+                -there are a few annotations that Spring needs to work, however
+    -Requests have 2 parts:
+        1. path
+            -i.e. "wiki/URL" is the path of the URL: "https://en.wikipedia.org/wiki/URL"
+        2. request method
+            - " get " unless specified otherwise
+
+ROUTING WITH ANNOTATIONS:
+
+    - " @RestController "
+            -designates that the following class is a controller
+            -allows our controller to respond with data
+                -i.e. Strings, JSON etc...
+
+    - " @RequestMapping() "
+            -maps web requests onto specific handler classes and/or handler methods
+                -class-level annotations allow chaining routes like below by nesting annotations!
+            -has "attributes???" like HTML that are passed like arguments
+                - " value "
+                    -the only required attribute to pass
+                    -if a nested path, the entire path does NOT need to be explicitly reiterated here
+                        -only the current level path needs to be specified
+                        -i.e. "/greeting/goodbye" can just be "/goodbye" if nested under "/greeting"
+                            -either wors, consecutive and equal paths will be collapsed
+                    -representst the path that the following method/class will be assigned to
+                        -i.e. " @RequestMapping(value="/") "
+                    -can be passed implicitly if it's the only argument
+                        -i.e. " @RequestMapping("/") " 
+                - " method "
+                    -represents the request method to match with the path that the following method/class will be assigned to
+                        -i.e. " @RequestMapping()
+                    -defaults to " RequestMethod.GET " if not argued
+
+        *************************************************************************************************
+        -i.e.   // Nesting @ class and method level:
+                @RestController
+                @RequestMapping("/greeting")
+                public class HomeController {
+                    @RequestMapping("")
+                    public String index(){
+                        return "This is accessed view http://your_server/simple/root";
+                    }
+                    @RequestMapping("/hello")
+                    public String hello(){
+                        return "Hello world! What route did you use to access me?";
+                    }
+                    @RequestMapping("/goodbye")
+                    public String world(){
+                        return "Goodbye world!";
+                    }
+                }
+
+                // This class would map exactly the same as the above, but is written messier
+                @RestController
+                public class HomeController {
+                    @RequestMapping("/greeting")
+                    public String index(){
+                    return "Hello user!";
+                    }
+                    // you can be explicit about the request as well
+                    @RequestMapping(value="/greeting/hello", method=RequestMethod.GET)
+                    public String hello(){
+                    return "Hello world! What route did you use to access me?";
+                    }
+                    @RequestMapping("/greeting/goodbye")
+                    public String world(){
+                    return "Goodbye world!";
+                    }
+                }
+
+
+            (^ demonstrates basic use / nesting of " @RequestMapping " annotation ^)
+            *************************************************************************************************
+
+ROUTING WITH QUERY PARAMETERS:
+
+    -Uses the " @RequestParam() " annotation
+        -allows passing key-value pairs through a URL path
+            - "?" always denotes the start of a query parameter
+                -i.e. "http://www.google.com/search?q=searchy+search"
+                    -everything after the "?" is called the "query string" or the "query parameters"
+                    -in this case, google is sent a key of "q" with a value of "searchy search"
+        -accepts some arguments:
+            - " value "
+                    -the value that wil represent the key for the key-value pair created fro
+                    -the only required argument
+                        -i.e. " @RequestParam(value="q") "
+                        -passed implicitly if its the only arg
+                            -i.e. " @RequestParam("q") "
+            - " required "
+                    -declares if the query parameter is required for this path
+                        -will crash the app if set to "true" and the path is requested with no query parameter
+                        -defaults to "true"!
+        -MUST import!
+        -included as a parameter itself for the path's method
+
+        *************************************************************************************************
+                // ".../?q=blahblahblah" request will pass "blahblahblah" to the controller
+                import org.springframework.web.bind.annotation.RestController;
+                import org.springframework.web.bind.annotation.RequestMapping;
+                import org.springframework.web.bind.annotation.RequestParam;
+
+                @RestController
+                public class HomeController {
+                    @RequestMapping("/")
+                    // "searchQuery" variable is created to hold the value passed to the URL key ("q" here)
+                    public String index(@RequestParam(value="q", required=false) String searchQuery) {
+                        if (searchQuery != null){
+                            return "You searched for: " + searchQuery;
+                        } esle {
+                            return "No search parameters given!";
+                        }
+                    }
+                }
+
+            (^ demonstrates basic use of query parameters ^)
+            *************************************************************************************************
+
+ROUTING WITH URL PARAMETERS:
+
+    -Different slightly from query parameters
+        -a.k.a. "path variables"
+        -i.e. "http://learn.codingdojo.com/m/59/5436/33349"
+            -each path variable represents a value passed to the controller
+    -Uses " @PathVariable " annotation:
+        -MUST import!
+        -added as a parameter to the controller method declaration
+    -MUST add the variables to the " @RequestMapping() " path as well!
+
+    *************************************************************************************************
+    -i.e.   //
+            import org.springframework.web.bind.annotation.PathVariable;
+            import org.springframework.web.bind.annotation.RequestMapping;
+            import org.springframework.web.bind.annotation.RestController;
+
+            @RestController
+            public class HomeController {
+                // place the path variables in the path...
+                @RequestMapping("/m/{track}/{module}/{lesson}")
+                // pair the path variables with "local" variables to hold the values passed to them
+                public String showLesson(@PathVariable("track") String track, @PathVariable("module") String module, @PathVariable("lesson") String lesson){
+                    // use the data passed through the URL!
+                    return "Track: " + track + ", Module: " + module + ", Lesson: " + lesson;
+                }
+            }
+
+        (^ demonstrates basic use of URL parameters / path variables ^)
+        *************************************************************************************************
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+SPRING BOOT TEMPLATING:
+
+GENERAL:
+
+    -Spring can use JSP to render pages
+    -REQUIRES "tomcat-embed-jasper" and "JSTL" dependencies to work
+        -add dependencies in the "pom.xml" file from a Spring project
+        -"Tomcat" is a server and "JSTL" is a library
+
+SETUP STEPS:
+
+    1. Use STS to add dependencies to the "pom.xml" file using the GUI
+        -i.e. open file in STS and click "dependencies" tab under the file window
+        -OR write them by hand to the file in XML code
+
+        *************************************************************************************************
+        -i.e.   // *pom.xml*
+                ...
+                <dependency>
+                        <groupId>org.apache.tomcat.embed</groupId>
+                        <artifactId>tomcat-embed-jasper</artifactId>
+                </dependency>
+                <dependency>
+                        <groupId>javax.servlet</groupId>
+                        <artifactId>jstl</artifactId>
+                </dependency>
+                ...
+
+            (^ demonstrates how to add dependencies manually with XML code ^)
+            *************************************************************************************************
+
+    2. create "src/main/webapp" folder if it doesn't exist
+        -running the project also creates "webapp" folder
+
+    3. create "src/main/webapp/WEB-INF" folder if it doesn't exist
+        -sets up the "webapp" folder with a sub-directory
+
+    4. edit "src/main/resources/applications.properties" file to contain the line:
+        - " spring.mvc.view.prefix=/WEB-INF/ "
+            -tells the Tomcat server to look in the "/WEB-INF/" folder for "view" files
+
+    5. Create .jsp file in "/WEB-INF/" folder and verify that it can be served up
+        -the following code will only be processed if the JSPs are hooked up correctly to use the JSTL library
+            -the "taglib prefix" specifies crucial .jsp settings
+                -more details later???
+            - " <c:out value="${ [+backend_data] }"/> " is how you would acess backend data and Java scripting in .jsp file
+                -like "{{ [+backend_data] }} " in Django's Jinja 2 system
+
+            *************************************************************************************************
+            -i.e.   // *index.jsp*
+                    <%@ taglib prefix = "c" uri = "http://java.sun.com/jsp/jstl/core" %>
+
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                    <meta charset="UTF-8">
+                    <title> Insert title here </title>
+                    </head>
+                    <body>
+                        <h1> Hello there friends!! </h1>
+                        <c:out value="${2+2}"/>
+                    </body>
+                    </html>
+
+                (^ demonstrates basic .jsp file that will render a "c:out value" and an "<h1>" element ^)
+                *************************************************************************************************
+
+    6. Set up a controller
+        - " @Controller " annotation will be used
+            -allows response to requests with a "view"
+            -NOT " @RestController " 
+                -used for responding with data such as string literals or json, won't work for views
+
+        *************************************************************************************************
+        -i.e.   // *HomeController.java*
+                package com.codingdojo.controllerspractice.controllers;
+                import org.springframework.stereotype.Controller;
+                import org.springframework.web.bind.annotation.RequestMapping;
+
+                @Controller
+                public class HomeController {
+                    @RequestMapping("/")
+                    public String index() {
+                        return "index.jsp";
+                    }
+                }
+
+            (^ demonstrates route setup to render a view using " @Controller " annotation ^)
+            *************************************************************************************************
+
+    7. Test!
+
+VIEW MODEL / CONTEXT:
+
+    -A "model" object is used to pass data to the view
+    -The model object implements the map interface to pass key-value pairs to the view
+        -use " model.addAttribute("[+key]", [+value]) " to add key-value pairs to the model
+        -this is how class names and IDs should be passed to .jsp view template elements!
+
+            *************************************************************************************************
+            -i.e.   // *HomeController.java*
+                    ...
+                        @RequestMapping("/")
+                        public String index(Model model) {
+                            model.addAttribute("dojoName", "Burbank");
+                            return "index.jsp";
+                        }
+                    ...
+
+                    // * src/main/webapp/WEB-INF/index.jsp*
+                    <c:out value="${dojoName}"/>
+
+                (^ demonstrates use of a model to pass context to a view ^)
+                *************************************************************************************************
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+STATIC CONTENT:
+
+GENERAL:
+
+    -Spring boot will automatically look for a "static" folder at "src/main/resources"
+        -HTML, CSS, and JS files will go here!
+            -for organization:
+                1. CSS gets a subfolder
+                2. JS gets one too
+                3. HTML files are stored at the root of the static folder though!
+
+SET UP:
+
+*************************************************************************************************
+-i.e.   // *src/main/resources/static/index.html*
+        <!DOCTYPE html>
+        <html>
+        <head>
+                <title></title>
+                <link rel="stylesheet" type="text/css" href="css/style.css">
+                <script type="text/javascript" src="js/app.js"></script>
+        </head>
+        <body>
+                // "greetingId" should be passed to the .jsp from its controller
+                <h1 id="${greetingId}">Hello World</h1>
+        </body>
+        </html>
+
+        // *src/main/resources/static/css/style.css*
+        h1 {
+            color: blue;
+        }
+
+        // *src/main/resources/static/js/app.js*
+        alert("Hello World");
+
+    (^ demonstrates basic use of "static" directory ^)
+    *************************************************************************************************
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+SESSION DATA IN SPRING:
+
+GENERAL:
+
+    -Used just like "HttpSession"
+    -"session" object uses map interface just like "model"
+        -session data can be accessed directly from .jsp files without a "Model model"
+        -can use with models and other method parameters like so:
+            -i.e. " public String index(@PathVariable("name") String zebra, Model model, HttpSession) {...} "
+        -use " session.setAttribute("[+key]", [+value]) " to SET key-value pairs in the session object
+            -pairs will not be set until the controller involving them is called!
+        -use " session.getAttribute("[+key]") " to GET values by key
+    -Use type casting when retrieving data from session
+        -i.e. " (Integer) " used below just to be extra explicit
+        -good practice in Java
+
+ACCESSING SESSION:
+
+    *************************************************************************************************
+    -i.e.   // *HomeController.java*
+            public String index(HttpSession session){
+                session.setAttribute("count", 0);
+                Integer count = (Integer) session.getAttribute("count");
+            }
+
+        (^ demonstrates basic use of the "session" object ^)
+        *************************************************************************************************
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+POST REQUESTS IN SPRING:
+
+GENERAL:
+
+    -A controller method can indicate its request-method type with the "method" argument to the "@RequestMapping" annotation
+        -i.e. " @RequestMapping(value="/login", method=RequestMethod.POST) "
+    -To send data via POST request, you must create a form in the .jsp view
+        -set its "method" HTML attribute to "POST"
+    -To retrieve data from a POST request, use "@RequestParam" 
+        -just like when retrieving passed data from the query string
+
+POST REQUESTS FOR LOGINS:
+
+    *************************************************************************************************
+    -i.e.   <!-- *index.jsp* -->
+            ...
+            <form method="POST" action="/login">
+                <label>Username: <input type="text" name="username"></label>
+                <label>Password: <input type="password" name="password"></label>
+                <button>Login</button>
+            </form>
+            ...
+
+            // *UsersController.java*
+            ...
+
+            @Controller
+            public class UsersController {
+                @RequestMapping(value="/login", method=RequestMethod.POST)
+                public String login(@RequestParam(value="username") String user, @RequestParam(value="password") String password) {
+                        // ... process information and save it to the session
+                        return "redirect:/dashboard";
+                }
+
+            // *DashboardController.java*
+            @Controller
+            public class DashboardController {
+                @RequestMapping("/dashboard")
+                public String dashboard() {
+                    // ... any code to process before rendering
+                    return "dashboard.jsp";
+                }
+            ...
+
+        (^ demonstrates basic sending and retrieving of POST requests ^)
+        *************************************************************************************************
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+FLASH DATA:
+
+GENERAL:
+
+    -"Flash data" is data that persists ONLY across the next request
+        -a sort of session data
+    -Uses map interface
+    -Useful for things such as error/success messages or anything that needs to be shown just once directly following a request
+    -Flash data is merged into a model after submission
+        -i.e. access keys via <c:out/> element!
+
+USING FLASH DATA:
+
+    *************************************************************************************************
+    -i.e.   // *HomeController.java*
+            import org.springframework.stereotype.Controller;
+            import org.springframework.ui.Model;
+            import org.springframework.web.bind.annotation.RequestMapping;
+            import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+            @Controller
+            public class HomeController {
+
+                @RequestMapping("/")
+                public String index(Model model) {
+                    model.addAttribute("dojoName", "Burbank");
+                    return "index.jsp";
+                }
+
+                @RequestMapping("/createError")
+                public String flashMessages(RedirectAttributes redirectAttributes) {
+                    redirectAttributes.addFlashAttribute("error", "A test error!");
+                    return "redirect:/";
+                }
+            }
+
+            <!-- *index.jsp -->
+            <%@ taglib prefix = "c" uri = "http://java.sun.com/jsp/jstl/core" %>
+
+            <!DOCTYPE html>
+            <html>
+            <head>
+            <meta charset="UTF-8">
+            <title> Code? </title>
+            </head>
+            <body>
+                <p><c:out value="${error}"/></p>
+            </body>
+            </html>
+
+        (^ demonstrates basic use of flash data to potentially display an error ^)
+        *************************************************************************************************
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+DEPENDENCY INJECTION:
+
+GENERAL:
+
+    -Documentation:
+        -https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans
+    -Sometimes we use member-method parameters that arguments are never provided for
+        -i.e. "(Model model, HttpSession session)" etc...
+    -Dependency injection is a powerful design pattern that inverts the usual control flow of a program
+        -a.k.a. "DI"
+        -process called "inversion of control"
+            -a.k.a. "IoC"
+    -Together, "IoC" and "DI" are a large part of modern Java frameworks
+        -basically the "Ioc container" finds all the dependencies, instantiates them, and injects them where required
+        -the process decouples the class construction from the construction of its dependencies
+            -results in cleaner, more modular and more maintainable code
+            -also makes testing easier
+
+    *************************************************************************************************
+    -i.e.   // *SomeController.java*
+            ...
+            @RequestMapping("/")
+            public String index(Model model) {
+                model.addAttribute("dojoName", "Burbank");
+                return "index";
+            }
+            ...
+
+        (^ demonstrates how "model" does not need instantiation, thanks to IoC and DI ^)
+        *************************************************************************************************
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+DATABASES WITH SPRING:
+
+GENERAL:
+
+    -"Java Persistence API" or "JPA" can be used to connect Spring to a database
+    -Can hook up any DB you want
+    -This guide will detail using JPA and Java MySQL Connector 
+    -"Domain models" contain the structure, or model, of the objects we're dealing with
+        -domain models will represent tables on a MySQL DB!
+        -simply a "Java Bean" that represents our "business data"
+            -i.e. the info we want about a particular thing
+    -"Domain services" contain all the logic to manipulate the domain models
+        - "@Service" annotation declares a class to be a service
+    -Data repositories are where we gain access to all our data once we start talking with the database
+        -repositories are interfaces
+            -they extend "CrudRepository"
+        -a repository represents all objects of a certain type as a conceptual set.
+        -acts like a collection, except with more elaborate querying capability
+
+SET-UP:
+
+    -See "spring_boot_full_stack_notes.txt" for a step-by-step guide
+    -Requires "spring-boot-starter-data-jpa" and "mysql-connector-java" dependencies
+
+        *************************************************************************************************
+        -i.e.   // *pom.xml*
+                ...
+                <dependency>
+                    <groupId>mysql</groupId>
+                    <artifactId>mysql-connector-java</artifactId>
+                    <scope>runtime</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-data-jpa</artifactId>
+                </dependency>
+                ...
+
+            (^ dependency code to add to pom.xml file ^)
+            *************************************************************************************************
+
+    -Requires DB connection to schema in "application.properties" file
+
+        *************************************************************************************************
+            -i.e.   // *application.properties*
+                    spring.datasource.url=jdbc:mysql://localhost:3306/[+schema_name]
+                    spring.datasource.username=root
+                    spring.datasource.password=root
+                    spring.datasource.driver-class-name=com.mysql.jdbc.Driver
+                    spring.jpa.hibernate.ddl-auto=update
+
+            (^ shows the code to be added to "application.properties" ^)
+            *************************************************************************************************
+
+    -See "spring_boot_full_stack_notes.txt" for a detailed step-by-step guide!
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+DB RELATIONSHIPS WITH STS:
+
+GENERAL:
+
+    -MUST hava "devtools" dependency!
+
+        *************************************************************************************************
+        -i.e.   // *pom.xml*
+                ...
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-devtools</artifactId>
+                </dependency>
+                ...
+
+            (^ dependency code for devtools ^)
+            *************************************************************************************************
+
+ONE TO ONE RELATIONSHIPS:
+
+    -"@OneToOne"
+        -defines the 1:1 relationship with another entity. There are different options that you can have in the annotation and it is extremely important that you use the correct one depending on which side of the relationship your entity is.
+        -takes some options:
+            -"(mappedBy="person")"
+                -this will map the license attribute in the Person class to the person attribute in the License class. It represents the field that owns the relationship. This element is only specified on the inverse (non-owning) side of the association.
+            -"(cascade=CascadeType.ALL)"
+                -the operations that must be cascaded to the target of the association. This will make sure referential integrity is preserved in ALL actions.
+            -"(fetch=FetchType.LAZY)"
+                -whether the association should be lazily loaded or must be eagerly fetched.
+                    -"LAZY"
+                        -the association is fetched when needed
+                    -"EAGER"
+                        -the association is fetched immediately.
+            -rest of them can be found here:
+                - https://www.objectdb.com/api/java/jpa/OneToOne
+    -"@JoinColumn(name="person_id")"
+        -defines mapping for composite foreign keys
+        -indicates that the corresponding table to this entity has a foreign_key to the referenced table
+
+    *************************************************************************************************
+    -i.e.   // *Person.java*
+            // ...
+            @Entity
+            @Table(name="persons")
+            public class Person {
+
+                @Id
+                @GeneratedValue(strategy = GenerationType.IDENTITY)
+                private Long id;
+                private String firstName;
+                private String lastName;
+                @Column(updatable=false)
+                private Date createdAt;
+                private Date updatedAt;
+                @OneToOne(mappedBy="person", cascade=CascadeType.ALL, fetch=FetchType.LAZY)
+                private License license;
+
+                public Person() {
+
+                }
+
+                @PrePersist
+                protected void onCreate(){
+                    this.createdAt = new Date();
+                }
+
+                @PreUpdate
+                protected void onUpdate(){
+                    this.updatedAt = new Date();
+                }
+
+                // ...
+                // getters and setters removed for brevity
+                // ...
+            }
+
+
+            // *License.java*
+            // ...
+            @Entity
+            @Table(name="licenses")
+            public class License {
+
+                @Id
+                @GeneratedValue(strategy = GenerationType.IDENTITY)
+                private Long id;
+                private String number;
+                private Date expirationDate;
+                private String state;
+                @Column(updatable=false)
+                private Date createdAt;
+                private Date updatedAt;
+                @OneToOne(fetch=FetchType.LAZY)
+                @JoinColumn(name="person_id")
+                private Person person;
+                public License() {
+
+                }
+
+                @PrePersist
+                protected void onCreate(){
+                    this.createdAt = new Date();
+                }
+
+                @PreUpdate
+                protected void onUpdate(){
+                    this.updatedAt = new Date();
+                }
+
+                // ...
+                // getters and setters removed for brevity
+                // ...
+            }
+
+
+        (^ demonstrates one to many relationship set up between persons and licenses ^)
+        *************************************************************************************************
+
+ONE TO MANY RELATIONSHIPS:
+
+    -"@OneToMany"
+        -defines a many-valued association with one-to-many multiplicity. This may be used within an embeddable class contained within an entity class to specify a relationship to a collection of entities. Notice that in this case, our ninjas attribute is of type List<Ninja>.
+        -"@OneToMany(mappedBy="dojo")"
+            -this will map the ninjas attribute in the Dojo class to the dojo attribute in the Ninja class.
+            -there are a few other options that you can have
+                - https://www.objectdb.com/api/java/jpa/OneToMany
+    -"@ManyToOne"
+        -defines a single-valued association to another entity class that has many-to-one multiplicity. This may be used within an embeddable class to specify a relationship from the embeddable class to an entity class. Notice that our dojo attribute is referring to the dojo_id. Therefore, this attribute gives the dojo that a specific ninja belongs to.
+        -there are a few other options that you can have
+            - https://www.objectdb.com/api/java/jpa/ManyToOne
+    -"@JoinColumn(name="dojo_id")"
+        -defines mapping for composite foreign keys. It indicates that the corresponding table to this entity has a foreign_key to the referenced table.
+
+    *************************************************************************************************
+    -i.e.   // *Dojo.java*
+            @Entity
+            @Table(name="dojos")
+            public class Dojo {
+
+                @Id
+                @GeneratedValue(strategy = GenerationType.IDENTITY)
+                private Long id;
+                private String name;
+                @Column(updatable=false)
+                private Date createdAt;
+                private Date updatedAt;
+                @OneToMany(mappedBy="dojo", fetch = FetchType.LAZY)
+                private List<Ninja> ninjas;
+
+                public Dojo() {
+
+                }
+
+                @PrePersist
+                protected void onCreate(){
+                    this.createdAt = new Date();
+                }
+
+                @PreUpdate
+                protected void onUpdate(){
+                    this.updatedAt = new Date();
+                }
+
+                // ...
+                // getters and setters removed for brevity
+                // ...
+            }
+
+
+            // *Ninja.java*
+            @Entity
+            @Table(name="ninjas")
+            public class Ninja {
+                @Id
+                @GeneratedValue(strategy = GenerationType.IDENTITY)
+                private Long id;
+                private String firstName;
+                private String lastName;
+                private int age;
+                @Column(updatable=false)
+                private Date createdAt;
+                private Date updatedAt;
+                @ManyToOne(fetch = FetchType.LAZY)
+                @JoinColumn(name="dojo_id")
+                private Dojo dojo;
+
+                public Ninja() {
+
+                }
+
+                @PrePersist
+                protected void onCreate(){
+                    this.createdAt = new Date();
+                }
+
+                @PreUpdate
+                protected void onUpdate(){
+                    this.updatedAt = new Date();
+                }
+
+                // ...
+                // getters and setters removed for brevity
+                // ...
+            }
+
+        (^ demonstrates set up of a one to many relationship between Dojo and Ninja models ^)
+        *************************************************************************************************
+
+MANY TO MANY RELATIONSHIPS:
+
+    -"@ManyToMany"
+        -defines a many-valued association with many-to-many multiplicity. You will have to use this annotation on both entities.
+    -"@JsonIgnore"
+        -we are using this annotation to solve an infinite recursion issue with Jackson and JPA. Therefore, we ignore that attribute when it's being serialized into json.
+    -"@JoinTable"
+        -defines the middle table the our entities will be mapped to.
+        -"@JoinTable(name="categories_products")"
+            -the name of the middle table.
+        -"joinColumns"
+            -the foreign key that matches the primary key of the embedded class when the tables are joined.
+        -"inverseJoinColumns"
+            -the foreign key that matched the foreign key of the opposite class when the tables are joined.
+    -The following example shows how to auto-generate a basic 2-column joining table to create a many to many relationship
+        -other columns can be added to the joining table by creating its own model file
+            -demonstrated in the second example below
+
+    *************************************************************************************************
+    -i.e.   // *Product.java*
+            @Entity
+            @Table(name="products")
+            public class Product {
+                @Id
+                @GeneratedValue(strategy = GenerationType.IDENTITY)
+                private Long id;
+                private String name;
+                private String description;
+                private float price;
+                @Column(updatable=false)
+                private Date createdAt;
+                private Date updatedAt;
+
+                @ManyToMany(fetch = FetchType.LAZY)
+                @JoinTable(
+                    name = "categories_products", 
+                    joinColumns = @JoinColumn(name = "product_id"), 
+                    inverseJoinColumns = @JoinColumn(name = "category_id")
+                )
+
+                private List<Category> categories;
+
+                public Product() {
+
+                }
+
+                @PrePersist
+                protected void onCreate(){
+                    this.createdAt = new Date();
+                }
+
+                @PreUpdate
+                protected void onUpdate(){
+                    this.updatedAt = new Date();
+                }
+
+                // ...
+                // getters and setters removed for brevity
+                // ...
+            }
+
+
+            // *Category.java*
+            @Entity
+            @Table(name="categories")
+            public class Category {
+                @Id
+                @GeneratedValue(strategy = GenerationType.IDENTITY)
+                private Long id;
+                private String name;
+                @Column(updatable=false)
+                private Date createdAt;
+                private Date updatedAt;
+
+                @ManyToMany(fetch = FetchType.LAZY)
+                @JoinTable(
+                    name = "categories_products", 
+                    joinColumns = @JoinColumn(name = "category_id"), 
+                    inverseJoinColumns = @JoinColumn(name = "product_id")
+                )
+
+                private List<Product> products;
+
+                public Category() {
+
+                }
+
+                @PrePersist
+                protected void onCreate(){
+                    this.createdAt = new Date();
+                }
+
+                @PreUpdate
+                protected void onUpdate(){
+                    this.updatedAt = new Date();
+                }
+
+                // ...
+                // getters and setters removed for brevity
+                // ...
+            }
+
+        (^ demonstrates set up of many to many relationships with standard auto-generated 2 column joining table ^)
+        *************************************************************************************************
+
+    -The following example shows how to create a joining table model to show more than just the 2 fields that link the models
+        -adds an ID for the joining table as well as d/t stamps
+        -the table becomes its own instance???
+
+        *************************************************************************************************
+        -i.e.   // *Product.java*
+                @Entity
+                @Table(name="products")
+                public class Product {
+                    @Id
+                    @GeneratedValue(strategy = GenerationType.IDENTITY)
+                    private Long id;
+                    private String name;
+                    private String description;
+                    private double price;
+                    @Column(updatable=false)
+                    private Date createdAt;
+                    private Date updatedAt;
+
+                    @ManyToMany(fetch = FetchType.LAZY)
+                    @JoinTable(
+                        name = "categories_products", 
+                        joinColumns = @JoinColumn(name = "product_id"), 
+                        inverseJoinColumns = @JoinColumn(name = "category_id")
+                    )
+
+                    private List<Category> categories;
+
+                    public Product() {
+
+                    }
+
+                    @PrePersist
+                    protected void onCreate(){
+                        this.createdAt = new Date();
+                    }
+
+                    @PreUpdate
+                    protected void onUpdate(){
+                        this.updatedAt = new Date();
+                    }
+
+                    // ...
+                    // getters and setters removed for brevity
+                    // ...
+                }
+
+
+                // *CategoryProduct.java*
+                @Entity
+                @Table(name="categories_products")
+                public class CategoryProduct {
+                    @Id
+                    @GeneratedValue(strategy = GenerationType.IDENTITY)
+                    private Long id;
+                    @Column(updatable=false)
+                    private Date createdAt;
+                    private Date updatedAt;
+
+                    @ManyToOne(fetch = FetchType.LAZY)
+                    @JoinColumn(name="product_id")
+                    private Product product;
+
+                    @ManyToOne(fetch = FetchType.LAZY)
+                    @JoinColumn(name="category_id")
+
+                    private Category category;
+
+                    public CategoryProduct() {
+
+                    }
+
+                    @PrePersist
+                    protected void onCreate(){
+                        this.createdAt = new Date();
+                    }
+
+                    @PreUpdate
+                    protected void onUpdate(){
+                        this.updatedAt = new Date();
+                    }
+
+                    // ...
+                    // getters and setters removed for brevity
+                    // ...
+                }
+
+
+                // *Category.java*
+                @Entity
+                @Table(name="categories")
+                public class Category {
+                    @Id
+                    @GeneratedValue(strategy = GenerationType.IDENTITY)
+                    private Long id;
+                    private String name;
+                    @Column(updatable=false)
+                    private Date createdAt;
+                    private Date updatedAt;
+
+                    @ManyToMany(fetch = FetchType.LAZY)
+                    @JoinTable(
+                        name = "categories_products", 
+                        joinColumns = @JoinColumn(name = "category_id"), 
+                        inverseJoinColumns = @JoinColumn(name = "product_id")
+                    )
+
+                    private List<Product> products;
+
+                    public Category() {
+
+                    }
+
+                    @PrePersist
+                    protected void onCreate(){
+                        this.createdAt = new Date();
+                    }
+
+                    @PreUpdate
+                    protected void onUpdate(){
+                        this.updatedAt = new Date();
+                    }
+
+                    // ...
+                    // getters and setters removed for brevity
+                    // ...
+                }
+
+            (^ demonstrates set up of many to many relationship between 2 models with a third model for the joining table ^)
+            *************************************************************************************************
+
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+VALIDATIONS WITH SPRING:
+
+GENERAL:
+
+    -Spring uses annotations to handle validations
+    -The annotations are used within the "domain model" files
+
+SOME COMMON VALIDATION ANNOTATIONS:
+
+    - " @Entity "
+        -represents an entity model for our application
+
+    - " @Table "
+        -sets this as a table in the database
+
+    - " @Id "
+        -sets this as the primary key
+
+    - " @GeneratedValue "
+        -sets this as an auto-incrementing value
+    
+    - " @Size "
+        -adds validation that the column must be in the specified range
+
+    - " @Min "
+        -adds validation that the column must be at least the specified value
+
+    - " @NotNull "
+        -adds validation that the column must be null
+
+    - " @PrePersist "
+        -runs the method right before the object is created
+
+    - " @PreUpdate"
+        -runs a method when the object is modified
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+JPA QUERIES (JPQL) AND NATIVE QUERIES:
+
+GENERAL:
+
+-CrudRepository is great for executing operations on a single entity, but poor for complex queries
+
+JPQL QUERIES:
+
+-JPQL is the object-oriented version of SQL in JPA
+    -the query strings may look a little different but they have a lot of similarities with plain SQL
+-If we want to update or delete, we must use a @Modifying Annotation to indicate that we are changing the values in our database
+
+*************************************************************************************************
+-i.e.   // *repositories/DojoRepository.java*
+        public interface DojoRepository extends CrudRepository<Dojo, Long>{
+            List<Dojo> findAll();
+
+            // get all dojos
+            @Query("SELECT d FROM Dojo d")
+            List<Dojo> findAllDojos();
+
+            // get all the names of the dojos
+            @Query("SELECT d.name FROM Dojo d")
+            List<String> findAllDojosNames();
+
+            // passing params and filtering (still retrieves a list)
+            @Query("SELECT d FROM Dojo d WHERE id = ?1")
+            List<Dojo> getDojoWhereId(Long id);
+
+            // passing params and filtering
+            @Query("SELECT d FROM Dojo d WHERE id = ?1")
+            Dojo getSingleDojoWhereId(Long id);
+
+            // Note the int type. It is because it returns the number of rows affected
+            @Modifying
+            @Query("update Dojo d set d.name = ?1 WHERE d.id = ?2")
+            int setNameForOne(String name, Long id);
+
+            @Modifying
+            @Query("update Dojo d set d.name = ?1")
+            int setNameForAll(String name);
+
+            @Modifying
+            @Query("delete Dojo d WHERE d.id = ?1")
+            int deleteOneDojo(Long id);
+        }
+
+    (^ demonstrates basic use of JPQL queries ^)
+    *************************************************************************************************
+
+NATIVE SQL QUERIES:
+
+-JPA also supports native queries. This way, you can write any query in raw SQL
+
+*************************************************************************************************
+-i.e.   // *repositories/DojoRepository.java*
+        public interface DojoRepository extends CrudRepository<Dojo, Long>{
+
+            // previous methods removed for brevity...
+
+            // Select all, we get a list of Dojo objects back.
+            @Query(value="SELECT * FROM dojos", nativeQuery=true)
+            List<Dojo> findAllDojoWithNativeQuery();
+
+            // get all the names of the dojos with id. If we want to select specific columns, we will get a list of Object arrays because they are no longer Dojo objects. Each index of the array will be the column selected respectively. Therefore 0 = id column, 1 = name column
+            @Query(value="SELECT id, name FROM dojos", nativeQuery=true)
+            List<Object[]> findAllDojosNamesWithId2();
+
+            // get one dojo
+            @Query(value="SELECT * FROM dojos WHERE id = ?1", nativeQuery=true)
+            Dojo getDojoWhereId(Long id);
+        }
+
+    (^ demonstrates basic use of native SQL queries ^)
+    *************************************************************************************************
+
+    -To unpack the data from the findAllDojoNamesWithId2 method, you would have to run something similar to this in your service:
+
+        *************************************************************************************************
+        -i.e.   List<Object[]> dojos = dojoRepo.findAllDojoNamesWithId2();
+                Object[] dojo = dojos.get(0);
+                Object dojoId = dojo[0];
+                Object dojoName = dojo[1];
+
+            (^ demonstrates unpacking of object list returned from findAllDojoNamesWithId2^)
+            *************************************************************************************************
+
+JPQL JOINS:
+
+-JPA allows us to set our relationships on our Domain models, but sometimes, we want all the data in one join query
+
+*************************************************************************************************
+-i.e.   // *repositories/DojoRepository.java*
+        public interface DojoRepository extends CrudRepository<Dojo, Long>{
+            List<Dojo> findAll()
+
+            // previous methods removed for brevity...
+
+            // inner join retrieving only the dojos
+            @Query("SELECT d FROM Dojo d JOIN d.ninjas n")
+            List<Dojo> joinDojosAndNinjas();
+
+            // inner join retrieving dojos and ninjas
+            @Query("SELECT d, n FROM Dojo d JOIN d.ninjas n")
+            List<Object[]> joinDojosAndNinjas2();
+        }
+
+    (^ demonstrates basic use of join queries with JPQL ^)
+    *************************************************************************************************
+
+    1. The first query retrieves all the dojos using a named method
+        -It will retrieve all the dojos without joining the ninjas table
+        -To retrieve the ninjas of each dojo, we must call the ".getNinjas()" method that we set in our Domain model
+        -For N dojos that we have, we are going to perform N+1 queries to get information about the ninjas
+            -1 query to get all the dojos + N queries to the ninjas for each dojo
+    2. The second query is very similar to the first one
+        -this time we are retrieving all the dojos that are connected with a ninja through the inner join
+            -in this case, we can possibly have multiple instances of the dojo because with have a One-to-Many relationship with the ninjas
+            -let's say we have 15 ninjas, divided equally between 3 dojos
+                -this query will return 15 rows with repeating dojos
+                -furthermore, because of the nature of our query, we have no idea about the ninja information for each dojo!
+    3. The third query efficiently retrieves the information about all the dojos that have a relationship with a ninja
+        -we avoid doing N+1 queries by getting all the dojo and ninja information all at once (1 query)
+
+-In the last example, notice that the "n" variable is set to the relationship dojo.ninjas
+    -to unpack the data, you can cast each index of the array of objects to the expecting class
+
+*************************************************************************************************
+        for(Object[] row : table) {
+            Dojo dojo = (Dojo) row[0];
+            Ninja ninja = (Ninja) row[1];
+            System.out.println(dojo.getName());
+            System.out.println(ninja.getFirstName());
+        }
+
+    (^ demonstrates unpacking data from a query object with type casting ^)
+    *************************************************************************************************
+
+    -If you want to use this query in your view, JSP will automatically cast the type for you
+
+    *************************************************************************************************
+    -i.e.   // *.jsp file*
+            <table class="table">
+                <thead>
+                    <th>Dojo Name</th>
+                    <th>Ninja First Name</th>
+                    <th>Ninja Last Name</th>
+                </thead>
+                <tbody>
+                    <c:forEach var="row" items="${table}">                
+                    <tr>
+                        <td>${row[0].name}</td>
+                        <td>${row[1].firstName}</td>
+                        <td>${row[1].lastName}</td>
+                    </tr>
+                    </c:forEach>
+                </tbody>
+            </table>
+
+        (^ demonstrates JSP type casting ^)
+        *************************************************************************************************
+
+SELF JOINS:
+
+GENERAL:
+
+    -A self join is when a table has a relationship with itself
+        -i.e. users with many friendships with other users
+
+SET UP:
+
+    - " @ManyToMany " annotation is used twice in the model's class definition
+        -i.e. first one fetches all the friends of a specific user, second fetches all users that friended a specific user
+
+*************************************************************************************************
+-i.e.   // *User.java*
+        @Entity
+        @Table(name="users")
+        public class User {
+            @Id
+            @GeneratedValue(strategy = GenerationType.IDENTITY)
+            private Long id;
+            private String firstName;
+            private String lastName;
+            private Date createdAt;
+            private Date updatedAt;
+
+            @ManyToMany(fetch = FetchType.LAZY)
+            @JoinTable(
+                name = "friendships", 
+                joinColumns = @JoinColumn(name = "user_id"), 
+                inverseJoinColumns = @JoinColumn(name = "friend_id")
+            )
+            private List<User> friends;
+
+            @ManyToMany(fetch = FetchType.LAZY)
+            @JoinTable(
+                name = "friendships", 
+                joinColumns = @JoinColumn(name = "friend_id"), 
+                inverseJoinColumns = @JoinColumn(name = "user_id")
+            )
+            private List<User> userFriends;
+
+            // other getter and setters removed for brevity
+
+            public List<User> getFriends() {
+                return friends;
+            }
+
+            public void setFriends(List<User> friends) {
+                this.friends = friends;
+            }
+
+            public List<User> getUserFriends() {
+                return userFriends;
+            }
+
+            public void setUserFriends(List<User> userFriends) {
+                this.userFriends = userFriends;
+            }
+        }
+
+    (^ demonstrates self-joined model for users with friends ^)
+    ************************************************************************************************
+
+PAGINATION AND SORTING:
+
+GENERAL:
+
+    -"PagingAndSortingRepository" is an available extension of "CrudRepository"
+        -makes pagination and sorting easier!
+        -include all "CrudRepository" methods???
+
+SET UP:
+
+    1. Create a repo that extends the repo
+
+        ************************************************************************************************
+        -i.e.   // *NinjaRepository.java*
+                public interface NinjaRepository extends PagingAndSortingRepository<Ninja, Long>{
+                }
+
+            (^ demonstrates PagingAndSortingRepository interface creation ^)
+            ************************************************************************************************
+
+    2. Create a service that will use the repo, holding all the pagination logic
+        -below, the ".findAll()" method accepts a Pageable type but Pageable is an interface itself
+            -therefore, we are using the PageRequest class, which implements the Pageable interface
+            -when we create a new instance of the PageRequest, we are passing:
+                1. the page number
+                2. how many we want per page
+                3. the sorting order
+                4. what we want to sort by
+
+        ************************************************************************************************
+        -i.e.   // *NinjaService.java*
+                @Service
+                @Transactional
+                public class NinjaService {
+                    @Autowired 
+                    NinjaRepository ninjaRepo;
+                    // static variable to set the number of ninjas that we want per page
+                    private static final int PAGE_SIZE = 5;
+                    public Page<Ninja> ninjasPerPage(int pageNumber) {
+                        // get all the ninjas page and sort them in ascending order the last name property
+                        PageRequest pageRequest = new PageRequest(pageNumber, PAGE_SIZE, Sort.Direction.ASC, "lastName");
+                        Page<Ninja> ninjas = ninjaRepo.findAll(pageRequest);
+                        return ninjaRepo.findAll(pageRequest);
+                    }
+                }
+
+            (^ demonstrates creation of Service to use the repo ^)
+            ************************************************************************************************
+
+    3. Create a route in the controller to use the pagination service
+
+        ************************************************************************************************
+        -i.e.   // *NinjasController.java*
+                ...
+                @RequestMapping("/pages/{pageNumber}")
+                public String getNinjasPerPage(Model model, @PathVariable("pageNumber") int pageNumber) {
+                    // we have to subtract 1 because the Pages iterable is 0 indexed. This is for our links to be able to show from 1...pageMax, instead of 0...pageMax class="keyword operator from-rainbow">- 1.
+                    Page<Ninja> ninjas = ninjaService.ninjasPerPage(pageNumber - 1);
+                    // total number of pages that we have
+                    int totalPages = ninjas.getTotalPages();
+                    model.addAttribute("totalPages", totalPages);
+                    model.addAttribute("ninjas", ninjas);
+                    return "ninjas.jsp";
+                }
+
+            (^ demonstrates use of the pagination service in controller route ^)
+            ************************************************************************************************
+
+    4. Render the information in the JSP file!
+
+        ************************************************************************************************
+        -i.e.   // *Ninjas.jsp*
+                <div id="ninjas">
+                    <h1>Ninjas</h1>
+                    // for loop to create all the links
+                    <c:forEach begin="1" end="${totalPages}" var="index">
+                        <a href="/pages/${index}">${index}</a>
+                    </c:forEach>
+                    <table class="table">
+                        <thead>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                        </thead>
+                        <tbody>
+                            // we have to call the .content method to actually get the ninjas inside the Page iterable.
+                            <c:forEach var="ninja" items="${ninjas.content}">                 
+                            <tr>
+                                <td><c:out value="${ninja.firstName}"></c:out></td>
+                                <td><c:out value="${ninja.lastName}"></c:out></td>
+                            </tr>
+                            </c:forEach>
+                        </tbody>
+                    </table>
+                </div>
+
+            (^ demonstrates rendering of paginated data ^)
+            ************************************************************************************************
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+LOGIN AND AUTHENTICATION WITH SPRING:
+
+GENERAL:
+
+    -Most frameworks use "traditional authentication" like BCrypt
+        -Spring can too!
+    -Spring applications use "Spring Security" as the de-facto standard for security
+        -Spring Security is very robust and flexible, but also overly complex
+        -requirement to be a Spring devloper
+
+BCRYPT SET UP:
+
+    1. MUST be added to dependency list in "pom.xml" file
+
+        ************************************************************************************************
+        -i.e.   // *pom.xml*
+                <dependency>
+                    <groupId>org.mindrot</groupId>
+                    <artifactId>jbcrypt</artifactId>
+                    <version>0.4</version>
+                </dependency>
+
+            (^ dependency code for BCrypt ^)
+            ************************************************************************************************
+
+    2. Create the model that will be using BCrypt
+        -i.e. " User " model with a BCrypted password
+        -use the " @Transient " annotation to denote that an attribute will NOT be saved in the DB
+            -i.e. " passwordConfirmation " attribute is used solely for validation
+
+        ************************************************************************************************
+        -i.e.   // *User.java*
+                // imports removed for brevity...
+                @Entity
+                @Table(name="users")
+                public class User {
+                    @Id
+                    @GeneratedValue(strategy=GenerationType.IDENTITY)
+                    private Long id;
+                    @Email(message="Email must be valid")
+                    private String email;
+                    @Size(min=5, message="Password must be greater than 5 characters")
+                    private String password;
+                    @Transient
+                    private String passwordConfirmation;
+                    @Column(updatable=false)
+                    private Date createdAt;
+                    private Date updatedAt;
+
+                    public User() {
+                    }
+
+                    @PrePersist
+                    protected void onCreate(){
+                        this.createdAt = new Date();
+                    }
+
+                    @PreUpdate
+                    protected void onUpdate(){
+                        this.updatedAt = new Date();
+                    }
+
+                    // other getters and setters removed for brevity...
+                }
+
+            (^ demonstrates creation of the model to use BCrypt ^)
+            ************************************************************************************************
+
+    3. Create a repo for the "User" model with a method to retrieve one "User" by email
+
+        ************************************************************************************************
+        -i.e.   // *UserRepository.java*
+                package com.relativelyintuitive.authentication.repositories;
+                import org.springframework.data.repository.CrudRepository;
+                import org.springframework.stereotype.Repository;
+                import com.relativelyintuitive.authentication.models.User;
+
+                @Repository
+                public interface UserRepository extends CrudRepository<User, Long> {
+                    User findByEmail(String email);
+                }
+
+            (^ demonstrates repo method to retrieve a User by email ^)
+            ************************************************************************************************
+
+    4. Create a Service for the Users with logic for registration and authentication
+
+        ************************************************************************************************
+        -i.e.   // *UserService.java*
+                package com.relativelyintuitive.authentication.services;
+                import java.util.Optional;
+                import org.mindrot.jbcrypt.BCrypt;
+                import org.springframework.stereotype.Service;
+                import com.relativelyintuitive.authentication.models.User;
+                import com.relativelyintuitive.authentication.repositories.UserRepository;
+
+                @Service
+                public class UserService {
+                    private final UserRepository userRepository;
+
+                    public UserService(UserRepository userRepository) {
+                        this.userRepository = userRepository;
+                    }
+
+                    // register user and hash their password
+                    public User registerUser(User user) {
+                        String hashed = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
+                        user.setPassword(hashed);
+                        return userRepository.save(user);
+                    }
+
+                    // find user by email
+                    public User findByEmail(String email) {
+                        return userRepository.findByEmail(email);
+                    }
+
+                    // find user by id
+                    public User findUserById(Long id) {
+                        Optional<User> u = userRepository.findById(id);
+                        if(u.isPresent()) {
+                            return u.get();
+                        } else {
+                            return null;
+                        }
+                    }
+
+                    // authenticate user
+                    public boolean authenticateUser(String email, String password) {
+                        // first find the user by email
+                        User user = userRepository.findByEmail(email);
+                        // if we can't find it by email, return false
+                        if(user == null) {
+                            return false;
+                        } else {
+                            // if the passwords match, return true, else, return false
+                            if(BCrypt.checkpw(password, user.getPassword())) {
+                                return true;
+                            } else {
+                                return false;
+                            }
+                        }
+                    }
+                }
+
+            (^ demonstrates basic use of BCrypt for registration and authentication of Users ^)
+            ************************************************************************************************
+
+    5. Create a custom validator to check that the "password" and "passwordConfirmation" match
+        1. Create "validator" package to hold custom validators
+        2. Create "UserValidator" class within the package
+            - " supports(Class<?>) "
+                -specifies that a instance of the User Domain Model can be validated with this custom validator
+            - " validate(Object, Errors) "
+                -creating our custom validation
+                -we can add errors via " .rejectValue(String, String) "
+            - " .rejectValue(String, String) "
+                -the first argument is the member variable of our Domain model that we are validating
+                -the second argument is a code for us to use to set an error message
+            - " @Component "
+                -below is an explanation of this annotating from the Spring Documentation
+                    -Spring provides further stereotype annotations: @Component, @Service, and @Controller
+                        - " @Component " is a generic stereotype for any Spring-managed component
+                        - " @Repository, @Service, and @Controller " are specializations of @Component
+                            -used for more specific use cases
+                            -i.e. in the persistence, service, and presentation layers, respectively
+                                -therefore, you can annotate your component classes with @Component
+                                -but using the other three instead is best practice
+                                    -makes classes better suited for processing by tools or associating with aspects
+
+        ************************************************************************************************
+        -i.e.   // *UserValidator.java*
+                package com.relativelyintuitive.authentication.validator;
+                import org.springframework.stereotype.Component;
+                import org.springframework.validation.Errors;
+                import org.springframework.validation.Validator;
+                import com.relativelyintuitive.authentication.models.User;
+
+                @Component
+                public class UserValidator implements Validator {
+
+                    // 1
+                    @Override
+                    public boolean supports(Class<?> clazz) {
+                        return User.class.equals(clazz);
+                    }
+
+                    // 2
+                    @Override
+                    public void validate(Object target, Errors errors) {
+                        User user = (User) target;
+
+                        if (!user.getPasswordConfirmation().equals(user.getPassword())) {
+                            // 3
+                            errors.rejectValue("passwordConfirmation", "Match");
+                        }
+                    }
+                }
+
+            (^ demonstrates creation of custom validator to check passwords given ^)
+            ************************************************************************************************
+
+    6. Create cutom error messages
+        1. Create a "messages.properties" file inside of "src/main/resources"
+        2. Add messages to it!
+            -i.e. " [+CODE].[+ModelAttribute].[+MemberVariable]=[+YOUR CUSTOM ERROR MESSAGE] "
+                -NO quotes needed around message!
+
+            ************************************************************************************************
+            -i.e.   // *messages.properties*
+                    Match.user.passwordConfirmation=Password and Password Confirmation must match
+
+                (^ demonstrates creation of a custom error message ^)
+                ************************************************************************************************
+
+    7. Use the validator in the controller!
+
+        ************************************************************************************************
+        -i.e.   // *Users.java*
+                @Controller
+                public class Users {
+                    private final UserService userService;
+
+                    // NEW
+                    private final UserValidator userValidator;
+
+                    // NEW
+                    public Users(UserService userService, UserValidator userValidator) {
+                        this.userService = userService;
+                        this.userValidator = userValidator;
+                    }
+
+                    @RequestMapping(value="/registration", method=RequestMethod.POST)
+                    public String registerUser(@Valid @ModelAttribute("user") User user, BindingResult result, HttpSession session) {
+                        userValidator.validate(user, result);
+                        if(result.hasErrors()) {
+                            return "registrationPage.jsp";
+                        }
+                        User u = userService.registerUser(user);
+                        session.setAttribute("userId", u.getId());
+                        return "redirect:/home";
+                    }
+
+                    // code removed for brevity
+                }
+
+            (^ demonstrates use of basic validator in its relevant controller ^)
+            ************************************************************************************************
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -1,0 +1,559 @@
+
+-SPRING BOOT FULL-STACK NOTES-
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+GENERAL:
+
+    -The following is a basic step-by-step guide for creating a simple full-stack Spring Boot project
+        -covers the setup of an application with an API, database, and full CRUD capability
+    -IF YOU PLAN TO PULL FROM PUBLIC API'S, DO NOT BUILD THE PROJECT WITH JAVA!
+        -Java fucking sucks for anything integrated with internet services
+            -Java is not the language of the internet
+            -Use JS to build an API pulling site instead
+                -JS is the language of the internet!!!
+        -It is a pain in the asssssss to pull data from an API with Java
+            -Tooooo many conversions when navigating the JSON chain to make Java efficient
+                -Use Unirest library if you must
+                    -not covered in these notes
+                -GSON Parser helps too...
+                    -not covere in these notes
+        -Build your shit on MERN if your site mainly pulls API data 
+ANYWAYS.......
+SET-UP STEPS:
+
+    1. Start a project with standard Spring Web dependency
+
+    2. Add "spring-boot-starter-data-jpa" and "mysql-connector-java" dependencies
+
+        *************************************************************************************************
+        -i.e.   // *pom.xml*
+                ...
+                <dependency>
+                    <groupId>mysql</groupId>
+                    <artifactId>mysql-connector-java</artifactId>
+                    <scope>runtime</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-data-jpa</artifactId>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-validation</artifactId>
+                </dependency>
+                ...
+
+            (^ dependency code to add to pom.xml file ^)
+            *************************************************************************************************
+
+    3. Create a MySQL schema and make sure the MySQL server is running
+
+    4. Configure Spring project properties
+        -add the following code to "application.properties"
+
+        *************************************************************************************************
+        -i.e.   // *application.properties*
+                spring.datasource.url=jdbc:mysql://localhost:3306/[+schema_name]
+                spring.datasource.username=root
+                spring.datasource.password=root
+                spring.datasource.driver-class-name=com.mysql.jdbc.Driver
+                spring.jpa.hibernate.ddl-auto=update
+
+            (^ shows the code to be added to "application.properties" ^)
+            *************************************************************************************************
+
+    5. Test the connection by running the project and checking the console for error messages
+        -if this line throws deprecation warning, you can delete it!
+            -i.e. "spring.datasource.driver-class-name=com.mysql.jdbc.Driver"
+
+    6. Create "models" package for domain models
+        -i.e. "src/main/java/com/[+companyname]/[+projectname]/models"
+
+    7. Create a class to be a "Java Bean" within the package
+        -"Java Bean" class requirements
+            1. all attributes MUST be private
+            2. MUST have getters and setters in the "getField()" / "setField()" formats
+                -use "@PrePersist" annotations as done below to auto-manage d/t stamps
+            3. MUST have an empty constructor
+
+        *************************************************************************************************
+        -i.e.   // *src/main/java/com/relativelyintuitive/languages/models/Language.java*
+                package com.relativelyintuitive.languages.models;
+
+                import java.util.Date;
+
+                import javax.persistence.Column;
+                import javax.persistence.Entity;
+                import javax.persistence.GeneratedValue;
+                import javax.persistence.GenerationType;
+                import javax.persistence.Id;
+                import javax.persistence.PrePersist;
+                import javax.persistence.PreUpdate;
+                import javax.persistence.Table;
+                import javax.validation.constraints.NotNull;
+                import javax.validation.constraints.Size;
+
+                import org.springframework.format.annotation.DateTimeFormat;
+
+                @Entity
+                @Table(name="languages")
+                public class Language {
+                    @Id
+                    @GeneratedValue(strategy = GenerationType.IDENTITY)
+                    private Long id;
+                    @NotNull
+                    private String name;
+                    @NotNull
+                    @Size(min = 2, max = 20)
+                    private String creator;
+                    @NotNull
+                    @Size(min = 3, max = 40)
+                    private String version;
+                    // This will not allow the createdAt column to be updated after creation
+                    @Column(updatable=false)
+                    @DateTimeFormat(pattern="yyyy-MM-dd")
+                    private Date createdAt;
+                    @DateTimeFormat(pattern="yyyy-MM-dd")
+                    private Date updatedAt;
+
+                    public Language() {
+                    }
+
+                    public Language(String name, String creator, String version) {
+                        this.name = name;
+                        this.creator = creator;
+                        this.version = version;
+                    }
+
+                    // annotations to auto-manage d/t stamps
+                    @PrePersist
+                    protected void onCreate(){
+                        this.createdAt = new Date();
+                    }
+
+                    @PreUpdate
+                    protected void onUpdate(){
+                        this.updatedAt = new Date();
+                    }
+
+                    // (other getters and setters removed for brevity)
+                }
+
+            (^ demonstrates basic "book" domain model ^)
+            *************************************************************************************************
+
+    8. Test by refreshing the Spring application and the DB should now have a table representing the domain model!
+
+    9. Create a new package for the repository
+        -i.e. "src/main/java/com/[+companyname]/[+projectname]/repositories"
+        -repositories are interfaces
+            -they extend "CrudRepository"
+                -creates a repo that exposes the Spring Data JPA
+                    -exposes many methods that can be used for CRUD!
+            -interface nature allows extending the repo AND being extended itself!
+
+        *************************************************************************************************
+        -i.e.   // *src/main/java/com/relativelyintuitive/languages/repositories/LanguageRepository.java*
+                package com.relativelyintuitive.languages.repositories;
+
+                import java.util.List;
+                import java.util.Optional;
+
+                import org.springframework.data.repository.CrudRepository;
+                import org.springframework.stereotype.Repository;
+
+                import com.relativelyintuitive.languages.models.Language;
+
+                @Repository
+                public interface LanguageRepository extends CrudRepository<Language, Long>{
+                    // this method retrieves all the languages from the database
+                    List<Language> findAll();
+                    // find language by ID if existent
+                    Optional<Language> findById(Long id);
+                    // this method finds languages with descriptions containing the search string
+                    List<Language> findByCreatorContaining(String search);
+                    // this method counts how many languages contain a certain string
+                    Long countByNameContaining(String search);
+                    // this method deletes a language that starts with a specific name
+                    Long deleteByNameStartingWith(String search);
+                }
+
+            (^ demonstrates basic repository interface ^)
+            *************************************************************************************************
+
+    10. Create package for "domain services" 
+        -i.e. "src/main/java/com/[+companyname]/[+projectname]/services"
+
+    11. Create a "domain service" class within the package
+        -"@Service" annotation declares class a service
+            -allows spring to inject the class as a dependency in any controller!
+            -dependency injection will also be used with the repository to access the database 
+
+        *************************************************************************************************
+        -i.e.   // *src/main/java/com/relativelyintuitive/languages/services/LanguageService.java*
+                package com.relativelyintuitive.languages.services;
+
+                import java.util.List;
+                import java.util.Optional;
+
+                import org.springframework.stereotype.Service;
+
+                import com.relativelyintuitive.languages.models.Language;
+                import com.relativelyintuitive.languages.repositories.LanguageRepository;
+
+                @Service
+                public class LanguageService {
+                    // adding the language repository as a dependency
+                    private final LanguageRepository languageRepository;
+
+                    public LanguageService(LanguageRepository languageRepository) {
+                        this.languageRepository = languageRepository;
+                    }
+
+                    // creates a language
+                    public Language createLanguage(Language b) {
+                        return languageRepository.save(b);
+                    }
+
+                    // returns all the languages
+                    public List<Language> allLanguages() {
+                        return languageRepository.findAll();
+                    }
+
+                    // retrieves a language if found by id
+                    public Language findLanguage(Long id) {
+                        Optional<Language> optionalLanguage = languageRepository.findById(id);
+                        if (optionalLanguage.isPresent()) {
+                            return optionalLanguage.get();
+                        } else {
+                            return null;
+                        }
+                    }
+
+                    // update a language through the webapp
+                    public Language updateLanguage(Language language) {
+                        return languageRepository.save(language);
+                    }
+
+                    // update a language using the API
+                    public Language updateLanguage(Long id, String name, String creator, String version) {
+                        Optional<Language> optionalLanguage = languageRepository.findById(id);
+                        if (optionalLanguage.isPresent()) {
+                            Language toPut = languageRepository.findById(id).get();
+                            toPut.setId(id);
+                            toPut.setName(name);
+                            toPut.setCreator(creator);
+                            toPut.setVersion(version);
+                            languageRepository.save(toPut);
+                            return toPut;
+                        } else {
+                            return null;
+                        }
+                    }
+
+                    // delete a language
+                    public void deleteLanguage(Long id) {
+                        Optional<Language> optionalLanguage = languageRepository.findById(id);
+                        if (optionalLanguage.isPresent())
+                            languageRepository.deleteById(id);
+                    }
+                }
+
+            (^ demonstrates basic domain service with CRUD functionality ^)
+            *************************************************************************************************
+
+    12. Set up the API to execute CRUD operations
+        -skip this step if you dont need an api...
+        -create a controller for the API
+
+            *************************************************************************************************
+            -i.e.   // *src/main/java/com/relativelyintuitive/languages/controllers/LanguagesApi.java*
+                    package com.relativelyintuitive.languages.controllers;
+
+                    import java.util.List;
+
+                    import org.springframework.web.bind.annotation.PathVariable;
+                    import org.springframework.web.bind.annotation.RequestMapping;
+                    import org.springframework.web.bind.annotation.RequestMethod;
+                    import org.springframework.web.bind.annotation.RequestParam;
+                    import org.springframework.web.bind.annotation.RestController;
+
+                    import com.relativelyintuitive.languages.models.Language;
+                    import com.relativelyintuitive.languages.services.LanguageService;
+
+                    @RestController
+                    public class LanguagesApi {
+                        // indicates we're using a languageService and that it won't be changing
+                        private final LanguageService languageService;
+
+                        // dependency injection is used to make languageService available in controller
+                        public LanguagesApi(LanguageService languageService){
+                            this.languageService = languageService;
+                        }
+
+                        @RequestMapping("/api/languages")
+                        public List<Language> index() {
+                            return languageService.allLanguages();
+                        }
+
+                        @RequestMapping(value="/api/languages", method=RequestMethod.POST)
+                        public Language create(@RequestParam(value="name") String name, @RequestParam(value="creator") String creator, @RequestParam(value="version") String version) {
+                            Language language = new Language(name, creator, version);
+                            return languageService.createLanguage(language);
+                        }
+
+                        @RequestMapping("/api/languages/{id}")
+                        public Language show(@PathVariable("id") Long id) {
+                            Language language = languageService.findLanguage(id);
+                            return language;
+                        }
+
+                        @RequestMapping(value="/api/books/{id}", method=RequestMethod.PUT)
+                        public Language update(@PathVariable("id") Long id, @RequestParam(value="name") String name, @RequestParam(value="creator") String creator, @RequestParam(value="version") String version) {
+                            Language book = languageService.updateLanguage(id, name, creator, version);
+                            return book;
+                        }
+
+                        @RequestMapping(value="/api/books/{id}", method=RequestMethod.DELETE)
+                        public void destroy(@PathVariable("id") Long id) {
+                            languageService.deleteLanguage(id);
+                        }
+                    }
+
+                (^ demonstrates basic API controller ^)
+                *************************************************************************************************
+
+    13. Test CRUD with Postman!???
+
+    14. Change from just an API to a full web application
+        -MUST have tomcat-embed-jasper and jstl dependencies
+        -MUST have WEB-INF line in "application.properties"
+
+        *************************************************************************************************
+        -i.e.   // *pom.xml*
+                ...
+                <dependency>
+                        <groupId>org.apache.tomcat.embed</groupId>
+                        <artifactId>tomcat-embed-jasper</artifactId>
+                </dependency>
+
+                <dependency>
+                        <groupId>javax.servlet</groupId>
+                        <artifactId>jstl</artifactId>
+                </dependency>
+                ...
+
+                // *application.properties*
+                ...
+                spring.mvc.view.prefix=/WEB-INF/
+                ...
+
+            (^ manual dependencies for tomcat-embed-jasper and jstl ^)
+            *************************************************************************************************
+
+    15. Create a new controller and views for the application
+        -create new controller for the application
+            -name convention is plural of its model
+                -i.e. "User.java" model gets a "Users.java" controller
+        -"@ModelAttribute" annotation:
+            -we are not accessing data sent with the request
+                -rather instantiating a new Book type and binding to our view model
+                    -since there is no Book being passed an empty book will be instantiated and bound to our view model
+                    -binding to our model will allow us to create a form that is also bound to the Book type
+                        -will allow us to validate the information against our Book type!
+        -"@Valid" annotation:
+            -used to check if the submitted object passes validation
+            -"BindingResult" is then injected to store the validation results
+                -this MUST come DIRECTLY after the "@Valid" parameter
+            -normally, you would NEVER render on a POST/PUT b/c of double-submission problem
+                -not a problem with "@Valid"!
+                    -the request won't be submitted unless it passes validation!
+                -another reason to render on a POST request with validations is that we don't lose the information that the user has filled in the form
+                    -if we were to redirect, we would lose all the information in the form 
+                - " <%@ page isErrorPage="true" %> "
+                    -allows rendering on POST request
+                    -NECESSARY to head any .jsp view file that will render of a POST
+
+        *************************************************************************************************
+        -i.e.   // *src/main/java/com/relativelyintuitive/controllers/Languages.java*
+                package com.relativelyintuitive.languages.controllers;
+
+                import java.util.List;
+
+                import javax.validation.Valid;
+
+                import org.springframework.stereotype.Controller;
+                import org.springframework.ui.Model;
+                import org.springframework.validation.BindingResult;
+                import org.springframework.web.bind.annotation.ModelAttribute;
+                import org.springframework.web.bind.annotation.PathVariable;
+                import org.springframework.web.bind.annotation.RequestMapping;
+                import org.springframework.web.bind.annotation.RequestMethod;
+
+                import com.relativelyintuitive.languages.models.Language;
+                import com.relativelyintuitive.languages.services.LanguageService;
+
+                @Controller
+                public class LanguagesController {
+                    private final LanguageService languageService;
+
+                    public LanguagesController(LanguageService languageService) {
+                        this.languageService = languageService;
+                    }
+
+                    @RequestMapping("/languages")
+                    public String index(@ModelAttribute("language") Language language, Model model) {
+                        List<Language> languages = languageService.allLanguages();
+                        model.addAttribute("languages", languages);
+                        return "/index.jsp";
+                    }
+
+                    @RequestMapping("/languages/new")
+                    public String language(@ModelAttribute("language") Language language) {
+                        return "/language.jsp";
+                    }
+
+                    @RequestMapping("/languages/{id}")
+                    public String show(@PathVariable("id") Long id, Model model) {
+                        Language daLanguage = languageService.findLanguage(id);
+                        model.addAttribute("language", daLanguage);
+                        return "/show.jsp";
+                    }
+
+                    @RequestMapping(value="/languages", method=RequestMethod.POST)
+                    public String create(@Valid @ModelAttribute("language") Language language, BindingResult result) {
+                        if (result.hasErrors()) {
+                            return "/index.jsp";
+                        } else {
+                            languageService.createLanguage(language);
+                            return "redirect:/languages";
+                        }
+                    }
+
+                    @RequestMapping("/languages/{id}/edit")
+                    public String edit(@PathVariable("id") Long id, Model model) {
+                        Language language = languageService.findLanguage(id);
+                        model.addAttribute("language", language);
+                        return "/edit.jsp";
+                    }
+
+                    @RequestMapping(value="/languages/{id}", method=RequestMethod.PUT)
+                    public String update(@Valid @ModelAttribute("language") Language language, BindingResult result, @PathVariable("id") String id) {
+                        if (result.hasErrors()) {
+                            return "/edit.jsp";
+                        } else {
+                            languageService.updateLanguage(language);
+                            return "redirect:/languages/" + id;
+                        }
+                    }
+
+                    @RequestMapping(value="/languages/{id}", method=RequestMethod.DELETE)
+                    public String destroy(@PathVariable("id") Long id) {
+                            languageService.deleteLanguage(id);
+                            return "redirect:/languages";
+                        }
+                    }
+
+
+                <!-- *src/main/webapp/WEB-INF/index.jsp* -->
+                <%@ page isErrorPage="true" %>    
+                <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>    
+                <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>     
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Creator</th>
+                            <th>Version</th>
+                            <th>action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <c:forEach items="${languages}" var="language">
+                        <tr>
+                            <td><a href="/languages/${language.id}"><c:out value="${language.name}"/></a></td>
+                            <td><c:out value="${language.creator}"/></td>
+                            <td><c:out value="${language.version}"/></td>
+                            <td>
+                                <form action="/languages/${language.id}" method="post">
+                                    <input type="hidden" name="_method" value="delete">
+                                    <input type="submit" value="Delete">
+                                </form>
+                                <a href="/languages/${language.id}/edit">edit</a>
+                            </td>
+                        </tr>
+                        </c:forEach>
+                    </tbody>
+                </table>
+
+                <form:form action="/languages" method="post" modelAttribute="language">
+                    <p>
+                        <form:label path="name">Name</form:label>
+                        <form:errors path="name"/>
+                        <form:input path="name"/>
+                    </p>
+                    <p>
+                        <form:label path="creator">Creator</form:label>
+                        <form:errors path="creator"/>
+                        <form:textarea path="creator"/>
+                    </p>
+                    <p>
+                        <form:label path="version">Version</form:label>
+                        <form:errors path="version"/>
+                        <form:input path="version"/>
+                    </p>
+                    <input type="submit" value="Submit"/>
+                </form:form>
+
+
+                <!-- *src/main/webapp/WEB-INF/edit.jsp* -->
+                <%@ page isErrorPage="true" %>    
+                <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>     
+
+                <h1>Edit Language</h1>
+                <form:form action="/languages/${language.id}" method="post" modelAttribute="language">
+                    <input type="hidden" name="_method" value="put">
+                    <p>
+                        <form:label path="name">Name</form:label>
+                        <form:errors path="name"/>
+                        <form:input path="name"/>
+                    </p>
+                    <p>
+                        <form:label path="creator">Creator</form:label>
+                        <form:errors path="creator"/>
+                        <form:textarea path="creator"/>
+                    </p>
+                    <p>
+                        <form:label path="version">Version</form:label>
+                        <form:errors path="version"/>
+                        <form:input path="version"/>
+                    </p>
+                    <input type="submit" value="Submit"/>
+                </form:form>
+
+
+                <!-- *src/main/webapp/WEB-INF/books/show.jsp* -->
+                <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>    
+
+                <p>Name: <c:out value="${language.name}"/></p>
+                <p>Creator: <c:out value="${language.creator}"/></p>
+                <p>Version: <c:out value="${language.version}"/></p>
+                <a href="/languages/${language.id}/edit">Edit</a>
+                <form action="/languages/${language.id}" method="post">
+                    <input type="hidden" name="_method" value="delete">
+                    <input type="submit" value="Delete">
+                </form>
+
+            (^ demonstrates setting up basic CRUD controller and views ^)
+            *************************************************************************************************
+
+    16. Add a line to "application.properties" for the edit method to work
+        -i.e. " spring.mvc.hiddenmethod.filter.enabled=true "
+
+    17. Test all!
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+

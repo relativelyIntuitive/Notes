@@ -1,0 +1,71 @@
+Step 5: Server Configuration
+Now we are going to set up our remote server for deployment. Our server is nothing more than a small allocated space on someone else’s larger computer (in this case, the big computer belongs to Amazon!). That space has an installed operating system, just like your computer. In this case, we are using a distribution of Linux called Ubuntu, version 16.04.
+
+Create a user:
+We should have a non-root user who also has root privileges. Let's create one now! In the example, our user will be named "kermit", but you may use whatever name you like.
+
+sudo adduser kermit              // This will ask you to create a password. Make it secure!
+                                 // You may then fill in your information, or press <enter> for default
+sudo usermod -aG sudo kermit     // this will give the user root privileges
+su - kermit                      // switch to the user kermit, your terminal prompt will indicate the change
+Server configuration:
+Although we have linux, our new computer is otherwise empty. Let’s change that so we can start building a server capable of providing content that the rest of the world can access. In order to do so, we have to install some key programs first. First, let’s install python, python dev, pip, nginx, and git
+
+In the terminal:
+
+sudo apt-get update
+sudo add-apt-repository ppa:jonathonf/python-3.6    [press ENTER when prompted]
+sudo apt-get update
+sudo apt-get install python3.6 -y
+sudo apt-get install python3-pip python3.6-dev nginx git -y
+sudo apt-get update
+sudo pip3 install virtualenv
+mySQL
+Next, we will need to install our mySQL server:
+
+sudo apt-get update
+sudo apt-get install mysql-server                      // answer Yes when prompted!
+A pop up will ask you to set your password. Type it in carefully! If you make it different from the password you use on your local machine, remember that you will have to update your mysqlconnection file in your Flask project.
+
+Next, we will need to set up the database that our project will need. This can easily be done by going to MySQL Workbench and reverse engineering your desired database, then forward engineering it. 
+
+1. Reverse engineer
+
+
+
+2. Forward engineer 
+
+We may filter out tables that we do not want forward engineered. Here, we are only going to process the tables in the simpleWall database. We excluded the tables from the emailVal and register databases by selecting them and clicking the right arrow.
+
+
+
+3. Copy the script
+
+When MySQL Workbench asks you to review the script, that's when you can copy it!
+
+
+
+
+
+Now, in our deployed server, we can open the mysql shell by typing:
+
+mysql -u root -p                                       // provide your mysql password when prompted
+This is where you may run SQL queries! Including the code that will create your database for you! Just paste the script that you copied from MySQL Workbench, and it will create your database. You may verify that the database was created with:
+
+SHOW DATABASES;
+When you are ready to leave the mysql shell, type:
+
+exit
+Get your project!
+Now, we are going to clone our project that we want to deploy into our server and cd into it.
+
+git clone {{ url copied from github project }}
+cd {{ project }}
+Make sure your project looks exactly like you remember it, and now let's make a virtual environment. The ~/myRepoName$ prompt in the code snippets provided is to ensure that you know that you should be in your project when running these commands.
+
+Virtualenv and install the necessary Python modules
+~/myRepoName$ virtualenv venv --python=python3.6          // create the environment and call it venv
+~/myRepoName$ source venv/bin/activate                    // activate the environment
+(venv) ~/myRepoName$ pip install -r requirements.txt      // install everything that requirements.txt says you need
+(venv) ~/myRepoName$ pip install gunicorn                 // install gunicorn
+(venv) ~/myRepoName$ pip install {{anything you need that was not already in requirements.txt}}

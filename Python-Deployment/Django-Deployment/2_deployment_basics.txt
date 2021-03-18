@@ -1,0 +1,14 @@
+Your Server
+We are using Amazon Web services to deploy our Python project. That means we have an Ubuntu server, a Linux operating system! However, it does not have anything else. Think back to how we had to do a number of installations on our own computers before we could start building Python projects. We will need to do the same for our Ubuntu server. But how do we get to it?
+
+Keep your PEM key secure, DO NOT push your PEM key to Github!
+
+The PEM key we download when we create our server instance is what gives us permission to SSH (Secure Shell) into our server. Never put your PEM key on GitHub or in any other way share your PEM key. Keep it in a directory that you know you will never have any chance of accidentally pushing to GitHub or otherwise sharing with anyone. If someone gets your PEM key, they may SSH into your server, do whatever they'd like, and run up your bill!
+
+When we SSH into our server, we create a pipe between our computer and our server. We will have a terminal window that is actually a window into our terminal. Keep in mind that this window is no longer your own computer! We are now on our Ubuntu server, and we need to do the same installations as we did on our own computer so that we may run our Python project. For now, we will only interact with our Ubuntu server through this terminal window. We will not be able to use VSCode or MySQLWorkbench or any other GUI.
+
+Your Code:
+When our Ubuntu server has everything it needs to run our Python project, we need to put our code in our server! To do this, we will use GitHub. We push our code from our computer onto GitHub, then pull the code from GitHub into our Ubuntu server.
+
+Deploy!
+Once our Ubuntu server has everything it needs, we'll set up Nginx and Gunicorn. Follow all the steps very closely and think about what each command is for!

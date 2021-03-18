@@ -1,0 +1,528 @@
+
+- DJANGO NOTES -
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+GENERAL:
+
+-Django is a web-development framework for managing large projects
+    -uses many files, instead of one large file like Flask would
+    -allows for outsorcing of different tasks to different files
+        (routes, route functions, database interaction, templates etc.)
+    -divides applications into smaller apps that work together as a part of a larger project
+-Django uses the MTV structure
+    (see definition and comparison to MVC below)
+-Django server defaults to port 8000
+-DO NOT manually change any project-folder names after creation!
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+MVC VS MTV:
+
+-MVC is very common and MTV is very similar to it
+1. MTV (model-template-view)
+    1.Model: 
+        -May build database tables
+        -Handles logic that relies on data
+        -Interfaces with the database
+    2.Template:
+        -HTML page that gets served to the client
+        -May contain some logic to be handled by a template engine
+        3.Controller:
+        -Receives incoming requests
+        -Minimal logic
+        -Calls on models to aggregate/process data
+        -Determines appropriate response
+
+2. MVC (model-view-controller)
+    1.Model: 
+        -May build database tables
+        -Handles logic that relies on data
+        -Interfaces with the databas
+    2.View:
+        -HTML page that gets served to the client
+        -May contain some logic to be handled by a template engine
+    3.Controller:
+        -Receives incoming requests
+        -Minimal logic
+        -Calls on models to aggregate/process data
+        -Determines appropriate response
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+STARTING A DJANGO PROJECT:
+
+1. Install Django from PIP with CMD, in the folder of the venv you want to use
+
+2. Activate the venv
+
+3. Navigate to the directory where the project will be stored
+
+4. "django-admin startproject <+project_name>" will create a new Django project with the given name
+
+5. Navigate into project directory and enter "python manage.py runserver" to start the server
+    -"localhost:8000" is the default port to see test debug page, confirming the server is working 
+
+6. Close server and enter "python manage.py migrate" to update any databases and allow the use of "session" dictionary
+    (see SESSION section below)
+
+7. Navigate to project directory and "python manage.py startapp <+app_name>" creates a new app in the project folder
+
+8. Open the "settings.py" file, located withing the titular folder within the main project directory
+
+9. Add any created apps to the "INSTALLED_APPS" list variable defined within
+
+    *************************************************************************************************
+    -i.e.   INSTALLED_APPS = [
+                'your_app_name_here', 
+                'django.contrib.admin',
+                'django.contrib.auth',
+                'django.contrib.contenttypes',
+                'django.contrib.sessions',
+                'django.contrib.messages',
+                'django.contrib.staticfiles',
+            ]
+        (^ first item in list added, don't forget the comma! ^)
+        *************************************************************************************************
+
+10. Open "urls.py" from the same titular folder within the main project directory
+
+11. Add the following URL pattern for the new app(s) and comment out/delete the default lines for now
+
+    *************************************************************************************************
+    -i.e.   from django.urls import path, include
+            # from django.contrib import admin
+            urlpatterns = [
+                path('', include('<+app_name>.urls')),
+                # path('admin/', admin.sites.urls)
+            ]
+        (^ the route starts w/empty string ("/"), so 2nd arg runs to resolve the rest of route ^)
+        *************************************************************************************************
+
+    -import "include" as well
+        -"include()" func redirects to an app's "url.py" file to resolve the rest of the route
+            (argument must be a string!)
+    -"from django.contrib import admin" can be removed
+        (for default "Successfully installed" server page)
+    -"urlpatterns" holds list of recognized URLs
+        -"path" func determines action for accepted URLs
+            -must be one per each app
+                (each app has their own url.py file for the rest of the URL)
+            -"path()" func takes 2 args. Arg#2 runs if arg#1 matches route
+        -"path('admin/', admin.sites.urls)" can be removed
+            (for default "Successfully installed" server page)
+
+12. Create a new "urls.py" file within the app folder and add the following code:
+
+    *************************************************************************************************
+    -i.e.   from django.urls import path
+            from . import views
+            urlpatterns = [
+                path('', views.index)
+            ]
+        (^ route ends w/empty string ("/"), so "index()" func from "views.py" runs ^)
+        *************************************************************************************************
+
+    -import "views.py" file to access its functions
+        (the "." means it can be found in the current directory)
+    -"urlpatterns" holds list of recognized URLs
+        -each "path()" item within determines action if the remainder of the URL matches it
+            -action is a function from "views.py" that is run if URL matches arg#1
+
+13. Add a function called "index" within the app's "views.py" file
+    -"views.py" file is known as the "controller"
+
+    *************************************************************************************************
+    -i.e.   from django.shortcuts import render, HttpResponse
+            def index(request):                                                             # every func's arg#1 is "request" object
+                return HttpResponse("this is the equivalent of @app.route('/')!")   
+                *************************************************************************************************
+
+    -by default, Django doesn't differentiate between GET/POST requests unless you are explicit
+        (see GET/POST requests below)
+    -"HttpResponse" is imported to return raw HTML instead of a rendered template
+    -if returning a string, must send the string via a "HttpResponse()" func
+        (can't just "return 'my string'")
+
+14. Run the server again and it should be working!
+
+15. See django_routing_diagram.png in notes for visual representation of the flow described here
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+DJANGO AND VARIABLE REQUESTS:
+
+-Django can accept variables in the URL path
+    -"<<+converter>:<+variable_name>>" is the path parameter syntax, like in Flask
+
+*************************************************************************************************
+-i.e.   "some_project/some_app/urls.py":
+        urlpatterns = [
+            path('bears', views.one_method),                            # would only match localhost:8000/bears
+            path('bears/<int:my_val>', views.another_method),           # would match localhost:8000/bears/23
+            path('bears/<str:name>/poke', views.yet_another),           # would match localhost:8000/bears/pooh/poke
+            path('<int:id>/<str:color>', views.one_more),               # would match localhost:8000/17/brown
+            path('<str:name>/<str:color>', views.var_index)   # would match localhost:8000/zack/green/25
+        ]
+
+        "some_project/some_app/views.py":
+        def one_method(request):                # no values passed
+            pass
+
+        def another_method(request, my_val):
+            pass
+
+        def yet_another(request, name):
+            pass
+
+        def one_more(request, id, color): 
+            pass
+
+        def var_index(request, name, color):
+            context = {
+                "name": name,
+                "color": color,
+                "pets": ['Dewey', 'Axel', 'Harley']
+            }
+            return render(request, "index.html", context)
+        
+        "some_project/some_app/templates/index.html":
+        <h1>Info From Server:</h1>
+        <p>Name: {{name}}</p>
+        <p>Color: {{color}}</p>
+        <p>Pets</p>
+        <ul>
+            {% for pet in pets %}
+                <li>{{pet}}</li>
+            {% endfor %}
+        </ul>
+    (^ demonstrates relationship between "urlpatterns", "views.py" file and an HTML template ^)
+    *************************************************************************************************
+
+-Data is passed to the template via the render() method by passing a single dictionary whose keys will be the template variables
+    (these variables can come from the URL also, as shown above)
+-You CANNOT use square brackets with Django's template engine! Instead, use dot notation
+    ("array[0]" becomes "{{ array.0 }}")
+-Many methods will work differently and require different syntax
+    -i.e. "len(<+obj>)" is "<+obj>|length"
+-Like with the Jinja2 engine used for Flask tempplates, you cannot comment out template engine engine syntax with <!-- --> like normal HTML
+    -"{# #}" is the syntax for a single-line comment
+    -"{% comment "Optional note" %} {% endcomment %}" is the syntax for multi-line commenting
+    -commented tags CANNOT be nested
+
+    *************************************************************************************************
+    -i.e.   {# <p> commented out text with {{ pub_date|date:"c" }} </p>
+            {% comment "Optional note" %}
+                <p> Commented out text with {{ create_date|date:"c" }} </p>
+            {% endcomment %}
+            *************************************************************************************************
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+RESPONSE TYPES:
+
+-There are many different ways to return a response in Django
+-"HttpResponse()"
+    -can be used to pass a string as a response
+    -must be imported from django.shortcuts
+-"redirect()"
+    -used to navigate to a different view method, before a final response is sent to the client
+    -pasically submits an altered URL that is linked to its own view method
+    -must be imported from django.shortcuts
+    -CANNOT pass context to a redirect
+-"JsonResponse()"
+    -used to return a JSON object
+    -must be imported from django.http
+-"render()"
+    -used to render an HTML "template"
+    -must be imported from django.shortcuts
+    -arg#1 always "request" object, arg#2 is a string path to the HTML template
+        (HTMLs MUST be stored in directory named "templates" within main app directory)
+
+*************************************************************************************************
+-i.e.   "urls.py":
+        from django.urls import path
+        from . import views
+        urlpatterns = [
+            path('', views.root_method),
+            path('another_route', views.another_method),
+            path('redirected_route', views.redirected_method)
+            path('render_test', views.index)
+        ]
+
+        "views.py":
+        from django.shortcuts import render, HttpResponse, redirect 
+        from django.http import JsonResponse
+
+        def root_method(request):
+            return HttpResponse("String response from root_method")
+
+        def another_method(request):
+            return redirect("/redirected_route")
+
+        def redirected_method(request):
+            return JsonResponse({"response": "JSON response from redirected_method", "status": True})
+
+        def index(request):
+            return render(request, "index.html")
+    (^ demonstrates ^)
+    *************************************************************************************************
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+STATIC FILES:
+
+-MUST be saved within a directory called "static" within the main app directory, as a sibling to the "templates" directory
+    -CSS, JS, images etc. can then be subdivided to their own directories within it
+-"{% load static %}" line must be added to the head of the HTML template that will be using the files before they can be referenced in the HTML
+
+    *************************************************************************************************
+    -i.e.   <!DOCTYPE html>
+            <html>
+                <head>
+                    <meta charset="utf-8">
+                    <title>Index</title>
+                    {% load static %}
+                    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+                    <script src="{% static 'js/script.js' %}"></script>
+                </head>
+                <body>
+                    <img src="{% static 'images/image.jpg' %}" />
+                </body>
+        (^ static files are referenced like "{% static '<+file_path_within_static_dir>' %}" after being loaded by "{% load static %}" ^)
+        *************************************************************************************************
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+GET/POST REQUESTS:
+
+-GET request is made when you are downloading data from a site 
+-POST request is made when you are uploading data to a site
+-By default, Django doesn't differentiate between GET/POST requests unless you are explicit
+-Flask accesses form data with request.form, but Django uses request.POST or request.GET depending on the request type
+
+    *************************************************************************************************
+    -i.e.   from django.shortcuts import render, redirect
+            def some_func(request):
+                if request.method == 'GET':
+                    print("a GET request is being made to this route")
+                    return render(request, 'some_template.html')
+                if request.method == 'POST':
+                    print("a POST request is being made to this route")
+                    return redirect('/')
+        (^ uses "if" statements to return different results based on whether request is GET or POST ^)
+        *************************************************************************************************
+
+-POST requests must include a CSRF token
+    -stands for and used to prevent "Cross-Site Request Forgery"
+        -type of malicious attack where a hacker pretends to be another user and 
+    -CSRF token helps the server recognize genuine requests
+    -django throws error message if a POST request is submitted without one
+    -POST requests can access form info by referencing their names as a string (like a variable)
+
+    *************************************************************************************************
+    -i.e.   "INDEX.HTML":
+            <h1>Index Page</h1>
+            <h3>Create a User</h3>
+            <form action='/create_user' method='post'>
+                {% csrf_token %}
+                Name: <input type='text' name='name'>
+                Email: <input type='text' name='email'>
+                <button type='submit'>Create User</button>
+            </form>
+
+            "URLS.PY":
+            from django.urls import path
+            from . import views
+
+            urlpatterns = [
+                path('', views.index),
+                path('create_user', views.create_user),
+                path('success', views.success)
+            ]
+
+            "VIEWS.PY":
+            from django.shortcuts import render, redirect
+            
+            def index(request):                             # this is the route that shows the form
+                return render(request,"index.html")
+
+            def create_user(request):                       # this is the route that processes the form
+                name_from_form = request.POST['name']
+                email_from_form = request.POST['email']
+                context = {
+                    "name_on_template" : name_from_form,
+                    "email_on_template" : email_from_form
+                }
+                return redirect("/success")
+
+            def success(request):                           # this is the success route
+                return render(request,"success.html")
+
+            "SUCCESS.HTML"
+            <h1> Success! </h1>
+
+        (^ POSTS form data to "/users" which calls "create_user" method to submit data and then redirect ^)
+        *************************************************************************************************
+
+    -forms information is submitted as a dictionary with keys equal to the "name" attribute from the inputs
+        -i.e. request.POST accessess dictionary...add key in brackets to select input data
+        -ALL form input data is submitted as a STRING
+    -if printing form data, it will show in the terminal, NOT the browser console!
+    -It's best practice for the POST request method to redirect instead of render, so that a refresh will not resubmit
+        (refresh of above would simply refresh the "success.html" page)
+        -DO NOT to have the method receive the request.POST and then immediately render like below
+            -means that if the page is refreshed after submission, the form will be submitted twice!
+                (the URL being refreshed will call the create_user method again and duplicate the user!)
+        -Context can NOT be passed to redirect though! You must use session data to make it persist through a redirect and second render
+            (see SESSION DATA section below)
+
+        *************************************************************************************************
+        -i.e.   "INDEX.HTML":
+                <h1>Index Page</h1>
+                <h3>Create a User</h3>
+                <form action='/users' method='post'>
+                    {% csrf_token %}
+                    Name: <input type='text' name='name'>
+                    Email: <input type='text' name='email'>
+                    <button type='submit'>Create User</button>
+                </form>
+
+                "URLS.PY"
+                from django.urls import path
+                from . import views
+                                    
+                urlpatterns = [
+                    path('', views.index),
+                    path('users',views.create_user)
+                ]
+
+                "VIEWS.PY"
+                from django.shortcuts import render
+
+                def index(request):
+                    return render(request,"index.html")
+
+                def create_user(request):
+                    print("Got Post Info....................")
+                    name_from_form = request.POST['name']
+                    email_from_form = request.POST['email']
+                    context = {
+                        "name_on_template" : name_from_form,
+                        "email_on_template" : email_from_form
+                    }
+                    return render(request,"show.html",context)
+
+                "SHOW.HTML":
+                    <h1>Show Page</h1>
+                    <h3>Info Submitted:</h3>
+                        <p>Name: {{ name_on_template }}</p>
+                        <p>Email: {{ email_on_template }}</p>
+
+            (^ this structure will end up submitting form on every request ^)
+            *************************************************************************************************
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+FILE UPLOADS:
+
+-"request.FILES" is where you will find any files uploaded from a POST request!
+    -Will only exist if there was a file upload in the POST request
+    -If saving a file to a model, use the "models.FileField()" type
+        -takes optional "upload_to" argument that specifices what folder to save it in within the "media" directory
+    -The model instance created will have a "file" attribute
+        -"file" attribute holds info on the file
+            - " [+object_name].file.name "
+                    -holds the file name
+            - " [+object_name].file.path "
+                    -holds the file path
+            - " [+object_name].file.url "
+                    -holds the file url
+    -To serve files in development:
+        1. Add 2 lines to "settings.py"
+            1. " MEDIA_ROOT = BASE_DIR / 'media' "
+            2. " MEDIA_URL = '/media/' "
+        2. ALSO you MUST add the following to the "urlpatterns" variable in "urls.py" with a plus sign!
+            - " urlpatterns = [...] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) "
+        3. Finally, add both "urls.py" imports
+            1. " from django.conf import settings "
+            2. " from django.conf.urls.static import static "
+        4. Now the file can be referenced by its .url attribute!
+            - " [+object_name].file.url "
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+SESSION DATA:
+
+-HTTP request/response cycle is "stateless"
+    -means that each request/response cycle is independent/ignorant of all other requests, before or after
+        (like GET/POST example, when redirecting on a POST instead of immediately rendering, browser forgets POST info upon redirect GET request)
+-"Persistent data storage" is necessary for user data to "persist."
+    -"session" is one form of "persistence"
+        -"session" is a dictionary that is available across the entire app
+        -"session" allows saving, or "writing", certain valuable pieces of data for use in future cycles
+            (results in a more cohesive user experience with most applications)
+    -persistent data storage helps us bridge gap between a "stateless" protocol like HTTP with the "stateful" data generated through it
+        -generated data that persists is called "state"
+            (whether there is a user logged in, who the current user is, what links a user has viewed previously etc)
+    -databases are another tool for persistent data storage
+        -databases allow you to limit the amount of data stored in session, which is good practice
+-"Cookies" are used by Django and many other frameworks to store session data
+    -cookies are securely hashed packets of session data sent from server to client
+    -once a client's browser has received this cookie, the information contained in it is written to a small file on their hard drive
+    -while hashed, cookies are not incredibly secure, so don't save anything private in them
+        (use a database for sensitive information)
+
+*************************************************************************************************
+-i.e.   TERMINAL:
+        (djangoPy3Env) project_name> python manage.py migrate   # outputs "Applying sessions.0001_initial... OK"
+
+        "VIEWS.PY":
+        def some_function(request):
+            request.session['name'] = request.POST['name']
+            request.session['counter'] = 100
+
+        "TEMPLATES/INDEX.HTML":
+        <p>Name in session is: {{request.session.name}}</p>
+        
+    (^ migrates data, allowing session use. Then stores POST data in session so it is available in templates via dot notation ^)
+    *************************************************************************************************
+
+-"Migrations" help to manage database state
+    -database must be updated like above via migration to allow the use of session
+-session dictionary MUST be accessed view dot notation in a template HTML, just like sequences
+
+-Some session methods:
+    - request.session['<+key>']
+        -this will retrieve (get) the value associated with 'key'
+        -i.e. request.session['currentUserId'] = newUser.id
+
+    - request.session['<+key>'] = '<+value>'
+        -set the value that will be stored by 'key' to 'value'
+
+    -'<+key>' in request.session
+        -returns a boolean of whether a key is in session or not
+
+    - {{ request.session.<+key> }}
+        -use dot notation (.) to access request.session keys from templates since square brackets ([]) aren’t allowed there
+
+    - del request.session['<+key>']
+        -deletes a session key if it exists, throws a KeyError if it doesn’t
+        -use along with try and except since it's better to ask for forgiveness than permission
+
+    - request.session.clear()
+        -clears all session data
+        -usefull for logging out a user
+
+    - request.session.save()
+        -if storing a list that is being modified in session, you will need to save the session after the append
+
+            *************************************************************************************************
+            -i.e.   request.session['my_list'] = []
+                    request.session['my_list'].append("new item")
+                    request.session.save()
+                (^ after list is changed, the session MUST be saved for the changes to persist ^)
+                *************************************************************************************************
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+

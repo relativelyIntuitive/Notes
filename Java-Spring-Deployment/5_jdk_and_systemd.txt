@@ -1,0 +1,50 @@
+JDK and systemd
+Lastly, we need to install the JDK to run our jar file and create a systemd script to have our application always running.
+
+1. Install the JDK
+    -"sudo apt-get install default-jdk"
+
+2. Navigate to '/var/springApp' and run your application with the 'java -jar <<warFile>>'. For example:
+    -"java -jar auth-0.0.1-SNAPSHOT.war"
+    -This will start your Spring Boot appplication. In your favorite browser, navigate to your public IP address and you should see your application.
+
+3. Currently our app is working fine; however, if we ever close our ssh session, the Spring Boot application will stop running
+    -To solve this issue, Spring Boot recommends that we create a systemd script to run our application.
+
+4. Create a script named <<yourApp>>.service in '/etc/systemd/system' directory.
+    *************************************************************************************************
+    cd /etc/systemd/system
+    sudo touch auth.service
+    sudo vim auth.service
+    *************************************************************************************************
+    -In the editor, follow this example:
+    *************************************************************************************************
+    [Unit]
+    Description=Auth application using Spring Boot
+    After=syslog.target
+    [Service]
+    User=ubuntu
+    ExecStart=/usr/bin/java -jar /var/springApp/auth-0.0.1-SNAPSHOT.war
+    SuccessExitStatus=143
+    [Install]
+    WantedBy=multi-user.target
+    *************************************************************************************************
+
+5. Let systemd know that we have created a new service:
+    -"sudo systemctl daemon-reload"
+
+6. Now that we have created the script, we need to make sure that our applications starts on every system boot:
+    -"sudo systemctl enable auth.service"
+
+7. Start our service:
+    -"sudo systemctl start auth"
+
+8. We can also stop, restart and check the status of our service:
+    *************************************************************************************************
+    sudo systemctl stop auth
+    sudo systemctl restart auth
+    systemctl status auth
+    *************************************************************************************************
+    -We don't have to run sudo for the status because we are just checking if the service is running.
+
+9. Now, your app will be running via systemd. You can close your ssh session and everyone will still be able to see your application.

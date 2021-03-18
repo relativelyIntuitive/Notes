@@ -1,0 +1,714 @@
+ - FULL-STACK MERN NOTES -
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+GENERAL:
+    -The following guide is a basic manual for setting up a basic MERN project with CRUD capabilities
+    -Be sure to setup a MongoDB db before starting this or it will not work!
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+SETTING UP A MERN PROJECT:
+
+1. Create the root project directory
+
+2. Create the backend "server" folder and its structure within the root project directory
+    -"server"
+        -"config"
+        -"controllers"
+        -"models"
+        -"routes"
+
+3. Initialize a "package.json" file in the server folder
+    - " npm init -y "
+
+4. Install dependencies like Express and Mongoose in the server folder
+    - " npm install express mongoose "
+
+5. Create the "server.js" file in server folder and set it up
+
+    *************************************************************************************************
+    -i.e.   // "server.js" will be linked to the "...routes.js" and "...config.js" later
+            const express = require('express');
+            const app = express();
+            const port = 8000;
+
+            // starts the Express server
+            app.listen(port, () => {
+                console.log(`Listening on port ${port}`)
+            });
+
+        (^ shows basic "server.js" setup ^)
+        *************************************************************************************************
+
+6. Create a front-end React project within the root project directory
+    - " npx create-react-app [+app_name] "
+    -app is often just called "client"
+
+7. Create a controller
+
+    *************************************************************************************************
+    -i.e.   *user.controller.js*
+            // "This is a test controller to be editted later"
+            module.exports.index = (req, res) => {
+                res.json({
+                   message: "Hello World!"
+                });
+            };
+
+        (^ demonstrates basic "Hello World" controller ^)
+        *************************************************************************************************
+
+8. Create a route
+
+    *************************************************************************************************
+    -i.e.   *hello.routes.js*
+            // There is no need for a root "/api" route and this will be changed later
+            const UserController = require('../controllers/user.controller');
+            module.exports = function(app){
+                app.get('/api', UserController.index);
+            };
+
+        (^ demonstrates root route creation ^)
+        *************************************************************************************************
+
+9. Link the "routes.js" file to the "server.js" file
+    - " require(...routes.js) " returns a function
+        -then " (app) " passes "app" as an arg to the returned function?
+
+    *************************************************************************************************
+    -i.e.   *server.js*
+            // (app) must be passed to the function returned by "require()"!
+            const express = require('express');
+            const app = express();
+            const port = 8000;
+
+            require('./server/routes/hello.routes')(app);
+
+            app.listen(port, () => {
+                console.log(`Listening on port ${port}`)
+            });
+
+        (^ demonstrates linking "routes.js" to "server.js" ^)
+        *************************************************************************************************
+
+10. Test the Express server in a browser
+    - " nodemon server.js "
+        -if nodemon is installed globally or to the project dependencies
+            -nodemon ALWAYS recommended
+
+11. Backend server is running! Now time to setup the React project
+    -"npm start" in the "client" folder to start front end server
+        -(need second terminal running) 
+
+12. Install Axios
+    - " npm install axios "
+    -Axios makes backend requests easier
+    -(dependencies like axios that will also be used by the front end may require changing imports to point to their folder in the proper "node_modules" directory)
+        -i.e. " import axios from '../../../server/node_modules/axios'; "
+        -(move the "node_modules" folder back and forth to be prompted to auto-update the imports and then save the files after)
+
+
+13. Create a components folder within "src" folder and then make a component
+
+    *************************************************************************************************
+    -i.e.   *Main.js*
+            // "useState" creates a loading "message" to be set by the axios request
+            import React, { useEffect, useState } from 'react'
+            import axios from '../../../server/node_modules/axios';
+
+            export default () => {
+                const [ message, setMessage ] = useState("Loading...")
+                useEffect(()=>{
+                    axios.get("http://localhost:8000/api")
+                        .then(res=>setMessage(res.data.message))       
+                }, []);
+
+                return (
+                    <div>
+                        <h2>Message from the backend: {message}</h2>
+                    </div>
+                )
+            }
+
+        (^ demonstrates creation of test component that makes and displays an API call ^)
+        *************************************************************************************************
+
+14. Import the component into the App
+    -replace entire default "App.js" file contents with the following
+
+    *************************************************************************************************
+    -i.e.   *App.js*
+            import React from 'react';
+            import Main from './components/Main';
+
+            function App() {
+                return (
+                    <div className="App">
+                        <Main />
+                    </div>
+                );
+            }
+            export default App;
+
+        (^ demonstrates basic use of a component by an app ^)
+        *************************************************************************************************
+
+15. Install "Cors"
+    -Cors adds the ability to make cross-origin requests
+        -if Cors isn't used, the App would just display the "Loading.." message
+            -React App won't be able to make API request from backend Express server without Cors
+    -Navigate to root project directory (server.js level)
+        - " npm install cors "
+
+16. Setup Cors 
+
+    *************************************************************************************************
+    -i.e.   *server.js*
+            // Cors must be required (imported) and then "used" by the Express "app"
+            const express = require('express');
+            const app = express();
+            // This line is new:
+            const cors = require('cors');
+            const port = 8000;
+
+            // This line is new
+            app.use(cors());
+
+            require('./server/routes/hello.routes')(app);
+
+            app.listen(port, () => {
+                console.log(`Listening on port ${port}`)
+            });
+
+        (^ demonstrates how to add Cors to Express server ^)
+        *************************************************************************************************
+
+17. Test the React App with a browser again!
+    -Make sure the Express server is still running
+        -Navigate to root "server.js" level project directory
+        - " nodemon server.js "
+    -Make sure the React app is still running
+        -Navigate to React App directory root
+        - " npm start "
+    -Should briefly see the "Loading..." message, and then "Hello World!"
+
+18. Yay! Cross-origin requests now allow communication between the front/back end!
+
+19. Create the database with MongoDB
+
+20. Connect the Express server to connect to the database with Mongoose
+    -Create "mongoose.config.js" file within the "server/config" directory
+
+    *************************************************************************************************
+    -i.e.   *mongoose.config.js*
+            const mongoose = require('mongoose');
+
+            mongoose.connect("mongodb://localhost/[+db_name}", {
+                useNewUrlParser: true,
+                useUnifiedTopology: true,
+            })
+                .then(() => console.log("Established a connection to the database"))
+                .catch(err => console.log("Something went wrong when connecting to the database", err));
+
+        (^ demonstrates how to connect Express server to MongoDB database with Mongoose ^)
+        *************************************************************************************************
+
+21. Import "mongoose.config.js" into the "server.js" file
+    - " app.use()" statements MUST be above the "require()" statement for the Mongoose config!
+
+    *************************************************************************************************
+    -i.e.   *server.js*
+            // The "app.use()" statements use Express middleware to add POST request processing abilities to the server
+            const express = require('express');
+            const cors = require('cors');
+            const app = express();
+            const port = 8000;
+
+            app.use(cors());
+            // This line is new:
+            app.use(express.json());
+            // This line is new:
+            app.use(express.urlencoded({ extended: true }));
+
+            require('./routes/hello.routes')(app);
+            // This line is new:
+            require('./config/mongoose.config');
+
+            app.listen(port, () => {
+                console.log(`Listening on Port ${port}`);
+            });
+
+        (^ demonstrates how to import the Mongoose config to allow handling of POST request and comms with the DB ^)
+        *************************************************************************************************
+
+22. Create a model
+
+        *************************************************************************************************
+        -i.e.   *user.model.js*
+                const mongoose = require('mongoose');
+
+                const UserSchema = new mongoose.Schema({
+                    firstName: { type: String },
+                    lastName: { type: String }
+                }, { timestamps: true });
+
+                const User = mongoose.model("User", UserSchema);
+
+                module.exports = User;
+
+            (^ demonstrates basic "User" model ^)
+            *************************************************************************************************
+
+23. Add controller method to handle creation of a document from the model
+
+    *************************************************************************************************
+    -i.e.   *user.controller.js*
+            // MUST import the model!
+            const User = require("../models/user.model");
+
+            // Controller to create a User doc
+            module.exports.createUser = (req, res) => {
+                const { firstName, lastName } = req.body;
+                User.create({
+                    firstName,
+                    lastName
+                })
+                    .then(user => res.json(user))
+                    .catch(err => res.json(err));
+            };
+
+        (^ demonstrates basic "User" doc creation controller ^)
+        *************************************************************************************************
+
+24. Update the Express server routes for the model
+
+    *************************************************************************************************
+    -i.e.   *user.routes.js*
+            // Make sure to add it as a ".post()" route!
+            const UserController = require('../controllers/user.controller');
+
+            module.exports = function(app){
+                app.get('/api', UserController.index);
+                // This line is new:
+                app.post('/api/users', UserController.createUser);
+            };
+
+        (^ demonstrates adding POST route for a model ^)
+        *************************************************************************************************
+
+25. Time to tie in the creation to the React App!
+    -Create "views" folder within the "src" directory in "client" App's root directory
+    -Move "Main.js" into the "views" directory
+        -MUST update "App.js" import of "Main.js" to indicate the new path!
+
+26. Create "UserForm.js" within "components" to hold a form
+
+    *************************************************************************************************
+    -i.e.   *UserForm.js*
+            import React, { useState } from 'react'
+            import axios from '../../../server/node_modules/axios';
+
+            const UserForm = () => {
+                // keep track of what is being typed via useState hook
+                const [userName, setUserName] = useState(""); 
+                // handler when the form is submitted
+                const onSubmitHandler = e => {
+                    // prevent default behavior of the submit
+                    e.preventDefault();
+                    // make a post request to create a new user
+                    axios.post('http://localhost:8000/api/users', {
+                        userName,
+                    })
+                        .then(res=>console.log(res))
+                        .catch(err=>console.log(err))
+                };
+
+                // onChange to update userName
+                return (
+                    <form onSubmit={onSubmitHandler}>
+                        <p>
+                            <label>UserName</label><br/>
+                            <input type="text" onChange = {(e)=>setUserName(e.target.value)}/>
+                        </p>
+                        <input type="submit"/>
+                    </form>
+                );
+            };
+
+            export default UserForm;
+
+        (^ demonstrates creation of basic form component ^)
+        *************************************************************************************************
+
+27. Update "Main.js" to display the "UserForm"
+
+    *************************************************************************************************
+    -i.e.   *Main.js*
+            // Replace everything with the following code
+            import React from 'react';
+            import UserForm from '../components/UserForm';
+
+            const Main = () => {
+                return (
+                    <div>
+                    <UserForm/>
+                    </div>
+                );
+            };
+
+            export default Main;
+
+        (^ demonstrates how to use a view file to import components ^)
+        *************************************************************************************************
+
+28. Test the form with Postman!
+
+29. Add a controller and a route to retrieve all users
+    *************************************************************************************************
+    -i.e.   *user.controller.js*
+            // Retrieves a list of all users
+            module.exports.getAllUsers = (request, response) => {
+                User.find({})
+                    .then(users => response.json(users))
+                    .catch(err => response.json(err))
+            };
+
+            *user.routes.js*
+            ...
+            app.get('/api/users', UserController.getAllUsers);
+            ...
+
+        (^ demonstrates how to add a route to retrieve all Users ^)
+        *************************************************************************************************
+
+30. Create a new component for the list of users
+    *************************************************************************************************
+    -i.e.   *UserList.js*
+            // "users" prop will be passed down from "Main.js" view next
+            import React from 'react'
+
+            const UserList = props => {
+                return (
+                    <div>
+                        {props.users.map((user, idx)=>{
+                            return <p key={idx}>{user.userName}</p>
+                        })}
+                    </div>
+                );
+            };
+
+            export default UserList;
+
+        (^ demonstrates basic component for displaying a list of users ^)
+        *************************************************************************************************
+
+31. Add the list component to "Main.js" view
+
+    *************************************************************************************************
+    -i.e.   *Main.js*
+            // Retrieves list of users and passes it down to "UserList", which displays when the API req is successfull
+            import React, { useEffect, useState } from 'react'
+            import UserForm from '../components/UserForm';
+            // These 2 lines are new:
+            import UserList from '../components/UserList';
+            import axios from '../../../server/node_modules/axios';
+
+            // These lines are new:
+            const Main = () => {
+                const [users, setUsers] = useState([]);
+                const [loaded, setLoaded] = useState(false);
+                useEffect(()=>{
+                    axios.get('http://localhost:8000/api/users')
+                        .then(res=>{
+                            setUsers(res.data);
+                            setLoaded(true);
+                        });
+                },[]);
+
+                return (
+                    <div>
+                    <UserForm/>
+                    // Next 2 lines are new:
+                    <hr/>
+                    {loaded ? <UserList users={users}/> :null}
+                    </div>
+                );
+            };
+
+            export default Main;
+
+        (^ demonstrates how to add the UserList component to the "Main.js" view ^)
+        *************************************************************************************************
+
+32. Install Reach Router within the main React "client" App directory
+    - " npm install @reach/router "
+
+33. Add a new controller, route and view for inspecting the details of a particular user and modify the list to include a link for each item
+
+    *************************************************************************************************
+    -i.e.   *user.controller.js*
+            // Adds a controller to retrieve a single user
+            module.exports.getUser = (req, res) => {
+                User.findOne({_id:req.params.id})
+                    .then(user => res.json(user))
+                    .catch(err => res.json(err))
+            };
+
+            *user.routes.js*
+            // Adds a route to call the controller to retrieve a single user
+            app.get('/api/users/:id', UserController.getUser);
+
+            *views/Detail.js*
+            import React, { useEffect, useState } from 'react'
+            import axios from '../../../server/node_modules/axios';
+            import { Link } from '@reach/router';
+
+            const Detail = props => {
+                const [user, setUser] = useState({});
+
+                const { id } = props;
+
+                useEffect(() => {
+                    axios.get("http://localhost:8000/api/users/" + id)
+                        .then(res => setUser(res.data));
+                }, [id]);
+
+                return (
+                    <div>
+                        <p>UserName: {user.userName}</p>
+                        <Link to = '/users'>Go Back</Link>
+                    </div>
+                );
+            };
+
+            export default Detail;
+
+
+            *UserList.JS*
+            // Add link to "Detail" view
+            import React from 'react'
+            import axios from 'axios';
+            import { Link } from '@reach/router';
+
+            const UserList = props => {
+                return (
+                    <div>
+                        {props.users.map((user, idx)=>{
+                            return (
+                                <div key={idx}>
+                                    <p key={idx}>{user.userName}</p>
+                                    <Link to={"/users/" + user._id}>View User</Link>
+                                </div>
+                            )
+                        })}
+                    </div>
+                );
+            };
+
+            export default UserList;
+
+        (^ demonstrates creation of "Details.js" view to display details on a user ^)
+        *************************************************************************************************
+
+34. Setup the front-end routing
+
+    *************************************************************************************************
+    -i.e.   *App.js*
+            // Import the router and create a route for each view!
+            import React from 'react';
+            // This line is new:
+            import { Router } from '@reach/router';
+            import Main from './views/Main';
+            // This line is new:
+            import Detail from './views/Detail';
+
+            function App() {
+                return (
+                    <div className="App">
+                        <Router>
+                            <Main path="users/"/>
+                            <Detail path="users/:id" />
+                        </Router>
+                    </div>
+                );
+            }
+
+            export default App;
+
+        (^ demonstrates how a router is used with view files within an "App.js" file ^)
+        *************************************************************************************************
+
+35. Add ability to update documents
+
+    *************************************************************************************************
+    -i.e.   *user.routes.js*
+            // Add ".put()" route for updating
+            ...
+            app.put('/api/users/:id', UserController.updateUser);
+            ...
+
+            *user.controller.js*
+            // Add ".findOneAndUpdate()" controller for updating
+            module.exports.updateUser = (request, response) => {
+                User.findOneAndUpdate({_id: request.params.id}, request.body, {new:true})
+                    .then(updatedUser => response.json(updatedUser))
+                    .catch(err => response.json(err))
+            };
+
+            *views/Update.js*
+            // Create a new view for updating
+            import React, { useEffect, useState } from 'react'
+            import axios from '../../../server/node_modules/axios';
+            // Be sure to import Link for the "Go Back" link!
+            import { Link } from '@reach/router';
+
+            const Update = props => {
+                const [userName, setUserName] = useState('');
+
+                const { id } = props;
+
+                useEffect(() => {
+                    axios.get('http://localhost:8000/api/users/' + id)
+                        .then(res => {
+                            setUserName(res.data.userName);
+                        });
+                }, [id]);
+
+                const updateUser = e => {
+                    e.preventDefault();
+                    axios.put('http://localhost:8000/api/users/' + id, {
+                        userName,
+                    })
+                        .then(res => console.log(res));
+                };
+
+                return (
+                    <div>
+                        <h1>Update a User</h1>
+                        <form onSubmit={updateUser}>
+                            <p>
+                                <label>UserName</label><br />
+                                <input type="text" 
+                                name="userName" 
+                                value={userName} 
+                                onChange={(e) => { setUserName(e.target.value) }} />
+                            </p>
+                            <input type="submit" />
+                        </form>
+                        <Link to = '/users'>Go Back</Link>
+                    </div>
+                );
+            };
+
+            export default Update;
+
+            *App.js*
+            // Add new route to "App.js"
+            ...
+            <Update path="users/:id/edit"/>
+            ...
+
+            *Detail.js*
+            // Add a new link to the "Detail" view
+            ...
+            <Link to={"/users/" + user._id + "/edit"}>Edit</Link>
+            ...
+
+        (^ demonstrates how to add an update ability ^)
+        *************************************************************************************************
+
+36. Add ability to delete documents
+
+    *************************************************************************************************
+    -i.e.   *user.routes.js*
+            // Add ".delete()" route
+            ...
+            app.delete('/api/users/:id', UserController.deleteUser);
+            ...
+
+            *user.controller.js*
+            // Add ".deleteOne()" method to controller
+            module.exports.deleteUser = (req, res) => {
+                User.deleteOne({ _id: req.params.id })
+                    .then(deleteConfirmation => res.json(deleteConfirmation))
+                    .catch(err => res.json(err))
+            };
+
+            *UserList.js*
+            // Create an onClick handler to make the Axios delete request, AND to remove the element from the DOM!
+            import React from 'react';
+            import axios from '../../../server/node_modules/axios';
+            import { Link } from '@reach/router';
+
+            const UserList = props => {
+                // "removeFromDom()" method will be passed down from "Main.js"
+                const { removeFromDom } = props;
+                const deleteUser = (userId) => {
+                    axios.delete('http://localhost:8000/api/users/' + userId)
+                        .then(res => {
+                            removeFromDom(userId)
+                        })
+                };
+
+                return (
+                    <div>
+                        {props.users.map((user, idx) => {
+                            return <p key={idx}>
+                                <Link to={"/users" + user._id + "/edit"}>
+                                    {user.userName}
+                                </Link>
+                                |
+                                <button onClick={(e)=>{deleteUser(user._id)}}>
+                                    Delete
+                                </button>
+                            </p>
+                        })}
+                    </div>
+                );
+            };
+
+            export default UserList;
+
+
+            *Main.js*
+            // Import "UserList" and create "removeFromDom" function to pass down to it via props
+            import React, { useEffect, useState } from 'react'
+            import axios from 'axios';
+            import UserForm from '../components/UserForm';
+            import UserList from '../components/UserList';
+
+            const Main = () => {
+                const [users, setUsers] = useState([]);
+                const [loaded, setLoaded] = useState(false);
+
+                useEffect(()=>{
+                    axios.get('http://localhost:8000/api/users')
+                        .then(res=>{
+                            setUsers(res.data);
+                            setLoaded(true);
+                        });
+                },[]);
+
+                // This is new!
+                const removeFromDom = userId => {
+                    setUsers(users.filter(user => user._id !== userId));
+                };
+
+                // Pass down the "removeFromDom" function to "UserList" via props
+                return (
+                    <div>
+                        <UserForm/>
+                        <hr/>
+                        {loaded && <UserList users={users} removeFromDom={removeFromDom}/>}
+                    </div>
+                );
+            };
+
+            export default Main;
+
+        (^ demonstrates how to add delete ability ^)
+        *************************************************************************************************
+
+37. Make Sure everything works, and then refine with CSS, etc!
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------

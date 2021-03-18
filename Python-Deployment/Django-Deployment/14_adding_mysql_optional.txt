@@ -1,0 +1,67 @@
+Adding a MySQL Server (optional)
+Objectives:
+Learn how to use a MySQL server (vs. SQLite) as the database server
+
+SQLite is great for testing, but it's not really efficient in the context of real-world use. This may be a bit too much to go into here, but let’s look at a quick summary of why that is, and what we’ll use instead.
+
+Although the developers of SQLite have done much to improve its performance, particularly in version 3, it suffers from some lack of efficient write concurrency. If your site has a lot of traffic, a queue begins to form, waiting for write access to the database. Before long, your response speed will slow to a crawl. This happens only on high-traffic sites, however.
+
+MySQL databases, on the other hand, are incredibly fast, and very good at performing multiple operations concurrently. In addition, MySQL can store an incredibly large amount of data, and thus scales well.
+
+This might never be a consideration for small to medium sized projects, but is key information in the real world. Very soon you may be working for a company that handles a large volume of requests, and it is important to know why depending on a SQLite database alone is not a practical solution for enterprise or large startups.
+
+If you’d like to learn how to add a MySQL database to the app we just deployed, read on. It’s not as hard as you might think, thanks to Django migrations!
+
+First, we’ll need to install everything necessary to run MySQL from our deployment machine.
+
+ubuntu@54.162.31.253:~$ sudo apt-get install libmysqlclient-dev -y
+Next we'll need to install MySQL-server
+
+ubuntu@54.162.31.253:~$ sudo apt-get install mysql-server -y
+IMPORTANT: When prompted with the purple screen, don't just hit enter! Enter a password for this server. We recommend using root for now. You'll have to type it twice.
+
+CHECK: Make sure it installed correctly.
+
+ubuntu@54.162.31.253:~$ mysql -u root -p
+Enter the password you just set. You should now be in the MySQL server prompt:
+
+mysql>
+We're now going to create the database for our project. You can call it whatever you want but we recommend giving it the name of your project.
+
+mysql> CREATE DATABASE {{projectName}};
+Don't forget semicolons at the end of each line. If you just keep getting the -> after hitting enter, type a ; and press enter.
+
+Exit the MySQL prompt.
+
+mysql> exit
+Activate your virtual environment:
+
+ubuntu@54.162.31.253:~myRepoName$ source venv/bin/activate
+Install a pip module inside our virtual environment to help connect our python code to our MySQL database:
+
+(venv) ubuntu@54.162.31.253:~myRepoName$ pip install mysqlclient
+Now that we have MySQL all set up, we are ready to change some lines in our settings.py document so we can start working with our MySQL database! Navigate to the appropriate folder and open it with VIM.
+
+ubuntu@54.162.31.253:~myRepoName/projectName$ sudo vim settings.py
+Change the databases section in settings.py to look like below. Note: The schema name is the database we just created in step , and the password is the password we set up when we installed the MySQL server in step .
+
+DATABASES = {
+  'default': {
+    'ENGINE': 'django.db.backends.mysql',
+    'NAME': '{{schemaName}}',
+    'USER': 'root',
+    'PASSWORD': '{{password}}',
+    'HOST': 'localhost',
+    'PORT': '3306',
+    }
+}
+Save and quit
+We’re almost done! Now the only thing left to do is to make migrations!
+
+(venv) ubuntu@54.162.31.253:~myRepoName$ cd ..
+(venv) ubuntu@54.162.31.253:~myRepoName$ python manage.py makemigrations
+(venv) ubuntu@54.162.31.253:~myRepoName$ python manage.py migrate
+Now just need to restart Gunicorn:
+
+(venv) ubuntu@54.162.31.253:~myRepoName$ sudo systemctl restart gunicorn
+CHECK: Now visit your site! You should be finished at this point, with a fully functioning site. Since we just created a brand new database, you obviously won't have any data yet, but share your site with your family and friends and you'll have lots of data in no time!

@@ -1,0 +1,51 @@
+Nginx
+Objectives:
+Set up NGINX
+
+We now need to create a new file to configure NGINX, our web server.
+
+*************************************************************************************************
+ubuntu@54.162.31.253:~$ sudo vim /etc/nginx/sites-available/{{projectName}}
+*************************************************************************************************
+
+Add the following to this new document, editing what's inside curly braces {{}}. Don't forget to type i to enter insert mode.
+
+*************************************************************************************************
+server {
+  listen 80;
+  server_name {{yourEC2.public.ip}};
+  location = /favicon.ico { access_log off; log_not_found off; }
+  location /static/ {
+      root /home/ubuntu/{{myRepoName}};
+  }
+  location / {
+      include proxy_params;
+      proxy_pass http://unix:/home/ubuntu/{{myRepoName}}/{{projectName}}.sock;
+  }
+}
+Save and exit. (esc, :wq, enter)
+*************************************************************************************************
+
+Now we're going to create a link to this file to let NGINX know what settings to use. Run the following (taking note of the space after {{projectName}}):
+
+*************************************************************************************************
+ubuntu@54.162.31.253:~$ sudo ln -s /etc/nginx/sites-available/{{projectName}} /etc/nginx/sites-enabled
+*************************************************************************************************
+
+CHECK: Make sure the link was successful. If not successful, double and triple check the file we just created.
+
+*************************************************************************************************
+ubuntu@54.162.31.253:~$ sudo nginx -t
+*************************************************************************************************
+
+Now that we have our custom configuration, we will remove the Nginx default site.
+
+*************************************************************************************************
+ubuntu@54.162.31.253:~$ sudo rm /etc/nginx/sites-enabled/default
+*************************************************************************************************
+
+All that is left to do is restart our NGINX server with our updated settings.
+
+*************************************************************************************************
+ubuntu@54.162.31.253:~$ sudo service nginx restart
+*************************************************************************************************

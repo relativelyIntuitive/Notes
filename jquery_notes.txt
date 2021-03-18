@@ -1,0 +1,188 @@
+
+ - JQUERY NOTES -
+
+    OVERVIEW:
+        -Different browsers interpret JS differently
+        -jQuery is a JS library that translates in a way that it works the same on all browsers
+        -Basically a shorthand way to interact with the DOM directly
+        -Selects HTML elements and executes a function on them
+    
+    SOURCES:
+        -Library source can be referenced in the <head>, to load before the <body>, or at the end of the <body>
+         before the closing </body> tag
+            (page loads quicker if library source is placed at the end of the <body>, best practice)
+        -Can be online source or local source
+        -Local-source must be installed and file-path referenced
+        -An online-source:
+            <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js'></script>
+                (Google APIs are good sources, because they will likely never go down)
+
+    HOW IT WORKS:
+        -jQuery library source script is passed to the browser's "JavaScript Interpreter" just like the rest of the JS
+        -Developer's jQuery script interacts with the DOM directly
+        -Browser constantly sends request for DOM and renders any changes it detects
+            (you should check the DOM for troubleshooting, not what the browser renders)
+        -If jQuery script is placed in the head, it must be within $(document).ready(function(){[+jQuery Script]}) 
+            (any body elements selected will not exist yet otherwise as <body> does not exist yet and jQuery will not work)
+            (not reccomended to put in the head)
+    
+    JQUERY VS. RAW JAVASCRIPT:
+        -All jQuery features can be accomplished with raw JavaScript, which is what happens behind the scenes of jQuery!
+            -i.e.   let btn = document.getElementById("btn");
+                    btn.addEventListener("click", function() {
+                        let pTag = document.getElementById("first-p");
+                        pTag.style.background-color = "green";
+                    })
+                        (^ JavaScript ^)
+
+            -i.e.   $('#btn').click(function() {
+                        let pTag = $('#first-p');
+                        pTag.css('background-color', 'green');
+                    })
+                        (^ jQuery ^)
+
+    STATIC VS. DYNAMIC CONTENT:
+        -Static content is that which is hard-coded into the HTML document
+        -Dynamic content is that which is created dynamically after the page has loaded, like by jQuery
+            -browser does not even know that dynamic content exists!
+                (even if you right-click page and view the source, dynamic-content will not show in the HTML code!)
+        -Normal event listeners will not be aware of dynamic content, even if it possesses the .class that the listener selects
+            -they only apply listeners to the content that exists when the page is loaded 
+            -a .on() handler or a callback function is needed to apply a listener to both static AND dynamic content! 
+                -.on() handler is the MOST EFFICIENT way to do this
+                -the callback would consist of the jQuery necessary to create the listeners for static-content,
+                 but it would be included as a callback in the function that creates the dynamic content, 
+                 effectively re-applying listeners each time dynamic-content is created
+
+    BASIC SYNTAX:
+        -$('[+scope]').funcName()
+            (selectors can be #id's, .classes, or <tags> just like CSS)
+        -Selectors can be listed with commas, or nested with spaces
+            -i.e.   $('h1, li, p') selects all <p>'s, all <li>'s and all <h1>'s
+            -i.e.   $('h1 li p') selects all <p>'s that're in <li>'s that're in <h1>'s
+        -Be careful when combining tag and class selectors. A space between them denotes a parent-child relationship!
+            -i.e.   $('p.dojo') selects all <p> elements with the .class of "dojo"
+            -i.e.   $('p .dojo') selects all elements with the .class of "dojo" that are the child of any <p> element!
+        -Some functions work as both getters and setters. .text() will get text .text('new text') will replace text
+            (empty parentheses should be included, unlike normal JS getters)
+        -Use $(this) for events like clicks or hovers, so you don't need to code each item!
+            ("this" should not have quotes around it like other scope selections)
+
+    TRAVERSING:
+        -Custon jQuery selectors that allow you to refer to elements based on their location within HTML structure
+            1.  .children()
+                    -i.e.    $(this).children('p').hide(); 
+                                (^ hides all <p>'s that are children of "this" ^)
+            2.  .parent()
+                    -i.e.    $(this).parent('p').hide(); 
+                                (^ hides all <p>'s that are parents of "this" ^)
+            3.  .siblings()
+                    -i.e.    $(this).siblings('p').hide(); 
+                                (^ hides all <p>'s that are siblings of "this" ^)
+        -Traversals can be chained as well!
+                    -i.e.    $(this).siblings().children('h1').text('new header!'); 
+                                (^ will select all <h1>'s that are children of the siblings of "this" and change their text ^)
+
+
+    SOME USEFUL FUNCTIONS:
+
+        Effects (visuals):
+            - .hide()
+                -hides selected element(s)
+            - .show()
+                -shows element(s)
+            - .toggle()
+                -toggles element(s) in/out of existence
+            - .slideUp()
+                -hide the matched elements with a sliding motion.
+                    (not available in the slim version)
+            - .slideDown() 
+                -display the matched elements with a sliding motion
+                    (not available in the slim version)
+            - .slideToggle()
+                -display or hide the matched elements with a sliding motion
+                    (not available in the slim version)
+            - .fadeOut()
+                -hide the matched elements by fading them to transparent
+                    (not available in the slim version)
+            - .fadeIn()
+                -display the matched elements by fading them to opaque
+                    (not available in the slim version)
+
+        CSS:
+            (adding or removing a class for any HTML element/DOM)
+            - .addClass()
+                -adds the specified class(es) to each element in the set of matched elements
+            - .removeClass()
+                -remove a single class, multiple classes, or all classes from each element in the set of matched elements
+            - .css()
+                -get the value of a computed style property for the first element in the set of matched elements 
+                 or set one or more CSS properties for every matched element
+                -i.e.   $('p').css('background-color', 'red');
+                            (^ changes backgroung-color property of all <p> elements to red ^)
+
+        Manipulation:
+            (GETTING or SETTING value or text in any HTML element)
+            - .after()
+                -insert content, specified by the parameter, after each element in the set of matched elements
+            - .append()
+                -insert content, specified by the parameter, to the end of each element in the set of matched elements
+            - .prepend()
+                -insert content, specified by the parameter, to the beginning of each element in the set of matched elements
+            - .attr()
+                -get the value of an attribute for the first element in the set of matched elements or set one or more attributes
+                 for every matched element
+            - .before()
+                -insert content, specified by the parameter, before each element in the set of matched elements
+            - .html()
+                -get the HTML contents of the first element in the set of matched elements
+                 or set the HTML contents of every matched element
+                    (needed to edit HTML, .text() won't work)
+            - .text()
+                -get the combined text contents of each element in the set of matched elements, including their descendants,
+                 or set the text contents of the matched elements
+                    (won't work for editting HTML, only text)
+            - .val()
+                -get the current value of the first element in the set of matched elements or set the value 
+                 of every matched element
+
+        Events:
+            (listener functions to handle an event, $(this) is useful for the selectors on their callback functions)
+            - .click()
+                -bind an event handler to the “click” JavaScript event, or trigger that event on an element
+            - .hover()
+                -bind one or two handlers to the matched elements, to be executed when the mouse pointer enters
+                 and leaves the elements
+            - .on()
+                -constantly monitors given scope for any targeted content to apply a given listener to, static OR dynamic
+                -$(document) scope is not always the best choice
+                    -it can slow things down depending on the document size
+                    -sometimes you may not want all dynamic elements to act the same either, but don't want to add extra .classes 
+                    -reduce scope when necessary/possible)
+                    
+                -i.e.   $(document).on('click', '.alert', function(){
+                            alert('you clicked me silly!');
+                        });
+                            (^ applies listeners to static AND dynamic content ^)
+
+                -i.e.   $('.alert').click(function(){
+                            alert('you've clicked me ya special guy!');
+                        });
+                            (^ applies listers ONLY to static content ^)
+
+        Database Functions:
+            - .submit()
+                -can be used with empty parentheses, inside of an event handler such as .click to "hard-submit" an HTML,
+                 or as an event-handler itself, with a callback function to run when submitted
+                    -empty .submit() can be used to "hard-submit" form, even if user didn't click submit button
+                        (maybe auto-submits a field each time a different field is selecte, unbeknownst to the user ;) ) 
+                    -"return false" can be added within a .submit() event-handler to prevent the form from submitting, thereby
+                     preventint the page from redirecting upon submission
+                        -useful if form is not complete
+            - .serialize()
+                -encodes a set of form elements within an array
+                -arrays are basically computer-friendly tables, which are basically human-friendly arrays!
+                    (arrays are easier to process in code than tables)
+
+
+

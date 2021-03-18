@@ -1,0 +1,1483 @@
+ - REACT NOTES -
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+GENERAL NOTES:
+
+    -React is a JS library for building UI's
+    -Created by Facebook
+    -Can be used to create single page apps, "SPA's"
+        -eliminate page loading
+        -faster more responsive feeling app
+    -Can be used with any technology
+    -Does not disable standard JS DOM manipulation
+    -Incredibly popular
+    -Uses components to build the DOM
+        -React Component is simply defined by a function that returns a React Element
+            -can be a functional component
+                -function that returns React Element
+            -or class component
+                -class that returns React Element
+        -maybe one component for a form, one for a navbar etc...
+        -components are capitalized by convention
+    -Can be used within an .html doc if the scripts are linked
+
+        *************************************************************************************************
+        <script crossorigin="" src="https://unpkg.com/react@16/umd/react.development.js"></script>
+        <script crossorigin="" src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script> 
+        *************************************************************************************************
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+CREATE REACT APP:
+
+    - "create-react-app"
+        -starter-kit that uses "Webpack" under the hood
+            -Webpack is a popular "bundler"
+                -bundlers are used by most modern JS projects to "build" the source code into production-ready files
+            -Allows apps to be broken down into smaller modules and transformed based on tools called "loaders"
+
+        1. run " npx create-react-app [+project_name] "
+            -"npx" is a tool that comes with npm v5.2 and higher
+            -will create new React project folder in the directory that it is run from
+
+        2. navigate to the newly-created project folder 
+
+        3. run "npm start"
+            -runs React development server and opens a browser tab that navigates to the default app
+                -server has live reload feature that reloads app whenever code changes are saved
+
+        4. overview of how the app is structured and modules communicate:
+
+            *************************************************************************************************
+            -i.e.  *PUBLIC/INDEX.HTML*
+                    <-- holds the main page that reacts -->
+                    <html>
+                        <head>
+                        </head>
+                        <body>
+                            <div id='root'></div>
+                        </body>
+                    </html
+
+                    *SRC/APP.JS*
+                    // holds all the other components that may contain nested components themselves
+                    function App(){
+                        return(
+                            <div className="App">
+                                //Other components live here
+                            </div>
+                        )
+                    }
+
+                    *SRC/INDEX.JS*
+                    // creates main <App/> Component in "index.html" within the "root" element
+                    ReactDOM.render(<App/>, document.getElementById('root'));
+
+                (^ demonstrates the .render() method calling the <App/> component on the "root" element ^)
+                *************************************************************************************************
+
+        5. default App code can be mostly deleted!
+
+            *************************************************************************************************
+            -i.e.   *SRC/APP.JS"
+                    // the React import allows the writing of JSX in this .js file
+                    import React from 'react';
+                    import logo from './logo.svg';
+                    import './App.css';
+
+                    function App() {
+                    return (
+                        <div className="App">
+                        <header className="App-header">
+                            <img src={logo} className="App-logo" alt="logo" />
+                            <p>
+                            Edit <code>src/App.js</code> and save to reload.
+                            </p>
+                            <a
+                            className="App-link"
+                            href="https://reactjs.org"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            >
+                            Learn React
+                            </a>
+                        </header>
+                        </div>
+                    );
+                    }
+                    export default App;
+                (^ everything between the return parentheses can be deleted, and all imports but React!^)
+                *************************************************************************************************
+
+            6. create "components" directory within the "src" directory
+                -this is where all the components for the React project will go!
+                    -to be imported and used by Apps
+                    -capitalize all components!
+                -React offers plenty of freedom over folder structuring for React projects
+                -React is just a library and very unopinionated
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+USING JSX: 
+
+    -JSX is a JS syntax extension that allows the interpretation of normal HTML syntax by JS without having to make it a string
+
+    *************************************************************************************************
+    -i.e.   class App extends Component {
+                render() {
+                    return (
+                        <h1>Hello World</h1>
+                    );
+                }
+            }
+
+        (^ basic JSX used to create a component "App" with a .render() method returning an <h1> HTML tag ^)
+        *************************************************************************************************
+
+    -JSX has some limitations
+        -JSX expressions can only have one Parent Element
+        -must "break-free" from JSX syntax with "{}" curly-braces when need to insert JS
+            -traditional "if-statement" syntax IS NOT supported this way though!
+                -Ternaries are fine and so are "switch/case" conditionals
+                -alternative "if-statement" syntax available though
+
+        *************************************************************************************************
+        -i.e.   // would throw an error that "JSX elements must be wrapped in an enclosing tag"
+                class App extends Component {
+                    render(){
+                        return (
+                            <h1>Hello World</h1>
+                            <p>This is a paragraph</p>
+                        );
+                    }
+                }
+
+                // you can enclose them within a single tag like <div> or use a JSX "Fragment" like below
+                class App extends Component {
+                    render(){
+                        return (
+                            <>
+                                <h1>Hello World</h1>
+                                <p>This is a paragraph</p>
+                            </>
+                        );
+                    }
+                }
+
+                // alt "if-statement" syntax creates different <p>'s depending on the value of "props.cat"
+                return (
+                    <div>
+                        <h1>{responseData.name}</h1>
+                        {props.cat === 'people' &&
+                            <>
+                                <p>Height: {responseData.height}</p>
+                                <p>Mass: {responseData.mass}</p>
+                                <p>Hair Color: {responseData.hair_color}</p>
+                                <p>Skin Color: {responseData.skin_color}</p>
+                            </>
+                        }
+                        {props.cat === 'planets' &&
+                            <>
+                                <p>Climate: {responseData.climate}</p>
+                                <p>Terrain: {responseData.terrain}</p>
+                                <p>Surface Water: {responseData.surface_water}</p>
+                                <p>Population: {responseData.population}</p>
+                            </>
+                        }
+                    </div>
+                );
+
+            (^ demonstrates some changes to JS when used within JSX ^)
+            *************************************************************************************************
+
+    -Not totally the same syntax as HTML either
+        -i.e. "className" must be used instead of "class" for JSX elements
+            -b/c JS already has a "class" keyword reserved!
+        -i.e. "htmlFor" must be used instead of "for" for JSX forms
+            -same reason, "for" is already reserved by JS!
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+CREATING FUNCTIONAL COMPONENTS:
+
+    -"creating class components" below:
+
+    1. "React.createElement()" 
+        -React method that creates a basic component
+
+        *************************************************************************************************
+        -i.e.   // creates a basic h1 element
+                const myReactComponent = React.createElement("h1", {}, "I am creating my first React component")
+
+                // creates a nested React Component
+                const myNestedReactComponent = React.createElement("div", {}, React.createElement("p", {}, "This element is nested"))
+
+            (^ demonstrates basic syntax of React.createElement() ^)
+            *************************************************************************************************
+
+        -has 3 main parameters
+            1. what kind of element to create
+                -like an <h1> 
+            2. props object
+                -empty object passed to every react component by default
+                -short for "properties"
+            3. children to include
+                -what to go inside the element tags
+                -can be string like "I am creating my first React component" 
+                -or another component nested with another React.createElement
+                    -like more nested .html elements
+        -elements must still be rendered before they will show on the browser!
+
+    2. "ReactDOM.render()"
+        -tells React to display a component
+        -takes 2 arguments
+            1. the component to display
+            2. the element to display it within
+        -overwrite whatever is in the targetted parent component?
+
+        *************************************************************************************************
+        -i.e.   // creates a component
+                const App = React.createElement("h1", {}, "Our First React page has rendered");
+                // renders the component stored in the variable
+                ReactDOM.render(App, document.getElementById("root"));
+
+                // creates an arrow-function method "App()" to create components
+                const App = () => React.createElement("h1", {}, "Our First React page has rendered");
+                // renders the component created by the method
+                ReactDOM.render(App, document.getElementById("root"));
+
+            (^ demonstrates how to create and render components w/methods and variables ^)
+            *************************************************************************************************
+
+    3. Babel
+        -Transpiler that allows the use of JSX (JavaScript Syntax Extension) language within <script> tags on HTML page
+            -not allowed out of the box
+            -the JSX would be interpreted as miswritten JS!
+            -NOT needed when React is being coded from within a React file instead of an HTML
+                -because "import React from 'react'" will be used to allow it
+        -Added to a page with a script tag
+            - "<script type="text/babel"></script>"
+        -Just syntactic sugar to allow the use of regular HTML syntax for convenience
+
+        *************************************************************************************************
+        -i.e.   // indicates Babel is to be used
+                <script type="text/babel">
+
+                // JSX can be rendered directly without using a component if Babel is in use
+                ReactDOM.render(<h1>Hello!</h1>, document.getElementById("root"));
+                // **Here is what the Babel translation looks like**
+                ReactDOM.render(React.createElement("h1", null, "Hello World"), document.getElementById("root"));
+
+                // using Babel to make a method for component creation
+                const App = () => <h1>Our First React page has rendered</h1>;
+                // we wrap our function name in an HTML tag instead of adding "()" to the end like JS
+                ReactDOM.render(<App></App>, document.getElementById("root"));
+
+                // Babel allows self closing JSX tags as well, like below
+                ReactDOM.render(<App />, document.getElementById("root"));
+
+            (^ demonstrates basic use of Babel transpiler ^)
+            *************************************************************************************************
+
+            -can tell the difference between React Component and normal HTML element b/c Components are capitalized
+                -React treats lowercase tags as HTML tags!
+
+    4.  JSX:
+
+        -Can be used to create and render elements without the use of .createElement()
+        -Looks like direct HTML but with some subtle differences
+
+            *************************************************************************************************
+            -i.e.   *PERSONCARD.JS*
+                    // creates PersonCard component that takes props from App as args
+                    import React from 'react';
+                    const PersonCard = props => {
+                        return(
+                            <div>
+                                <h1>{ props.lastName }, { props.firstName }</h1>
+                                <p>Age: { props.age }</p>
+                                <p>Hair Color: { props.hairColor }</p>
+                            </div>
+                        );
+                    }
+                    export default PersonCard;
+
+
+                    *APP.JS*
+                    ...
+                    <PersonCard firstName="John" lastName="Smith" age={ 8 } hairColor="Brown" /> 
+
+                (^ shows basic functional component being passed props as args from its App call ^)
+                *************************************************************************************************
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS-COMPONENTS:
+
+    -ES6 Class can be used to create React Elements instead of a function
+
+    -Basic steps to creating and using class-components:
+        1. make sure there is a 'components' directory created within 'src' directory found in project's root
+        2. create .js file in 'components' directory
+            -this is the component file
+        3. import default Component class from React
+            -i.e. " import React, { Component } from 'react'; "
+        4. code the component and export it!
+            -follow the rules below to code it
+            -MUST end with an export!
+                -i.e. " export default [+Component_name] "
+        5. import the comonent with the Apps that will use it
+            -i.e. " import [+Component_name] from './components/[+Component_name]'; "
+        6. now it can be used in the Apps!
+            -XML example:
+                -i.e. " <[+Component_name]/> "
+
+    -There are 3 requirements for a Class Component to be valid
+        1. class names must start with a capital letter
+        2. class must extend React.Component
+            -i.e. "class [+Class_name] extends React.Component {}"
+        3. class must have a render() method that returns a React Element either by JSX or React.createElement()
+            -must produce something!
+
+        *************************************************************************************************
+        -i.e.   import React, { Component } from 'react';
+
+                class SomeClassComponent extends Component {
+                    render() {
+                        return <div>This is our first class component.</div>;
+                    }
+                }
+
+                export default SomeClassComponent;
+
+            (^ basic Class Component ^)
+            *************************************************************************************************
+
+    - "this.props" accesses props in a class-component
+        -already have access to the props variable defined by the Component class since it's being extended
+    -The class props can also be destructured like this:
+
+    *************************************************************************************************
+    -i.e.   // uses this.props to access props for the component
+            class Header extends React.Component {
+                render() {
+                    return (
+                        <div>
+                            // By inheriting from React.Component all we need is the "this" keyword in front of props.
+                            <h1>My name is { this.props.firstName } { this.props.lastName }</h1>
+                        </div>
+                    );
+                }
+            }
+
+            // creates firstName and lastName variables to hold references to the props via destructuring
+            class Header extends React.Component {
+                render() {
+                    const { firstName, lastName } = this.props;
+                    return (
+                        <div>
+                        // Destructuring allows us to use them like variables. This is just a small amount of syntactical sugar.
+                            <h1>My name is { firstName}  { lastName }</h1>
+                        </div>
+                    );
+                }
+            }
+
+        (^ shows how props can be accessed traditionally or via destructuring ^)
+        *************************************************************************************************
+
+    -Props variable is useful for passing data down from component to component
+        -can pass data up too?
+        -no limit to amount that can be passed-down via props
+        -anything can be passed down
+            -strings are allowed by default, but anything else needs curly-braces "{}" around it
+                -numbers
+                -objects / arrays
+                -functions can even be passed down!
+                -strings work in braces too!
+                -when in doubt, just use curly-braces!
+
+            *************************************************************************************************
+            -i.e.   // Valid. We can send normal strings, but in numbers need curly braces
+                    <SomeComponent someProp="test" someOtherProp={ 67 }/>
+
+                    //Valid. A String is still a Javascript expression
+                    <SomeComponent someProp={ "test" } someOtherProp={ 67 }/>
+
+                    //Invalid. Numbers need curly braces
+                    <SomeComponent someProp="test" someOtherProp=67/>
+
+                (^ shows how to pass-down various data types by creating props to access with components ^)
+                *************************************************************************************************
+
+    -Children of a component can also be accessed by the component via props
+        -i.e. " this.props.children "
+        
+        *************************************************************************************************
+        -i.e.   *APP.JS*
+                // calls component with a header prop and 3 <p> children
+                import React from 'react';
+                import './App.css';
+                import MyNewComponent from './components/MyNewComponent';
+
+
+                function App() {
+                return (
+                    <div className="App">
+                        <MyNewComponent header={ "Header Prop" }>
+                            <p>This is a child</p>
+                            <p>This is another child</p>
+                            <p>This is even another child</p>
+                        </MyNewComponent>  
+                    </div>
+                );
+                }
+
+                export default App;
+
+                *MYNEWCOMPONENT.JS*
+                // uses the header prop to render a <h1> and all children of the component
+                import React, { Component } from 'react';
+
+
+                class MyNewComponent extends Component{
+                    render(){
+                        return(
+                            <div>
+                                <h1>
+                                    { this.props.header }
+                                </h1>
+                                { this.props.children }
+                            </div>
+                        );
+                    }
+                }
+
+                export default MyNewComponent;
+            (^ shows how to access a component's children ^)
+            *************************************************************************************************
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS-COMPONENTS VS. FUNCTIONAL-COMPONENTS:
+
+    -Components can be built as either classes or functions
+    -Class-componenets used to be the way to go
+        -used to be more robust
+        -had state handling ability where functional-components did not
+    -The creation of "hooks" allows functional-components to access state!
+        -NO hook can ever be called conditionally
+        -makes functional-components more useful most of the times
+        -most new React code will use functional-components
+            -React team stated that they will still support clas-components though
+            -can be mixed and matched
+            -many old apps still use class-components
+    -functional components should be preffered and used
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+SYNTHETIC EVENTS:
+
+    -React uses a custom approach to add event listeners to our elements
+        -wraps the browser's native elements and applies its own event system called "Synthetic Events"
+    -3 main rules:
+        1. event names are camelCased instead of lowercase
+            -i.e "onclick" becomes "onClick"
+        2. returning false will not work with any event, to prevent bubbling
+            -you will need to manually "callevent.stopPropagation()" or "e.preventDefault()" as necessary
+        3. events cannot be called asynchronously because of how React "pools" the Synthetic events
+
+    *************************************************************************************************
+    -i.e.   // creates click event that creates alert when a button is clicked
+            import React from 'react';
+            import logo from './logo.svg';
+            import './App.css';
+
+
+            function App() {
+                return (
+                    // listener expression must be in a function or it will run on load immediately instead of on click
+                    <button onClick={ ()=> alert("This button has been clicked!") }>Click Me</button>
+                );
+            }
+
+            export default App;
+
+        (^ shows basic click event-listener ^)
+        *************************************************************************************************
+
+    -Some other common events:
+        - "onChange"
+            -runs when a form input is changed
+            -i.e. " <input type="text" onChange={ (e) => setUsername(e.target.value) } /> "
+            -"e.target" is the input that is changed!
+        - "onSubmit"
+            -runs when a form is submitted
+        - "onFocus"
+            -runs when an element is given focus 
+                -(clicked on or tabbed to)
+        - "onBlur"
+            -runs when an element loses focus
+                -(user clicked or tabbed away)
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+STATE:
+    1.Class-Components:
+        -Components can store their own data instead of just having it given to them through props
+        -"State" is what we will call the variable that a Component will hold their own data with
+            -like a light-switch, either in "on" or "off" state that persists until changed
+        -State will be made an attribute of the class
+            -class needs a constructor to give attributes
+            -state attribute must hold an object 
+                -object will hold the state keys
+                -state information will be accessed via the keys of this object
+                    -i.e. " {this.state.position} "
+        -State can ONLY be altered with ".setState()" method
+            -because the state is treated as immutable by React
+            -i.e. " { this.state.position = "Off" } " won't work
+            -i.e. " { this.setState({ position = "Off" }) } " will work
+
+        *************************************************************************************************
+        -i.e.  *APP.JS*
+                // app calls PersonCard twice
+                import React from 'react';
+                import PersonCard from './components/PersonCard';
+
+                function App() {
+                return (
+                    <>
+                    <PersonCard firstName="Jane" lastName="Jane" age={ 45 } hairColor="Black"/>
+                    <PersonCard firstName="John" lastName="Smith" age={ 88 } hairColor="Brown"/>
+                    </>
+                );
+                }
+
+                export default App;
+
+
+                *PERSONCARD.JS*
+                import React, { Component } from 'react';
+
+                // PersonCard class is created with the state attribute to hold its initial age prop data
+                class PersonCard extends Component {
+                    constructor(props) {
+                        super(props);
+                        this.state = {
+                            age: this.props.age
+                        };
+                    }
+
+                    // ageUp method is created to overwrite the state object, effectively updating the age
+                    ageUp = () => {this.setState({age: this.state.age + 1})};
+
+                    // rendered <button> calls .ageUp() method to change the state and then displays in <p>
+                    render() {
+                        const { firstName, lastName, age, hairColor } = this.props;
+                        return (
+                            <div>
+                                <h1>{lastName}, {firstName}</h1>
+                                <p>Age: {this.state.age}</p>
+                                <p>Hair Color: {hairColor}</p>
+                                <button onClick={this.ageUp}>BirthdayButton for {this.firstName} {this.lastName}</button>
+                            </div>
+                        )
+                    }
+                }
+
+                export default PersonCard;
+
+            (^ shows basic implementation and use of state ^)
+            *************************************************************************************************
+
+    2.Functional-Components:
+        -Didn't use to have state handling abilities
+        -Can now mimic it with "hooks"
+            -hooks are now extremely important in React
+                -allows you to "hook" in or use a certain piece of functionality
+            -"useState()" is such a hook
+                -call it and argue the state object to it
+                    -DOES NOT need to argue an obj for state like Class-Components do!
+                    -Can pass primitive values instead, without a value pair
+                        -takes pace of "state" var (see below)
+                        -this is the most common way it's used with functional-components!
+                        -can be done multiple times in each component, effectively creating multiple hooks!
+                -destructure it into "state" and "setState"
+                    -if passing a primitive, "state" will be replaced with the "key" so to speak of the state value
+                    -the "setState" name changes as well!
+                        -i.e. " const [count, setCount] = useState(0); "
+                -access the state with "state" and update it with "setState"
+
+        *************************************************************************************************
+        -i.e.   // needs the following import to work either way!
+                import React, { useState } from 'react';
+
+            1.  // argues the state object with useState to create state, then destructures it into state and setState vars
+                const Counter = props => {
+                    const [state, setState] = useState({
+                        clickCount: 0
+                    });
+
+                    // updates state by using setState to determine a new state based off the current state
+                    const handleClick = () => {
+                            setState({
+                                clickCount: state.clickCount + 1
+                            });
+                        }
+
+                    // returns state info by accessing it via the destructured state var
+                    return(
+                        <div>
+                            { state.clickCount }
+                            <button onClick={ handleClick }>Click Me</button>
+                        </div>
+                    );
+                }
+
+            2.  // argues the state as a single primitive value that is named "count"
+                const Counter = props => {
+                    const [count, setCount] = useState(0);
+                
+                    // updates 
+                    const handleClick = () => {
+                        setCount(count + 1);
+                    }
+
+                    // returns state info via the destructured "count" variable
+                    return (
+                        <div>
+                            { count }
+                            <button onClick={ handleClick }>Click Me</button>
+                        </div>
+                    );
+                }
+            
+
+                export default Counter;
+
+            (^ shows how hooks are used with obj state vs primitive state ^)
+            *************************************************************************************************
+
+    3. Lifting State Up:
+        -suppose we want to make an app containing a component for creating messages and a component for displaying them
+        -solution is that we can provide a prop to the <MessageForm /> from the parent of both it and <MessageDisplay />
+            -props can be functions!
+            -if this prop is a function, then we can have the child component call the function!
+            -if the function accepts a parameter, then the child can pass a parameter into this function!
+
+        *************************************************************************************************
+        -i.e.   *APP.JS*
+                import React, { useState } from 'react';
+                import MessageForm from './Components/MessageForm';
+                import MessageDisplay from './Components/MessageDisplay';
+
+
+                function App() {
+                    const [currentMsg, setCurrentMsg] = useState("There are no messages");
+
+                    // creates a function to update the currentMsg state
+                    const youveGotMail = ( newMessage ) => {
+                        setCurrentMsg( newMessage );
+                    }
+
+                    return (
+                        <>
+                            // passes the function down to the MessageForm as a prop
+                            <MessageForm onNewMessage={ youveGotMail } />
+                            // passes down the currentMsg data that was lifted from MessageForm as a prop to MessageDisplay
+                            <MessageDisplay message={ currentmsg } />
+                        </>
+                    );
+                }
+
+
+                *MESSAGEFORM.JS*
+                import React, { useState } from 'react';
+
+
+                const MessageForm = (props) => {
+                    const [msg, setMsg] = useState("");
+
+                    // onNewMessage() function in prop is able to pass this component's state data back up!
+                   const handleSubmit = (e) => {
+                        e.preventDefault();
+                        props.onNewMessage( msg );
+                    };
+
+                    return (
+                        <form onSubmit={ handleSubmit }>
+                            <h1>Set Message</h1>
+                            <textarea 
+                                rows="4"
+                                cols="50"
+                                placeholder="Enter your message here"
+                                onChange={ (e) => setMsg(e.target.value }
+                                value={ msg }
+                            ></textarea>
+                            <input type="submit" value="Send Message" />
+                        </form>
+                    );
+                };
+
+                export default MessageForm;
+
+
+                *MESSAGEDISPLAY.JS*
+                import react, { useState } from 'react';
+
+
+                // returns JSX with the message from props
+                const MessageDisplay = (props) => {
+                    return (
+                        <>
+                            <h1>Current Message</h1>
+                            <pre>{ props.message }</pre>
+                        </>
+                    );
+                };
+
+                export default MessageDisplay;
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+LIFECYCLE METHODS:
+
+    -Using class components gives easy access to React's lifecycle methods
+    -Every component, both class and functional, has a lifecycle it goes through
+        -from creation/mounting to destruction/unmounting
+        -the methods used to access these lifecycles are called "lifecycle methods"
+        -lifecycle methods are automatically called in the background
+    -Component's lifecycle can be split into 4 stages, each with methods that run in a certain order
+        1. mounting:
+            -stage where React creates and inserts component into the DOM
+            1. constructor()
+                -state is assigned here
+                -event handlers are bound here
+                -React sets default and initial values for the props and the state
+                -first method called before the component is actually mounted
+                -NOT where API calls are made or subscriptions introduced
+            2. render()
+                -html content is processed and rendered here
+            3. componentDidMount()
+                -immediately follows completion of the render methodd
+                -where we'd initialize network requests, subscriptions, timers
+                -where we'd target DOM nodes from component tree 
+                
+        2. updating:
+            -stage that runs every time the component's state or properties
+            1. shouldComponentUpdate(nextProps, nextState)
+                -gives ability to explicitly tell React if component should be re-rendered after a change in state or props
+                    -used to optimize performance
+                    -true by default
+                    -can change to false if don't want the component to re-render
+
+        3. unmounting:
+            -final stage where React unmounts the component and removes it from the DOM
+            1. componentWillUnmount()
+                -invoked right before the component is unmounted
+                -ideal place to cancel any on-going network requests, subscriptions, or to clear timers
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+STYLES WITH REACT:
+
+    -There are a few ways to add styles to a React App:
+        1. Direct Import:
+            -.css file can be imported directly and referenced
+                -bootstrap works too (see #4 in this section)
+            -make sure to use "className" instead of "class" to assign JSX element classes
+
+            *************************************************************************************************
+            -i.e.   *STYLES.CSS*
+                    .btn {
+                        padding: 12px 15px; 
+                        font-family: Arial, sans-serif;
+                        font-weight: bold;
+                        background: linear-gradient(30deg, rebeccapurple, magenta); 
+                        color: #fff; 
+                        border: none;
+                    }
+
+                    *MYBUTTONCOMPONENT.JS*
+                    import React, { Component } from 'react';
+                    import './styles.css';
+
+
+                    class MyButton extends Component {
+                        render() {
+                            return <button className="btn">{ props.children }</button>;
+                        }
+                    }
+
+                    export default MyButton;
+
+                (^ shows styling by importing a .css file ^)
+                *************************************************************************************************
+
+        2. Inline Styles:
+            -object variable can be created in the component to work like a CSS ruleset
+            -then the object is passed to an element under the usual "style" attribute
+            -just like regular HTML
+            -CSS MUST be camelCased when used in objects like this
+            -ALL values in the object's pairs must be enclosed in strings
+            -does NOT support pseudo-classes!
+            -does NOT support media queries!
+
+            *************************************************************************************************
+            -i.e.   *MYBUTTONCOMPONENT.JS*
+                    import React, { Component } from 'react';
+
+                1.  // object is created to form a css ruleset...property names must be camelCased with commas seperating them
+                    const btnStyle = {
+                        padding: '12px 15px',
+                        fontFamily: 'Arial, sans-serif',
+                        fontWeight: 'bold',
+                        background: 'linear-gradient(30deg, rebeccapurple, magenta)', 
+                        color: '#fff',
+                        border: 'none'
+                    };
+
+                    // style attribute of element is filled with the css data from the btnStyle object
+                    class MyButton extends Component {
+                        render() {
+                            return <button style={ btnStyle }>{ props.children }</button>;
+                        }
+                    }
+                
+                2.  // css ruleset is created entirely inline within double curly-braces
+                    class MyButton extends Component {
+                        render() {
+                            return <button style={{padding: '12px 15px', fontFamily: 'Arial, sans-serif', etc...}}>{ props.children }</button>;
+                        }
+                    }
+
+                    export default MyButton;
+
+                (^ shows how to use inline-styling ^)
+                *************************************************************************************************
+
+        3. CSS Modules:
+            -overcomes many problems with the first 2 approaches
+                -media queries can be used like normal
+                -BUUUT class names CANNOT be hyphenated!
+                    -so camelCasing is used by convention
+            -"create-react-app" supports CSS modules by default
+            -place within components folder with the component it matches
+                -" <+component_name>.module.css " naming convention
+                    -no matter what it MUST end in ".module.css" !
+            -components can use different styles of the same name without conflict
+                -i.e. another component could use another stylesheet with another .btnStyle that has different rules
+                    -the CSS class names are given unique hashes at build time to keep them isolated
+
+            *************************************************************************************************
+            -i.e.   *MYBUTTONCOMPONENT.MODULE.CSS*
+                    // CSS class name is camel cased, but properties can be written regularly!
+                    .btnStyle {
+                        padding: 12px 15px; 
+                        font-family: Arial, sans-serif; 
+                        font-weight: bold;
+                        background: linear-gradient(30deg, rebeccapurple, magenta); 
+                        color: #fff; 
+                        border: none;
+                    }
+
+
+                    *MYBUTTONCOMPONENT.JS*
+                    import React, { Component } from 'react';
+                    // the "." signifies same directory, and the "/" accessess the specified CSS module from there
+                    import styles from './MyButtonComponent.module.css';
+
+
+                    class MyButton extends Component {
+                        render() {
+                            return <button className={ styles.btnStyle }>{ props.children }</button>;
+                        }
+                    }
+
+                    export default MyButton;
+                (^ shows how CSS modules can be used without special adjustments like the first 2 approaches needed ^)
+                *************************************************************************************************
+
+        4. Bootstrap!
+            - " npm install react-bootstrap bootstrap "
+            - " import 'bootstrap/dist/css/bootstrap.min.css'; " 
+                -include at top of "App.js" or "index.js" file
+            -Bootstrap classes can now be added to Apps and Components via className JSX attribute!
+                *************************************************************************************************
+                -i.e.   //import individual components to reduce data sent to client!
+                        import Button from 'react-bootstrap/Button';
+                        // or less ideally
+                        import { Button } from 'react-bootstrap';
+
+                    (^ demonstrates basic use of Bootstrap with React ^)
+                    *************************************************************************************************
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+PROPERTY-VALUE SHORTHAND:
+    -New ES6 notation
+    -Allows creation of objects with single words argued for each pair 
+        -useful if you want a key to have the same value as the variable name
+
+    *************************************************************************************************
+    -i.e.   // pre ES6
+            const newUser = { username: username, email: email, password: password };
+
+            // with property-value shorthand notation
+            const newUser = { username, email, password };
+        *************************************************************************************************
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+FORMS:
+    -2 basic ways to deal with forms in React:
+        1. state:
+            -track input values as a piece of state, updating them on change events and rendering them back
+            -called "controlled-components"
+            -this strategy is preffered, as it allows React to stay between us and the actual DOM
+            *************************************************************************************************
+            -i.e.   import React, { useState } from  'react';
+
+                    // creates 3 hooks!
+                    const UserForm = (props) => {
+                        const [username, setUsername] = useState("");
+                        const [email, setEmail] = useState("");
+                        const [password, setPassword] = useState("");  
+
+                        // e.preventDefault prevents the default form submitting behavior that called this listener
+                        const createUser = (e) => {
+                            e.preventDefault();
+                            //uses property-value shorthand notation to set the property values
+                            const newUser = { username, email, password };
+                            console.log("Welcome", newUser);
+                        };
+
+                        return(
+                            // sets "createUser" to run when form is submitted
+                            <form onSubmit={ createUser }>
+                                <div>
+                                    <label>Username: </label> 
+                                    <input type="text" onChange={ (e) => setUsername(e.target.value) } />
+                                </div>
+                                <div>
+                                    <label>Email Address: </label> 
+                                    <input type="text" onChange={ (e) => setEmail(e.target.value) } />
+                                </div>
+                                <div>
+                                    <label>Password: </label>
+                                    <input type="text" onChange={ (e) => setPassword(e.target.value) } />
+                                </div>
+                                <input type="submit" value="Create User" />
+                            </form>
+                        );
+                    };
+
+                    export default UserForm;
+
+                (^ shows how state can be used to track form data ^)
+                *************************************************************************************************
+                -the above example WILL NOT clear the form on a submit
+                    -because we prevented the default behavior of the form!
+                    -this is not a bad thing here. When validations are added, the user's input will still be visible if they need to fix it
+                    -inputs can be set to clear on submit though like this if necessary:
+                        -i.e. " <input type="text" onchange={ (e) => setUsername("") } value={ username } /> "
+                        -applies what's known as two-way data-binding
+                            -whatever value is currently in the username state will match what is in the form
+                            -we can set username back to an appropriate starting value
+                                -i.e. " setUsername(""); "
+
+        2. refs:
+            -attach a pointer to DOM nodes like inputs and reach out to inspect their values once form is submitted
+            -called "uncontrolled-components"
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+CONDITIONAL-RENDERING:
+    -Say you want a header above a form that says "Please submit the form"
+    -It should change after the form is submitted
+
+    *************************************************************************************************
+    -i.e.   import React, { useState } from  'react';
+
+
+            const UserForm = (props) => {
+                const [username, setUsername] = useState("");
+                const [email, setEmail] = useState("");
+                const [password, setPassword] = useState("");
+                const [hasBeenSubmitted, setHasBeenSubmitted] = useState(false);
+
+                // changes hasBeenSubmitted state from "false" when the form is submitted
+                const createUser = (e) => {
+                    e.preventDefault();
+                    const newUser = { username, email, password };
+                    console.log("Welcome", newUser);
+                    setHasBeenSubmitted( true );
+                };
+
+                // function returns a message based on whether the form has been submitted yet or not
+                const formMessage = () => {
+                    if( hasBeenSubmitted ) {
+                    return "Thank you for submitting the form!";
+                } else {
+                    return "Welcome, please submit the form";
+                }
+                };
+
+                return (
+                    <form onSubmit={ createUser }>
+                        <h3>{ formMessage() }</h3>
+                    <div>
+                            <label>Username: </label> 
+                            <input type="text" onChange={ (e) => setUsername(e.target.value) } />
+                        </div>
+                        <div>
+                            <label>Email Address: </label> 
+                            <input type="text" onChange={ (e) => setEmail(e.target.value) } />
+                        </div>
+                        <div>
+                            <label>Password: </label>
+                            <input type="text" onChange={ (e) => setPassword(e.target.value) } />
+                        </div>
+                        <input type="submit" value="Create User" />
+                    </form>
+                );
+            };
+
+            export default UserForm;
+
+        (^ shows how to render a message based on whether or not a form was submitted yet using state ^)
+        *************************************************************************************************
+
+        -Ternary operators can make this even cleaner!
+
+        *************************************************************************************************
+        -i.e.   <form onSubmit={ createUser }>
+                    {
+                        hasBeenSubmitted ? 
+                        <h3>Thank you for submitting the form!</h3> :
+                        <h3>Welcome, please submit the form.</h3> 
+                    }
+                    <div>
+                        <label>Username: </label> 
+                        <input type="text" onChange={ (e) => setUsername(e.target.value) } />
+                    </div>
+                </form>
+
+            (^ shows how the formMessage function can be replaced with a ternary operator and pure JSX ^)
+            *************************************************************************************************
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+VALIDATIONS:
+    -Ternaries are very useful for this
+
+    *************************************************************************************************
+    -i.e.   // uses a hook to hold errors
+            const MovieForm = (props) => {
+                const [title, setTitle] = useState("");
+                const [titleError, setTitleError] = useState("");
+                
+                // validates data and adds any errors to titleError hook
+                const handleTitle = (e) => {
+                    setTitle(e.target.value);
+                    if(e.target.value.length < 1) {
+                        setTitleError("Title is required!");
+                    } else if(e.target.value.length < 3) {
+                        setTitleError("Title must be 3 characters or longer!");
+                    }
+                }
+                
+                // (rest of component removed for brevity)
+
+                // returns JSX, including any input-validation errors in real-time
+                return (
+                    <form onSubmit={ (e) => e.preventDefault() }>
+                        <div>
+                            <label>Title: </label>
+                            <input type="text" onChange={ handleTitle } />
+                            {
+                                // uses a ternary operator to check for validation errors to display
+                                titleError ?
+                                <p style={{color:'red'}}>{ titleError }</p> :
+                                ''
+                            }
+                        </div>
+                        <input type="submit" value="Create Movie" />
+                    </form>
+                );
+            }
+
+        (^ Shows how real-time validations can be used with ternary operators ^)
+        *************************************************************************************************
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+USING .MAP() AND HANDLERS IN REACT:
+
+    -very useful for creating JSX from arrays
+    -also nice bc doesn't modify the array
+    -remember that the .map() callback can accept 3 parameters:
+        1. current value
+            -value of the current item being processed
+        2. current index
+            -index of the current item being processed
+            -for each element, we use its index i as the key to silence a React warning???
+        3. this array
+            -reference to the entire array being processed
+
+    *************************************************************************************************
+    -i.e.   import React from 'react';
+
+
+            const Groceries = (props) => {
+                // this array could just as easily come from props
+                const groceryList = ["pearl onions", "thyme", "cremini mushrooms", "butter"];
+                return (
+                    <ul>
+                    {
+                        groceryList.map( (item, i) => 
+                            <li key={ i }>{ item }</li>
+                        )
+                    }
+                    </ul>
+                ); 
+            }
+
+            export default Groceries;
+
+        (^ shows how .map() can be used to easily make JSX from arrays ^)
+        *************************************************************************************************
+
+    -often times you will use a synthetic-event callback on mapped elements that have been rendered
+
+        *************************************************************************************************
+        -i.e.   // does not pass any info about the specific clicked target to the handler when called
+                const MyComponent = props => {
+                    const onClickHandler = (e) => {
+                        alert("You have clicked the button");
+                    }
+                
+                    return props.movies.map( (item, index) => {
+                        return <button onClick={ onClickHandler }>{ item }</button>
+                    });
+                }
+
+
+                // encloses the onClickHandler callback within an anonymous callback function that will call and pass event-data to the handler 
+                const MyComponent = props => {
+                    const onClickHandler = (e, value) => {
+                        alert(value);
+                    }
+                
+                    return props.movies.map( (item, index) => {
+                        return <button onClick={ (e) => onClickHandler(e, item) }>{ item }</button>
+                    });
+                }
+
+            (^ demonstrates how to pass element-specific data to a handler callback ^)
+            *************************************************************************************************
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+PROMISES:
+
+    -A promise is a pattern where the eventual response (and how long it will take to receive it) is unknown
+    -Promises have 3 states:
+        1. Pending
+            -the outcome is not yet determined
+        2. Resolved
+            -the outcome is completed successfully
+        3. Rejected
+            -the outcome is completed with errors
+    -While a promise is unfulfilled any code that comes after it is free to run
+
+    *************************************************************************************************
+    -i.e.   const noMondays = new Promise( (resolve, reject) => {
+            if(new Date().getDay() !== 1) {
+                    resolve("Good, it's not Monday!");
+                } else {
+                    reject("Someone has a case of the Mondays!");
+                }
+            });
+            noMondays
+                .then( res => console.log(res) )
+                .catch( err => console.log(err) );
+
+        (^ shows basic promise ^)
+        *************************************************************************************************
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+APIS WITH REACT:
+
+    -"Application Programming Interface"
+    -Essentially an interface that allows a program to communicate with another program that uses a different stack/language etc.
+        -like a bridge
+    -What is a RESTful API?
+        -an API that communicates among and between web-services
+        -follow rules that make sure that they are easy to implement
+    -"Fetch" is JavaScript's built-in method to consume data from an API
+        -Fetch uses promises
+        -Fetch will run infinitely if not nested within an event or useEffect() hook!
+            -On paid APIs this will fuck you hard!
+            -make sure to use this with useEffect() or an event-handler!
+        -provides a response when successfull, that has a ".results" property in the json
+
+        *************************************************************************************************
+        -i.e.   // .then() called if fetch success, .catch() called if failure
+                fetch("http://www.example.com")
+                    .then(response =>{
+                        //do something
+                    }).catch(err => {
+                        console.log(err);
+                    })
+
+                // same thing but written with async/await (ES7)
+                let response = await fetch("http://www.example.com");
+
+                // basic html <script> to test fetch with
+                <script>
+                    fetch("https://pokeapi.co/api/v2/pokemon")
+                    .then(response => {
+                        return response.json();
+                    }).then(response => {
+                        console.log(response);
+                        console.log(response.results);
+                    }).catch(err=>{
+                        console.log(err);
+                    });
+                </script>
+
+
+            (^ shows the syntax and basic use of fetch ^)
+            *************************************************************************************************
+
+    -useEffect() is another hook that can be used to manage state in normally stateless functional-components
+        -best way to use fetch
+        -CAN NOT be called conditionally!
+            -no hook can ever be...must always be callend in the exact same order
+            -can't make different fetches or axios requests depending on conditions
+        -used to manage "side-effects" in a React project
+        -if used in a functional-component, the method will execute directly after the componenet is rendered
+            -and every time the component updates!
+        -takes an optional second-argument of an array that contains different variables
+            -allows useEffect() to also run whenever one of those variables changes!
+            -otherwise pass empty array???
+
+        *************************************************************************************************
+        -i.e.   // {useEffect} must be imported as well like so
+                import React, {useState, useEffect} from 'react';
+
+                const Example = (props) => {
+                    const [people, setPeople] = useState([]);
+
+                    // fetch happens on refresh and whenever state.isSubmitted changes on form submit
+                    useEffect(() => {
+                        fetch('https://swapi.dev/api/people/')
+                            .then(response => response.json())
+                            .then(response => setPeople(response.results))
+                    }, [state.isSubmitted]);
+
+                    // only maps divs if people has data useing ternary check!
+                    return (
+                        <div>
+                            {people.length > 0 ? 
+                                people.map((person, index)=>{
+                                    return (<div key={index}>{person.name}</div>)
+                                })
+                                :null}
+                        </div>
+                    );
+                }
+                export default Example;
+
+            (^ demonstrates a common use of useEffect() within a functional-component ^)
+            *************************************************************************************************
+
+    -Axios is a third-party library that allows easy configuration of API calls in JS and a React App
+        -can be implemented with a CDN or install it directly to an NPM project
+            -"npm install axios" while within project root directory
+                -will install axios folder to "node_modules"
+            -MUST be imported into component
+                -"import axios from 'axios';"
+        -uses alternative method to fetch
+            -"axios.get()"
+            -can also use ".post()" to specify a POST request with no extra arguments
+            -response is found in "response.data" instead of "response.json()"
+
+        *************************************************************************************************
+        -i.e.   // uses "axios.get()" instead of fetch to make the API call
+                import React, { useEffect, useState } from 'react';
+                import axios from 'axios';
+
+                ...other code here...
+
+                const someComponent = props => {
+                    const [responseData, setResponseData] = useState(null);
+                    useEffect(()=>{
+                        axios.get('http://www.example.com')
+                            .then(response=>{
+                                setResponseData(response.data)
+                            })
+                            .catch(err => {
+                                console.log(err);
+                            })
+                    }, []); 
+                    return(
+                        <div>
+                            {responseData}
+                        </div>
+                    )
+                }
+
+            (^ shows syntax of basic API call using Axios with useEffect() ^)
+            *************************************************************************************************
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+ROUTING WITH REACT (REACH ROUTER):
+
+    -In a Single Page Application, routing does not make sense in the same way
+    -In SPAs, we will use routing, but only in a very superficial sense
+        -we will go to a new route, but we will actually not necessarily be making another request to the server
+        -instead, this pseudo-route will just tell our SPA which part of the page we want to see
+        -so, if you are not making requests to an API, visiting a new route in an SPA is not actually making another request
+            -it is just a way to tell our SPA the portion of the app we want to see
+            -this gives the illusion to the user that they are visiting another route
+            -we actually are going to make an asynchronous request (React comes with AJAX) to our server to grab the data, and just update the DOM with that data
+                -other than that, the HTML, CSS and Javascript will just be loaded based on what was sent in the first request
+    -Various third-party libraries allow routing to be used with React SPAs
+        -"React Router" and "Reach Router" are two of the most popular libraries for this
+            -these notes will cover the use of Reach Router
+                1. install Reach Router with NPM
+                    -"npm install @reach/router"
+                2. import Router into component
+                    -"import { Router } from '@reach/router';"
+                3. wrap the part of our website that relies on routing within the "<Router>" tags
+                    -creates a container of sorts for all of the routes to live in
+                4. give each component within <Router> a "path" prop that determines which route will render it
+                    -looks like it's rendering on a new page, but this is an illusion!
+                        -only the DOM is changing
+                    -set path to "*" an asterisk to make it the backup route if the URL doesn't match any others
+                        -make sure you have a root route set though or that will route to the asterisk component
+                5. use "<Link>" tags to navigate to redirect to various routes
+                    -ALWAYS use instead of normal HTML "<a>" tags!
+                    -will not refresh the page like an <a> tag will
+                        -simply changes the URL and the DOM!
+                    -use "to" prop to configure the route it will ADD to the current URL
+
+
+                *************************************************************************************************
+                -i.e.   *APP.JS*
+                        // <Router> displays whichever component has a matching "path" prop
+                        import React from 'react';
+                        import { Router } from '@reach/router';
+                        import NavBar from './components/NavBar.js';
+
+
+                        function App() {
+                        return (
+                            <div className="App">
+                                <Navbar/>
+                                <Router>
+                                    <Home path="/"/>
+                                    <LoginComponent path="/login"/>
+                                    <DashboardComponent path="/dashboard"/>
+                                    <NotFound path ="*"/>
+                                </Router>
+                            </div>
+                        );
+                        }
+                        export default App;
+
+
+                        *NAVBAR.JS*
+                        // creates a NavBar component that contains links to other routes
+                        import React from 'react';
+                        import { Link } from '@reach/router';
+
+
+                        const NavBar = (props) => {
+                        return (
+                            <div>
+                                <Link to = "/dashboard">Dashboard</Link>
+                                <Link to = "/login">Login</Link>
+                            </div>
+                        );
+                        }
+
+                (^ shows how to configure a basic set of routes with Reach Router ^)
+                *************************************************************************************************
+
+                -Reach Router can also redirect to routes programmatically
+                    -without using a <Link> element that needs to be clicked on!
+                    -can be used within click-handlers etc. to do things like redirect when a non-<Link> element is clicked!
+                    -MUST import "navigate" from Reach
+                        - " import { navigate } from '@reach/router' "
+                        - " navigate('/some_route') " can now be used to redirect the user programmatically
+
+                    *************************************************************************************************
+                    -i.e.   // creates the same NavBar component, but with navigate() methods instead of <Links>
+                            import React from 'react';
+                            import { navigate } from '@reach/router';
+
+                            const NavBar = (props) => {
+
+                            const handleDashButtonClick = e => {
+                                e.preventDefault();
+                                navigate('/dashboard');
+                            }
+
+                            const handleLoginButtonClick = e => {
+                                e.preventDefault();
+                                navigate('/login');
+                            }
+
+                            return (
+                                <div>
+                                    <button onClick={handleDashButtonClick}>Dashboard</button>
+                                    <button onClick={handleLoginButtonClick}>Login</button>
+                                </div>
+                            );
+                            }
+
+
+                        (^ demonstrates the use of navigate() method ^)
+                        *************************************************************************************************
+
+                -Reach Router can also route URLs with parameters!
+                    -the front end URL-parameters will be passed down as props to the components
+                        -REGARDLESS of what data is passed via URL-parameter, it will ALWAYS be passed as a string
+                            -must be converted after receipt if it should be anything else
+
+                    *************************************************************************************************
+                    -i.e.   *APP.JS*
+                            // creates a path with a parameter that receives an argument from its component
+                            function App(){
+                                return(
+                                    <div className="App">
+                                        <Router>
+                                            <ListOfDogsComponent path="/dogs" />
+                                            <DetailDogComponent path="/dogs/:id" />
+                                        </Router>
+                                    </div>
+                                )
+                            }
+
+
+
+                            *DETAILDOGCOMPONENT.JS*
+                            import React from 'react';
+
+
+                            const DetailDogComponent = props => {
+                                return(
+                                    <p>You are looking at the dog with id = {props.id}</p>
+                                )
+                            }
+
+                        (^ shows basic use of a URL that accepts an argument ^)
+                        *************************************************************************************************
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------

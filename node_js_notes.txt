@@ -1,0 +1,136 @@
+
+ - NODE.JS NOTES -
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+GENERAL:
+
+    -Node is essentially a JavaScript shell
+        -JS can be entered line by line or run by-the-file
+            - "node <+file_name.js>"
+    -Enter "node" in the terminal to launch it
+    -Node servers use an "event-loop" instead of the more common single-thread per-connection
+        -allows multiple connections on the same input/output thread
+        -works best for situations where events need to be handled quickly in real-time, with minimal processing
+            -better suited for a chat app than math calculations
+    -Node comes with NPM (Node Package Manager) by default
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+NPM (NODE PACKAGE MANAGER):
+
+    -Like pip in Python
+    -Used to manage project dependencies
+        -these dependencies are .js files and libraries
+        -these chunks called "modules" in MEAN / MERN stacks
+            -"gems" in Ruby
+            -"libraries" in Python
+            -called "middleware" generically
+        -npm fetches and prepares this "middleware"
+    -Can install middleware modules from your computer (locally) or remotely from the npm registry
+    -"nodemon" package auto-restarts the JS file or project whenever a save is made
+        -still MUST refresh the browser page though!
+        -install globally, on every Node project
+            -most modules will not be installed globally
+        -MUST start server with " nodemon [+server.js_file] " instead of " node [+server.js_file] "!
+            -otherwise, Nodemon won't keep the server updated for you
+
+    *************************************************************************************************
+    -i.e.   TERMINAL:
+
+            // "-g" option indicates to install nodemon globally
+            npm install -g nodemon
+
+            // Mac users may need to use "sudo" to install packages globally
+            sudo npm install -g nodemon
+
+            // Can install multiple packages at once!
+            npm install express mongoose
+
+        (^ demonstrates how to install a package with npm ^)
+        *************************************************************************************************
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+SERVER-FOLDER STRUCTURE MODULARIZATION:
+
+    -Best practice to have habit of modularizing projects from the start
+        -makes keeping track of content easy as project grows
+        -modules can be easily imported/exported between server files this way!
+    -Project should be structured based on models
+        -because Express is used strictly for hanglind all comms with the database in MERN
+    -Basic server-folder structure:
+        -"server" folder:
+            -holds all server related files
+            -holds each of the following:
+                1."config" folder:
+                    -holds config files?
+                2. "controllers" folder:
+                    -holds all logic for each model 
+                    -i.e. creating, updating etc...
+                3. "models" folder:
+                    -holds all the model schemas
+                4. "routes" folder:
+                    -holds all routes for each model
+                5. "server.js" file:
+                    -handles all server logic with Express!
+                6. "packages.json" file:
+                    -" npm init -y "
+
+    -Importing/exporting between files:
+
+        1. Exporting:
+            -i.e. " module.exports = [+export(s)] "
+            -will export whatever?
+            -like functions
+
+        *************************************************************************************************
+        -i.e.   *MY_MODULE.JS*
+
+                // exports "greet()" function
+                module.exports.greet = function() {
+                    console.log("Hello! We are exporting a function called greet!");
+                };
+
+                // exports "add()" function
+                module.exports.add = function(num1, num2) {
+                    console.log("The sum is: ", num1, num2);
+                };
+
+                // exports the same "greet()" and "add()" functions, but within a single object with names as keys and value as anon-functions
+                module.exports = {
+                    greet: function() {
+                        console.log("Hello! We are exporting a function called greet!");
+                    },
+                    add: function(num1, num2) {
+                        console.log("The sum is: ", num1, num2);
+                    }
+                };
+
+        (^ demonstrates basic exporting ^)
+        *************************************************************************************************
+
+        2. Importing:
+            -i.e. " require("./[+module_path]")
+                -DO NOT need ".js" at end of file path
+                    -require() method looks for .js files by default
+                -DEFAULTS to searching the "node_modules" directory
+                    -usually the modules to import are NOT in the same directory as the App
+                    -use "./" to prefix the path for any files that are to be found in the current-App's directory
+            -will import from other files
+
+        *************************************************************************************************
+        i.e.    *APP.JS*
+
+                // imports "my_module" and saves it in a variable that can access it's exports with JSON
+                const myCustomModule = require("./my_module");
+                myCustomModule.greet()
+                myCustomModule.add(5, 7);
+
+                // same thing, but with destructuring
+                const { greet, add } = require("./my_module"):
+                greet();
+                add(5, 7);
+
+        (^ shows how to import another file's exports with and w/out using destructuring ^)
+        *************************************************************************************************

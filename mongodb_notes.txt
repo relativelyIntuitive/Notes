@@ -1,0 +1,331 @@
+
+ - MONGODB NOTES -
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+GENERAL:
+
+    -MongoDB is a NoSQL database!
+        -concept of NoSQL is that there are no relations between the data
+            -in a NoSQL environment, every piece of data is unaware of the other pieces
+            -no "JOINS"!
+                -JOINS are actually an expensive task
+                    -i.e. " SELECT * FROM users LEFT JOIN address ON users.id = address.user_id "
+                        -for every user, we have to find the address that matches one piece of information in the address table, for EVERY entry!
+                -Node.js servers can use "socket connections"
+                    -allow for real-time communication between clients and servers
+                    -if an expensive operation like JOIN were to be used, it would negate the speed advantage offered by Node servers 
+        -NoSQL is a very different concept from the traditional relational-database model
+            -adaption of NoSQL has become a prominent industry phenomenon
+        -NoSQL is ideal when there is a focus on speed with little/no need for relationships between tables
+            -(objects in this case)
+        -ACTUALLY stands for "Not Only SQL"!
+        -DOES support a "structured query language" (SQL)
+            -BUT provides more flexibility with storage than with basic "tabular storage"
+                -"tabular storage" refers to storing data in tables
+                -MongoDB uses "documents" instead of tables!
+                    -these "documents" are just JS objects!
+                    -big advantage of docs over tables is that a key-value pair in a doc can hold an array!
+                        -table "fields" have no way of holding more than one piece of data!
+    -Why MongoDB specifically for MERN database?
+        -there are many other NoSQL databases, but MongoDB is best suited for MERN integration
+        -everything stored in MongoDB is a JSON object!
+            -makes navigation simple and intuitive
+    -Must be connected to Node and Express with a library, such as "Mongoose"
+        -see "mongoose_notes.txt"
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+TRADITIONAL SQL DATABASE VS MONGODB NOSQL DATABASE:
+
+    1. MySQL database schema == MongoDB database (db)
+        -MongoDB is still a database!
+    2. SQL tables == MongoDB collections
+        -SQL db is made of tables containing groups of similarly-structured pieces of data
+            -tables are normally where all structure of a particular db facet is defined for an SQL db
+            -column names and data types are very important in the world of relational databases
+        -MongoDB collections are analogous to SQL tables
+            -purpose is to "corral" individual records
+            -no structure to a collection
+                -documents in a collection DO NOT need to all have the same key-value pairs!
+                    -unlike SQL table rows all requiring the same fields!
+                -makes MongoDB powerful, but certainly not one-size-fits-all solution
+    3. SQL row/record == MongoDB document (JSON object)
+        -This is the main selling point of MongoDB
+            -stores JS objects without needing to know the contents beforehand?
+            -gain on speed, loss on rigidity
+            -trade structure for flexibility
+        -Each doc is a JSON object and can have any number of key-value pairs!
+            -TECHNICALLY stored as BSON (binary JSON)
+                -friendlier to store
+                    -since it's binary
+                -supports a few more things that JSON doesn't!
+                    -like dates!
+                -in practice, it works the same as ordinary JSON and documents can be treated as such
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+MONGODB SHELL:
+
+    -To open the shell:
+        1. install MongoDB
+        2. navigate to the "/bin" directory
+            -i.e. " cd c:/"Program Files"/MongoDB/Server/<version_number>/bin/ "
+                -(number prolly 4.4)
+            -"/bin" directories hold executeables
+                - ".exe" files are directly interpreted by the machine when run
+                    -no compiling or interpretation needed
+        3. run "mongo.exe" found within
+            -i.e. " mongo.exe " in terminal
+                -some versions of MongoDB will need "./mongo" command instead...
+            -terminal cursor should become a single arrow with a blinking underscore
+                -indicates shell is open!
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+BASIC MONGODB SHELL COMMANDS:
+
+    - " show dbs "
+        -shows all databases available on the current MongoDB server
+
+    - " db "
+        -shows the currently selected database
+
+    - " use [+db_name] "
+        -changes selected database to the one specified
+        -if the db specified doesn't exist, Mongo shell will create a new database and then switch to it
+
+    - " db.dropDatabase() "
+        -deletes the currently selected db
+            -make sure that the proper db is selected first!
+
+    - " show collections "
+        -shows all collections in a db
+
+    - " db.createCollection("[+collection_name]") "
+        -creates a new collection in the current database
+        -make sure the proper db is selected first!
+
+    - " db.[+collection_name].drop() "
+        -destroys the specified collection
+        -MUST have the right db selected, that contains the specified collection!
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+MONGODB CRUD: 
+
+    1. Create:
+        -Inserts a document into a collection
+            -documents in a collection DO NOT need to all have the same key-value pairs!
+            -unlike SQL table rows all requiring the same fields!
+        -Format of the document (BSON object) going into the database is exactly what it will be coming back out
+        -MongoDB will automatically create a unique "_id" field for each obj in the db if not specified
+            -each _id is a string!
+                -i.e. "5462a78e514e258182f4c69a"
+                -part of the string is a timestamp?
+
+        ************************************************************************************************
+        -i.e.    // Pattern:
+                db.[+collection_name].insert({[+document_content]})  
+                
+                // Creates a doc in the "ninjas" collection with the "name" "belt" and "status" keys
+                db.ninjas.insert({name: "Trey", belt: "black", status: "awesome"})
+
+            (^ demonstrates basic syntax and use of ".insert()"" method ^)
+            ************************************************************************************************
+
+    2. Read:
+        -Retrieves a document from a collection
+        -The search parameter passed is a document
+            -everything in the document will match the fields in the db
+            -only those documents that match the query document will be returned back from the query
+                -use ".findOne()" method instead if you only want to retrieve the first doc found!
+        -MongoDB returns as many results as it can
+        -Pass an empty object or nothing at all to retrieve all of the specified collection
+        -Use ".pretty()" method to format the results so they are easier to read
+            -i.e.   " db.[+collection_name].find().pretty() "
+        -NOTE the REQUIRED use of "ObjectId()" to search by _id
+            -ObjectId() can also be used to search by creation time, as part of the _id is a timestamp
+
+        ************************************************************************************************
+        -i.e.   // Pattern: 
+                db.[+collection_name].find({[+query_document_content]})
+
+                // Retrieves any docs in the "ninjas" collection with the "name" key-value of "Trey"
+                db.ninjas.find({name: "Trey"})
+
+                // Retrieves ONLY the first doc in the "ninjas" collection with the "name" key-value of "Trey"
+                db.ninjas.find({name: "Trey"})
+
+                // This one retrieves all ninja documents
+                db.ninjas.find({})
+
+                // NOTE: finding by _id MUST be done with ObjectId like this!
+                db.ninjas.find({_id: ObjectId("5462a78e514e258182f4c69a")})
+
+            (^ demonstrates basic syntax and use of ".find()" method ^)
+            ************************************************************************************************
+
+    3. Update:
+        -Updates a document in a collection
+        -Has 2 REQUIRED parameters:
+            1. a query document to find the document to update
+                -selects the FIRST doc that matches the query
+                    -can change, see options parameter below
+            2. the document to "update" the target doc with
+                -"update" will replace EVERYTHING but the _id field of the target doc by default!
+                    -be sure to include existing info from the target in the update if you don't want to lose it
+                -use an "update operator" if you want to add the update without overwriting the rest!
+                    -i.e. " {$set: {[+document_update_content]}} " as second parameter
+                        -will add the update to the target, without deleting everything else!
+                    -several diffent "update operators" available to use with MongoDB
+        -Has a third optional paramer that takes "options" object with modifier key-value pairs
+            -"multi" key will hold boolean value that determines if only the first retrieved doc will be updated
+                -defaults to "false", updating only the first doc found
+
+        ************************************************************************************************
+        -i.e.   // Pattern:
+                db.[+collection_name].update({[+query_document_content], [+document_update_content], [+options]})
+
+                // This example update will overwrite everything in the target doc except the _id
+                db.ninjas.update({name: "Trey"}, {location: "Mountain View"})
+
+                // This example update will add the "location" field to the target without overwriting anything
+                db.ninjas.update({name: "Trey"}, {$set: {location: "Mountain View"}})
+
+                // This example update will work like the above, but update ALL ninjas named "Trey"
+                db.ninjas.update({name: "Trey"}, {$set: {location: "Mountain View"}}, {multi: true})
+
+                // Verify the update was a success!
+                db.ninjas.find({location: "Mountain View"}).pretty()
+
+            (^ demonstrates the syntax and use of the ".update()" method ^)
+            ************************************************************************************************
+
+    4. Destroy:
+        -Removes a document from a collection
+        -Takes a query document as an arg
+            -query document contains everything that should match the deletion targets
+        -Has optional second parameter
+            -called the "justOne" boolean 
+            -defaults to "false" if ommitted
+            -if set to "true" the query will only remove the first document that matches the query
+                -otherwise, deletes ALL docs that match the query!
+
+        ************************************************************************************************
+        -i.e.   // Pattern:
+                db.[+collection_name].remove({[+query_document_content]}, [+justOne_boolean])
+
+                // This removes any doc in the "ninjas" collection with "belt" key-value of "yellow"
+                db.ninjas.remove({belt: "yellow"})
+
+                // This query would have the same effect as the one above.
+                db.ninjas.remove({belt: "yellow"}, false)
+
+                // This query would delete only the first document that matches
+                db.ninjas.remove({belt: "yellow"}, true)
+
+            (^ demonstrates basic syntax and use of ".remove()" method and both of its parameters ^)
+            ************************************************************************************************
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+OPERATORS:
+
+    -Allow you to 'operate' on the data!
+        -lulz
+        -they're basically options that modify how CRUD methods work
+
+        ************************************************************************************************
+        -i.e.   // Retrieves all dojos with "number_of_students" > 15
+                db.dojos.find({number_of_students: {$gt: 15}})
+
+                // This example update will add the "location" field to target doc without overwriting anything
+                db.ninjas.update({name: "Trey"}, {$set: {location: "Mountain View"}})
+
+        (^ demonstrates basic use of operators ^)
+        ************************************************************************************************
+
+    -Some of the most useful operators:
+        -full list at "docs.mongodb.com/manual/reference/operator"!
+            -there are TONS!
+
+        -Comparison operators:
+            -can be combined!
+                -i.e. " db.students.find({lucky_number: {$gte: 1}, lucky_number: {$lte: 9}}) "
+                    -retrieves all "students" with a "lucky_number" from 1-9
+
+            -" $gt " - (greater than)
+                -use to query selectively on numerical-valued fields
+                -i.e. " db.dojos.find({number_of_students: {$gt: 15}}) "
+
+            -" $gte " - (greater than or equal to)
+                -use to query selectively on numerical-valued fields
+
+            -" $lt " - (less than)
+                -use to query selectively on numerical-valued fields
+
+            -" $lte " - (less than or equal to)
+                -se to query selectively on numerical-valued fields
+
+            -" $in " - (in array)
+                -use to find documents who have a particular value within an array.
+
+        -Logical operators:
+            -" $and "
+                -joins query clauses with a logical AND returns all documents that match the conditions of both clauses
+
+            -" $not "
+                -inverts the effect of a query expression and returns documents that do not match the query expression
+
+            -" $nor "
+                -joins query clauses with a logical NOR returns all documents that fail to match both clauses
+
+            -" $or "
+                -joins query clauses with a logical OR returns all documents that match the conditions of either clause
+                -i.e. " db.inventory.find( {$or: [{ [+query_document_1_content]}, { [+query_document_2_content] }]}) "
+                    -takes an array!
+
+    -Some of the most useful "array update operators":
+        -used to update documents that have array values
+
+        -" $pop "
+            -removes either the first or last element from an array
+            -i.e. " db.[+collection_name].update({[+query_document_content]}, {$pop: {[+array_key]: (1 or -1)}}) "
+                -argue 1 to remove the last item in the array, -1 for the first item
+
+        -" $pull "
+            -removes a specified value from an array
+                -unlike $pop, which removes values by their relative location within the array
+            -i.e. " db.[+collection_name].update({[+query_document_content]}, {$pull: {[+array_key]: [+value_to_pull]}}) "
+                -this will remove ALL instances of the argued value from ANY retrieved docs with the array key argued
+
+        -" $push "
+            -pushes to an array contained within a document
+            -i.e. " db.[+collection_name].update({[+query_document_content]}, {$push: {[+array_key]: [+value_to_push]}}) "
+                -pushes 'snowboarding' to "interests" array in the doc found by _id in the "students" collection
+
+        -" $addToSet "
+            -it functions mostly like $push
+                -but only adds to the specified array if the value does NOT already exist
+                    -prevents duplicate entries
+
+    -Operators can be chained via "aggregation"
+        -some operators have "aggregation variables" which are just versions of themselves that can be chained
+        -MUST surround the "aggregation stage" within array brackets! "[]"
+        -" $$NOW " is the aggregation variable used below
+            -creates current datetime value
+
+        ************************************************************************************************
+        -i.e.   // Adds "updated_on" field to every customer, and sets its value to the current datetime
+                db.customers.update(
+                    {},
+                    [
+                    { $set: {updated_on: "$$NOW"}}
+                    ],
+                    {multi: true}
+                )
+
+        (^ demonstrates use aggregation variables ^)
+        ************************************************************************************************
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
