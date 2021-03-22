@@ -484,7 +484,7 @@ SETTING UP A MERN PROJECT:
             export default Detail;
 
 
-            *UserList.JS*
+            *UserList.js*
             // Add link to "Detail" view
             import React from 'react'
             import axios from 'axios';

@@ -478,6 +478,20 @@ CLASS-COMPONENTS VS. FUNCTIONAL-COMPONENTS:
 
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+PRESENTATIONAL AND CONTAINER COMPONENTS:
+
+    -Design paradigm wherein there are generally two types of components:
+        1. One that presents information that is passed down to it 
+        2. Another that does the logic and work to actually get that data
+    -Some components are just accepting props and performing actions based on those props. Others are "doing the work".
+        -i.e. A Main component making calls to an API to retrieve People, and any other logic required. A PersonList component is simply accepting data and callbacks and props.
+    -By adhering to this philosophy, it can be quite easy to re-use components, b/c we can create a generic component, such as a button, that will do something when you click it
+            -the button component can be completely agnostic as to what this action is, it will simply just execute whatever method you pass down. 
+            -if we design a button like this, then we can easily reuse it for anytime we want to execute a function when clicking on a button, instead of writing many different buttons that do different things
+    -While it can be useful, you should not try to force this design pattern.
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 SYNTHETIC EVENTS:
 
     -React uses a custom approach to add event listeners to our elements
@@ -901,6 +915,8 @@ STYLES WITH REACT:
                 *************************************************************************************************
 
         4. Bootstrap!
+            -Regular Bootstrap classess can be used, or "ReactStrap" for premade componenets, like Material UI has
+                -"ReactStrap" not covered here
             - " npm install react-bootstrap bootstrap "
             - " import 'bootstrap/dist/css/bootstrap.min.css'; " 
                 -include at top of "App.js" or "index.js" file
@@ -913,6 +929,117 @@ STYLES WITH REACT:
 
                     (^ demonstrates basic use of Bootstrap with React ^)
                     *************************************************************************************************
+
+        5. Material UI
+            -CSS library of pre-made React componenents
+            -To install:
+                1. In React client directory:
+                    - " npm install @material-ui/core "
+                2. Import specific Material-UI componenents as needed in each file
+                    -i.e. " import { Paper } from '@material-ui/core'; "
+             -Some useful components:
+                1. Paper and Cards:
+                    -A Paper component is one that will give a nice background and potentially some elevation to a component.
+
+                    *************************************************************************************************
+                    -i.e.   import { Paper } from '@material-ui/core';
+                            ...
+                            <Paper elevation={3}>
+                                <p>Some text here</p>
+                            </Paper>
+                            ...
+
+                        (^ demonstrates basic use of a Paper component ^) 
+                        *************************************************************************************************
+
+                    -A Card componenent is one you can give different elevations to make it appear "higher up" on the page.
+
+                        *************************************************************************************************
+                        -i.e.   import { Card } from '@material-ui/core';
+                                ...
+                                <Card>
+                                    <CardContent>
+                                        <h1>This is content within my card</h1>
+                                    </CardContent>
+                                </Card>
+                                ...
+
+                            (^ demonstrates basic use of Card components ^)
+                            *************************************************************************************************
+
+                2. Buttons
+                    -Material-UI has very nice looking buttons as well. It is as simple as importing it and implementing it:
+
+                        *************************************************************************************************
+                        -i.e.   import { Button } from '@material-ui/core';
+                                ...
+                                <Button>
+                                    Click Me
+                                </Button>
+                                ...
+
+                            (^ demonstrates basic use of Button componenent ^)
+                            *************************************************************************************************
+
+                3. Forms
+                    -Material can make very nice looking forms as well. We can do something simple like:
+
+                        *************************************************************************************************
+                        -i.e.   *components/LoginForm.js*
+
+                                import React from 'react';
+                                import {
+                                    Paper,
+                                    FormControl,
+                                    InputLabel,
+                                    OutlinedInput,
+                                    Button
+                                } from '@material-ui/core';
+
+                                const styles = {
+                                    paper: {
+                                        width: "20rem", padding: "1rem"
+                                    },
+                                    input: {
+                                        marginBottom: "1rem"
+                                    },
+                                    button: {
+                                        width: "100%"
+                                    }
+                                };
+
+                                export default function RegForm() {
+                                    return (
+                                        <Paper elevation={3} style={styles.paper}>
+                                            <h2>Reg Form</h2>
+                                            <form>
+                                                <FormControl variant="outlined" style={styles.input}>
+                                                    <InputLabel>Username</InputLabel>
+                                                    <OutlinedInput type="text"/>
+                                                </FormControl>
+                                                <FormControl variant="outlined" style={styles.input}>
+                                                    <InputLabel>E-mail</InputLabel>
+                                                    <OutlinedInput type="email"/>
+                                                </FormControl>
+                                                <FormControl variant="outlined" style={styles.input}>
+                                                    <InputLabel>Password</InputLabel>
+                                                    <OutlinedInput type="password"/>
+                                                </FormControl>
+                                                <FormControl variant="outlined" style={styles.input}>
+                                                    <InputLabel>Password</InputLabel>
+                                                    <OutlinedInput type="password"/>
+                                                </FormControl>
+                                                <Button type="submit" variant="contained" color="primary">
+                                                    Register
+                                                </Button>
+                                            </form>
+                                        </Paper>
+                                    );
+                                };
+
+                            (^ demonstrates basic use of a Material components to build a Registration form ^)
+                            *************************************************************************************************
+
 
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
