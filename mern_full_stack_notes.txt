@@ -225,9 +225,9 @@ SETTING UP A MERN PROJECT:
             const port = 8000;
 
             app.use(cors());
-            // This line is new:
+            // This line is new; allows express server to read json
             app.use(express.json());
-            // This line is new:
+            // This line is new; allows server to read incoming strings and arrays 
             app.use(express.urlencoded({ extended: true }));
 
             require('./routes/hello.routes')(app);
@@ -267,7 +267,7 @@ SETTING UP A MERN PROJECT:
             const User = require("../models/user.model");
 
             // Controller to create a User doc
-            module.exports.createUser = (req, res) => {
+            module.exports.register = (req, res) => {
                 const { firstName, lastName } = req.body;
                 User.create({
                     firstName,
@@ -290,7 +290,7 @@ SETTING UP A MERN PROJECT:
             module.exports = function(app){
                 app.get('/api', UserController.index);
                 // This line is new:
-                app.post('/api/users', UserController.createUser);
+                app.post('/api/register', UserController.register);
             };
 
         (^ demonstrates adding POST route for a model ^)
@@ -316,7 +316,7 @@ SETTING UP A MERN PROJECT:
                     // prevent default behavior of the submit
                     e.preventDefault();
                     // make a post request to create a new user
-                    axios.post('http://localhost:8000/api/users', {
+                    axios.post('http://localhost:8000register', {
                         userName,
                     })
                         .then(res=>console.log(res))
@@ -712,3 +712,278 @@ SETTING UP A MERN PROJECT:
 37. Make Sure everything works, and then refine with CSS, etc!
 
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+. Add Authentication and Authorization for Users to backend
+    -Authentication is the process of ensuring that the User logged in is the right person
+        -i.e. finding by email and matching password
+    -Authorization is the process of determining if the authenticated User has permission to access the requested resource
+        -i.e. not able to edit other Users accts
+
+. Install packages needed to "server" directory
+    -i.e. " npm i dotenv bcrypt cookie-parser jsonwebtoken "
+        - " i " short for install
+        - "cookie-parser" allows sending cookies from backend to frontend and reading of cookies on a request
+        - "dotenv" allows creating a ".env" file in the server directory to store variables
+            -access via " process.enc.[+VARIABLE_NAME] "
+            -useful for storing API keys etc. and sensitive data
+
+. Setup ".env" file and restructure "server.js" and "mongoose.config.js", adding new packages and settings
+
+    *************************************************************************************************
+    -i.e.   *server/.env*
+
+            // access these via "process.env.[+VARIABLE_NAME]
+            PORT = 8000;
+            // not a .js file; doesn't need quotes for a string!
+            DB_NAME = [+db_name]
+            // add any other secret keys here...
+
+            *server.js*
+
+            // "express variable can list requirements like so without variable type declaration!
+            const express = require('express'),
+                app = express(),
+                cors = require('cors'),
+                cookieParser = require('cookie-parser'),
+                port = process.env.PORT,
+                // starts the Express server
+                server = app.listen(port, () => console.log(`Listening on port ${port}`));
+
+            app.user(cookieParser());
+            // "credentials:true" checks that same webtoken sent with API request is included in the response
+            // "origin" must also be defined
+            app.use(cors({credentials:true,origin:'http://localhost:3000'}));
+            app.use(express.json());
+            app.use(express.urlencoded({ extended: true }));
+
+            require('./routes/user.routes')(app);
+            require('./config/mongoose.config');
+            require('dotenv').config();
+
+            *mongoose.config.js*
+            // mongoose can list stuff for setup like express
+            const mongoose = require('mongoose'),
+                uri = `mongodb://localhost/${process.env.DB_NAME}`;
+
+            // configures the Mongoose connection to the MongoDB
+            mongoose.connect(uri, {
+                useNewUrlParser: true,
+                useUnifiedTopology: true,
+            })
+                .then(() => console.log("Established a connection to the database"))
+                .catch(err => console.log("Something went wrong when connecting to the database", err));
+
+        (^ demonstrates new settings to get started with logins ^)
+        *************************************************************************************************
+
+.  Add validations to the User model
+    -Many built-in validators are included with mongoose
+    -Email requires a custom validator
+        -(see below)
+        -custome validators are objects with a "validator" function that must return true or false, and a message to display if false
+        -uses a "Regular expression" a.k.a. a "Regex" to verify email syntax
+    -Use "mongoose virtuals" for fields like "passwordConf" that don't need saving in the DB
+        -grabs variable, converts and sets it to a "virtual field"
+        -(see below)
+        -then, use "pre hook" Middleware to run to check the 2 passwords to verify match before saving User into DB
+            -(see below)
+            -"pre hooks" are run in order before saving the User
+            -don't forget to run "next()" after each Middleware used!
+            -do NOT rewrite the function in the Middleware as an arrow function, or the scope for "this" will be wrong!
+    -User Bcrypt to hash the password before saving
+        -Bcrypt MUST be required in the controller and the model file
+        -uses another "pre hook" to hash before saving User data
+            -"pre hooks" are run in order before saving the User
+        -Bcrypt should be used asynchronously, so use with Promises
+            -the integer passed as the 2nd arg to "bcrypt.hash()" indicates the # of salt rounds used when generating a salt
+                -12 is a common default when the data is not very sensitive
+
+    *************************************************************************************************
+    -i.e.   *user.model.js*
+            const mongoose = require('mongoose'),
+                bcrypt = require('bcrypt');
+
+            const UserSchema = new mongoose.Schema({
+                userName: {
+                    type: String,
+                    required: [true, "*Username is required!"],
+                    minlength: [2, "*Username must be at least 2 characters long!"],
+                    maxlength: [16, "*Username must no more than 16 characters long!"]
+                },
+                email: {
+                    type: String,
+                    required: [true, "*Email is required!"],
+                    validate: {
+                        validator: val => /^([\w-\.]+@([\w-]+\.)+[\w-]+)?$/.test(val),
+                        message: "*Email must be provided in a valid format!"
+                    }
+                },
+                password: {
+                    type: String,
+                    required: [true, "*Password is required!"],
+                    minlength: [8, "*Password must be at least 8 characters long!"],
+                },
+            }, { timestamps: true });
+
+            // adds and sets passwordConf as "virtual field" for validation that won't be saved to db
+            UserSchema.virtual('passwordConf')
+                .get( () => this._passwordConf )
+                .set( value => this._passwordConf = value );
+
+            // pre hook compares the two passwords before saving User data
+            // do NOT rewrite callback as arrow func or it will not have the right scope for "this"
+            UserSchema.pre('validate', function(next) {
+                if (this.password !== this.passwordConf) {
+                    this.invalidate('passwordConf', '*Password and Password Confirmation must match!')
+                }
+                // "next()" function calls next Middleware or next validation when it's done
+                next();
+            });
+
+            // pre hook hashes the password before saving User data
+            // do NOT rewrite this one as arrow either!
+            UserSchema.pre('save', function(next) {
+                bcrypt.hash(this.password, 12)
+                    .then(hash => {
+                    this.password = hash;
+                    // do NOT forget to call "next" again at the end of the bcrypt Middleware!
+                    next();
+                });
+            });
+
+            const User = mongoose.model("User", UserSchema);
+
+            module.exports = User;
+
+        (^ demonstrates adding validations to User model with mongoose ^)
+        *************************************************************************************************
+
+. Create login/out/reg methods in the User controller for authorization
+    -Add bcrypt and jsonwebtoken requirements
+    -Rewrite register to look like below
+        -This will redirect to a page upon creation and log in the new user
+            -use a jsonwebtoken to create a cookie for the "usertoken"
+                - "jwt.sign()" createst the token
+                    -sign() requires a secret key as its 2nd arg!
+                        -store it in the ".env" file!
+                        -arbitrary value, can be alphanumeric
+            - "httpOnly: true," argument to res.cookie() ensures that only browser uses the jwt
+            - ".json()" sets up the json response to include data to pass back with the response
+
+        *************************************************************************************************
+        -i.e.   *user.controller.js*
+
+                ...
+                // creates a User
+                module.exports.register = (req, res) => {
+                    User.create(req.body)
+                        .then(user => {
+                            res
+                                .cookie(
+                                    // "usertoken" is a key/value pair cookie to be used for authorization, essentially "logging in"
+                                    "usertoken",
+                                    // a jwt will become its value via jwt.sign()
+                                    jwt.sign({_id: user._id}, process.env.JWT_KEY),
+                                    {
+                                        httpOnly: true,
+                                    }
+                                )
+                                // sends only the userName with the response
+                                .json({ msg: "Success!", user: {
+                                    userName : user.userName
+                                }});
+                        })
+                        .catch(err => res.status(400).json(err));
+                };
+
+                // logs authorizes a User login
+                module.exports.login = (req, res) => {
+                    User.findOne({email:req.body.email})
+                        .then( user => {
+                            if(user == null) {
+                                res.status(400).json({ msg: "Invalid login attempt!"})
+                                res.cookie()
+                            } else {
+                                bcrypt.compare(req.body.password, user.password)
+                                    .then(isValid => {
+
+                                        if(isValid === true) {
+                                            res
+                                                .cookie(
+                                                    "usertoken",
+                                                    jwt.sign({ _id: user._id }, process.env.JWT_KEY),
+                                                    {
+                                                        httpOnly: true,
+                                                    }
+                                                )
+                                                .json({ msg: "User login success!" });
+                                        } else {
+                                            res.status(400).json({ msg: "Invalid Login attempt!"})
+                                        }
+                                    })
+                                    .catch(err => {
+                                        console.lo(err);
+                                        res.status(400).json({ msg: "Invalid login attempt!"})
+                                    })
+                            }
+                        })
+                        .catch(err => res.status(400).json(err.errors));
+                };
+
+                // logs a User out
+                module.exports.logout = (req, res) => {
+                    res.clearCookie('usertoken');
+                    res.sendStatus(200);
+                };
+                ...
+
+            (^ demonstrates basic registration controller method ^)
+            *************************************************************************************************
+
+. Add authentication to the backend server for most User routes
+    -Other than register and login
+        -UNLESS you want to prevent access to those pages when they ARE logged in...
+    -Create "jwt.config.js" in the "server/config" directory
+        -this will configure custom authentication Middleware
+        *************************************************************************************************
+        -i.e.   *server/config/jwt.config.js*
+                const jwt = require("jsonwebtoken");
+
+                // authenticates current User
+                module.exports.authenticate = (req, res, next) => {
+                    // access the usertoken if exists or generate errors
+                    jwt.verify(req.cookies.usertoken, process.env.JWT_KEY, (err, payload) => {
+                        if (err) { 
+                            // 401 status prevents access to unauthorized data
+                            res.status(401).json({verified: false});
+                        } else {
+                            // do NOT forget to call "next()" for any Middleware success conditions!
+                            next();
+                        }
+                    });
+                };
+
+            (^ demonstrates creation of custome authentication Middleware ^)
+            *************************************************************************************************
+
+. Add authentication to necessary User routes and create routes for login/logout
+    -Add imports to use authenticator
+
+    *************************************************************************************************
+    -i.e.   *user.routes.js*
+            const UserController = require('../controllers/user.controller'),
+                { authenticate } = require('../config/jwt.config');
+
+            ...
+            // argue "authenticate" to run middleware, passing the controller method to the "next" parameter for authenticator to run it after a success
+            app.get('/api/users', authenticate, UserController.getAllUsers);
+            app.post('/api/login', UserController.login);
+            // authenticate logout too
+            app.get('/api/logout', authenticate, UserController.logout);
+            ...
+
+        (^ demonstrates adding authentication to backend routes ^)
+        *************************************************************************************************
+
+. Add login/reg auth to frontend client
+    -Can't really test backend until this is done

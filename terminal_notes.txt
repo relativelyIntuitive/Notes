@@ -171,6 +171,7 @@
                 -NPM
                         - "  sudo npm install [+package_name] "
                                 -installs specified package if found
+                                - " i " can be used as short hand
                                 -can install multiple packages at once
                                         - " npm install express mongoose "
                                 -add  " -g "  option after  " install "  to install package globally
@@ -352,6 +353,7 @@
                 -NPM:
                         -  " npm install [+package_name] "
                                 -installs specified package if found
+                                - " i " can be used as short hand
                                 -can install multiple packages at once
                                         - " npm install express mongoose "
                                 -add  " -g "  option after  " install "  to install package globally
