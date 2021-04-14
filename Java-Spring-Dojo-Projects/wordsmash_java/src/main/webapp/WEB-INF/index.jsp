@@ -30,23 +30,6 @@
 		</div>
 	</div>
 	<br/>
-	
-	<div class="row">
-		<div class="col">
-			<div class="container">
-			    <h1>Search!</h1>
-			    <p class="text-danger"><c:out value="${error}"/></p>
-			    <p class="text-danger"><c:out value="${success}"/></p>
-			    <form action="/search" method="post">
-				    <p>
-				        <label>Query:</label>
-				        <input type="text" name="query"/>
-				    </p>
-				    <input type="submit" value="Search"/>
-				</form>	
-			</div>
-		</div>
-	</div>
 	<br/>
 </body>
 </html>

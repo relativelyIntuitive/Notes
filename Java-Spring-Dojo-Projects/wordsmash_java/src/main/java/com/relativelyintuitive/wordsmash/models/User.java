@@ -1,19 +1,12 @@
 package com.relativelyintuitive.wordsmash.models;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
@@ -33,7 +26,6 @@ public class User {
 	@NotNull
 	@Size(min = 2, message = "Username must be at least 2 characters long")
 	private String username;
-	private ArrayList<String> favorites;
 	@NotNull
 	@Email(message = "Email must be a valid format")
 	private String email;
@@ -45,14 +37,6 @@ public class User {
 	@Column(updatable = false)
 	private Date createdAt;
 	private Date updatedAt;
-	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-	private List<Comment> comments;
-    @ManyToMany(fetch = FetchType.LAZY)
-	@JoinTable(name = "likers",
-			joinColumns = @JoinColumn(name = "user_id"),
-			inverseJoinColumns = @JoinColumn(name = "comment_id")
-		)
-	private List<User> liked;
 
 	public User() {
 	}
@@ -89,13 +73,6 @@ public class User {
 		this.username = username;
 	}
 
-	public ArrayList<String> getFavorites() {
-		return favorites;
-	}
-
-	public void setFavorites(ArrayList<String> favorites) {
-		this.favorites = favorites;
-	}
 
 	public String getEmail() {
 		return email;
@@ -135,21 +112,5 @@ public class User {
 
 	public void setUpdatedAt(Date updatedAt) {
 		this.updatedAt = updatedAt;
-	}
-
-	public List<Comment> getComments() {
-		return comments;
-	}
-
-	public void setComments(List<Comment> comments) {
-		this.comments = comments;
-	}
-
-	public List<User> getLiked() {
-		return liked;
-	}
-
-	public void setLiked(List<User> liked) {
-		this.liked = liked;
 	}
 }

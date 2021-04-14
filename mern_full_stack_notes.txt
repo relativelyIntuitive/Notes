@@ -733,12 +733,15 @@ SETTING UP A MERN PROJECT:
     -i.e.   *server/.env*
 
             // access these via "process.env.[+VARIABLE_NAME]
-            PORT = 8000;
-            // not a .js file; doesn't need quotes for a string!
+            PORT = 8000
+            // not a .js file; doesn't need quotes for a string, OR semi-colons!
             DB_NAME = [+db_name]
             // add any other secret keys here...
 
             *server.js*
+
+            // allows dotenv to be used
+            require('dotenv').config();
 
             // "express variable can list requirements like so without variable type declaration!
             const express = require('express'),
@@ -749,7 +752,7 @@ SETTING UP A MERN PROJECT:
                 // starts the Express server
                 server = app.listen(port, () => console.log(`Listening on port ${port}`));
 
-            app.user(cookieParser());
+            app.use(cookieParser());
             // "credentials:true" checks that same webtoken sent with API request is included in the response
             // "origin" must also be defined
             app.use(cors({credentials:true,origin:'http://localhost:3000'}));
@@ -758,7 +761,6 @@ SETTING UP A MERN PROJECT:
 
             require('./routes/user.routes')(app);
             require('./config/mongoose.config');
-            require('dotenv').config();
 
             *mongoose.config.js*
             // mongoose can list stuff for setup like express
