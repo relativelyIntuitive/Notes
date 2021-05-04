@@ -709,17 +709,17 @@ SETTING UP A MERN PROJECT:
         (^ demonstrates how to add delete ability ^)
         *************************************************************************************************
 
-37. Make Sure everything works, and then refine with CSS, etc!
+37. Make Sure everything works
 
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-. Add Authentication and Authorization for Users to backend
+38. Add Authentication and Authorization for Users to backend
     -Authentication is the process of ensuring that the User logged in is the right person
         -i.e. finding by email and matching password
     -Authorization is the process of determining if the authenticated User has permission to access the requested resource
         -i.e. not able to edit other Users accts
 
-. Install packages needed to "server" directory
+39. Install packages needed to "server" directory
     -i.e. " npm i dotenv bcrypt cookie-parser jsonwebtoken "
         - " i " short for install
         - "cookie-parser" allows sending cookies from backend to frontend and reading of cookies on a request
@@ -727,7 +727,7 @@ SETTING UP A MERN PROJECT:
             -access via " process.enc.[+VARIABLE_NAME] "
             -useful for storing API keys etc. and sensitive data
 
-. Setup ".env" file and restructure "server.js" and "mongoose.config.js", adding new packages and settings
+40. Setup ".env" file and restructure "server.js" and "mongoose.config.js", adding new packages and settings
 
     *************************************************************************************************
     -i.e.   *server/.env*
@@ -778,7 +778,7 @@ SETTING UP A MERN PROJECT:
         (^ demonstrates new settings to get started with logins ^)
         *************************************************************************************************
 
-.  Add validations to the User model
+41.  Add validations to the User model
     -Many built-in validators are included with mongoose
     -Email requires a custom validator
         -(see below)
@@ -860,7 +860,7 @@ SETTING UP A MERN PROJECT:
         (^ demonstrates adding validations to User model with mongoose ^)
         *************************************************************************************************
 
-. Create login/out/reg methods in the User controller for authorization
+42. Create login/out/reg methods in the User controller for authorization
     -Add bcrypt and jsonwebtoken requirements
     -Rewrite register to look like below
         -This will redirect to a page upon creation and log in the new user
@@ -942,7 +942,7 @@ SETTING UP A MERN PROJECT:
             (^ demonstrates basic registration controller method ^)
             *************************************************************************************************
 
-. Add authentication to the backend server for most User routes
+43. Add authentication to the backend server for most User routes
     -Other than register and login
         -UNLESS you want to prevent access to those pages when they ARE logged in...
     -Create "jwt.config.js" in the "server/config" directory
@@ -968,7 +968,7 @@ SETTING UP A MERN PROJECT:
             (^ demonstrates creation of custome authentication Middleware ^)
             *************************************************************************************************
 
-. Add authentication to necessary User routes and create routes for login/logout
+44. Add authentication to necessary User routes and create routes for login/logout
     -Add imports to use authenticator
 
     *************************************************************************************************
@@ -987,5 +987,12 @@ SETTING UP A MERN PROJECT:
         (^ demonstrates adding authentication to backend routes ^)
         *************************************************************************************************
 
-. Add login/reg auth to frontend client
+45. Add login/reg auth to frontend client
     -Can't really test backend until this is done
+
+46. Create Reg component
+
+    *************************************************************************************************
+    -i.e.   *RegForm.js*
+        (^ ^)
+        *************************************************************************************************
