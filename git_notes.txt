@@ -1,6 +1,21 @@
 
 - GIT NOTES -
 
+        LINKING LOCAL FOLDER TO REMOTE REPO
+            …create a new repository on the command line
+            echo "# [+REPO_NAME]" >> README.md
+            git init
+            git add README.md
+            git commit -m "initial commit"
+            git branch -M main
+            git remote add origin [+REPO-URL]
+            git push -u origin main
+
+            …or push an existing repository from the command line
+            git remote add origin https://github.com/relativelyIntuitive/adsfasdfasdf.git
+            git branch -M main
+            git push -u origin main
+
         FORKING/CLONING:
             1. Fork: Remote, server-side copy of a repository, distinct from the original.
                 -Forking a repository that you don't own creates a copy of it on your GitHub profile
@@ -26,4 +41,3 @@
             3. Update the state
                 -updates the repo that's tied to local copy
                 -   git push origin master
-            
