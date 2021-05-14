@@ -186,7 +186,7 @@ DATA TYPES:
                         key: value,
                         etc...
                     }
-                (if keys/values are text, don't forget quotes!)
+                (^ if keys/values are text, don't forget quotes! ^)
                 *************************************************************************************************
             -like objects in JS
             -group of key-value pairs
