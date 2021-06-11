@@ -70,8 +70,8 @@ MONGODB SHELL:
     -To open the shell:
         1. install MongoDB
         2. navigate to the "/bin" directory
-            -i.e. " cd c:/"Program Files"/MongoDB/Server/<version_number>/bin/ "
-                -(number prolly 4.4)
+            -i.e. " cd c:/"Program Files"/MongoDB/Server/4.4/bin/ "
+                -(replace "4.4" with necessary version if needed)
             -"/bin" directories hold executeables
                 - ".exe" files are directly interpreted by the machine when run
                     -no compiling or interpretation needed
