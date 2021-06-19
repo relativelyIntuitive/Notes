@@ -455,7 +455,7 @@ VALIDATIONS WITH MONGOOSE:
         *************************************************************************************************
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-NESTED DOCUMENTS WITH MONGODB AND MONGOOSE:
+(RELATIONSHIPS) NESTED DOCUMENTS WITH MONGODB AND MONGOOSE:
 
 -Because MongoDB is NoSQL, joins are not used!
     -"nested documents" are the analog to relational fields
