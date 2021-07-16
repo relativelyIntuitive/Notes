@@ -1,0 +1,20 @@
+{
+  "name": "nbc",
+  "version": "1.0.0",
+  "description": "",
+  "main": "nbc.js",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "chai": "^4.3.4",
+    "express": "^4.17.1",
+    "node": "^16.4.1"
+  },
+  "devDependencies": {
+    "mocha": "^9.0.2"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "author": "",
+  "license": "ISC"
+}
