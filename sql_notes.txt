@@ -142,7 +142,7 @@
                 -   SELECT customers.name, addresses.city  
                     FROM customers 
                     JOIN addresses ON addresses.id = customers.address_id;
-                                      (primary-key)     (foreign-key)
+                      (table to join) (primary-key)     (foreign-key)
                     (joins customers and addresses charts together to display the name and city of each customer)
                 
                 -Joins 2 tables by their shared keys
