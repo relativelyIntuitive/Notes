@@ -207,6 +207,7 @@ DATA TYPES:
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 CUSTOM CLASSES:
+
     -Variables are "instances" of built-in classes
     -The above data types are built-in classes, but you can define your own
     -A class is like a blueprint that ensures the consistent creation of instances
@@ -224,6 +225,7 @@ CUSTOM CLASSES:
         -This is known as the " implicit passing of self"
     -Parameters other than "self" can also be left out and attributes given a value
         (i.e. self.account_balance = 0)
+
     *************************************************************************************************
     -i.e.   class User:
                 def __init__(self, name, email_address):
@@ -239,35 +241,109 @@ CUSTOM CLASSES:
             monty = User("Monty Python", "monty@python.com")
         (^ creates 2 new instances of class-type "User" ^)
         *************************************************************************************************
+
     -Attributes/methods of an instance can then be accessed using dot notation
         (i.e. guido.email /// guido.make_deposit(500)
     -Methods can be chained with dot-notation as long as the methods being chained return themselves at the end
+
         *************************************************************************************************
         -i.e.   def make_deposit(self, amount):
                     self.account_balance += amount
                     return self
             (^ last line is needed in order for the method to allow others chained after it ^)
             *************************************************************************************************
+
     -Classes can be associated with eachother
+
         *************************************************************************************************
         -i.e.   self.account = BankAccount(int_rate=0.02, balance=0)
             (^ creates a BankAccount instance and links it to the user as the attribute .account ^)
             *************************************************************************************************
+
         -this way the User instance can have multiple accounts, as the .balance attribute belongs to each 
             account instead
         -can access the .account just like any other attribute, except it has its own attributes too
+
             *************************************************************************************************
             -i.e.   def make_deposit(self, amount):
                         self.account.deposit(amount)
                         print(self.account.balance)
                 (^ chain the accounts attributes as expected ^)
                 *************************************************************************************************
+
         -must use a User method that references the account to alter bank account attributes, 
             cannot chain to account method through.account attribute at runtime
             (i.e. guido.make_deposit(500), NOT guido.account.deposit(500) if .deposit() is a method of the account)
         -the classes MUST be in the same file so that the referenced is recognized
             (modularization allows for seperate files to be associated though)
+    
+    -Classes can implicitly inherit other classes
 
+        *************************************************************************************************
+        -i.e.   class Vehicle(object):
+                    def __init__(self, wheels, capacity, make, model):
+                        self.wheels = wheels
+                        self.capacity = capacity
+                        self.make = make
+                        self.model = model
+                        self.mileage = 0
+                    def drive(self,miles):
+                        self.mileage += miles
+                        return self
+                    def reverse(self,miles):
+                        self.mileage -= miles
+                        return self
+                class Bike(Vehicle):
+                    def vehicle_type(self):
+                        return "Bike"
+                class Car(Vehicle):
+                    def set_wheels(self):
+                        self.wheels = 4
+                        return self
+                class Airplane(Vehicle):
+                    def fly(self, miles):
+                        self.mileage += miles
+                        return self
+                v = Vehicle(4,8,"dodge","minivan")
+                print v.make
+                b = Bike(2,1,"Schwinn","Paramount")
+                print b.vehicle_type()
+                c = Car(8,5,"Toyota", "Matrix")
+                c.set_wheels()
+                print c.wheels
+                a = Airplane(22,853,"Airbus","A380")
+                a.fly(580)
+                print a.mileage
+            (^Bike, Car, and Airplane inherit the Vehicle class^)
+            *************************************************************************************************
+
+    -"super" keyword is used to access parent class methods
+        -can use for things like accessing __init__() method that isn't otherwise inherited???
+
+        *************************************************************************************************
+        -i.e.   from human import Human
+
+                class Wizard(Human):
+                    def __init__(self):
+                        super(Wizard, self).__init__()   # use super to call the Human __init__ method
+                        self.intelligence = 10           # every wizard starts off with 10 intelligence
+                    def heal(self):
+                        self.health += 10
+                class Ninja(Human):
+                    def __init__(self):
+                        super(Ninja, self).__init__()    # use super to call the Human __init__ method
+                        self.stealth = 10                # every Ninja starts off with 10 stealth
+                    def steal(self):
+                        self.stealth += 5
+                class Samurai(Human):
+                    def __init__(self):
+                        super(Samurai, self).__init__()  # use super to call the Human __init__ method
+                        self.strength = 10               # every Samurai starts off with 10 strength
+                    def sacrifice(self):
+                        self.health -= 5
+
+            (^ super is used to call __init__() from the parent class, adding it's attributes/methods to the child class...new attributes/methods added also ^)
+            *************************************************************************************************
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 STRING FORMATTING:
@@ -355,20 +431,35 @@ FUNCTIONS:
                 |code...
                 |code...
                 |code...
-                *************************************************************************************************
+        *************************************************************************************************
 
     -Functions are defined with "def" keyword
     -MUST use "return" if you want the function to return a value
     -Default parameters can be set like so:
+
         *************************************************************************************************
         -i.e.   def beCheerful(name='', repeat=2):
                     print(f"good morning {name}\n" * repeat)
                 beCheerful()
             (^ prints "good morning" twice, as no arguments are made to override the defaults ^)
             *************************************************************************************************
+
     -If arguments are made explicitly, the order doesnt matter!
         -i.e.   beCheerful(repeat=4, name='Zeebo')
             (^ works because arguments are defined explicitly! ^)
+
+    -Variable amounts of arguments can be accepted using the "splat operator"
+        -arguments passed into the splat parameter are stored as a tuple under the same name
+
+        *************************************************************************************************
+        -i.e.   def varargs(arg1, *args):
+                    print "Got " + arg1 + " and " + ", ".join(args)
+                varargs("one") # output: "Got one and "
+                varargs("one", "two") # output: "Got one and two"
+                varargs("one", "two", "three") # output: "Got one and two, three"
+
+            *************************************************************************************************
+
     -There are many built-in Python functions
     -Some generic built-in functions:
         - print()
