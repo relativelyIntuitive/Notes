@@ -6,4 +6,4 @@ Some notes are very brief, some are comprised of a great many scores of pages. S
 
 For help building an application from scratch, it is reccommended to start with the fullstack step-by-step guides and reference the notes for the individual tech as they come up if you are confused, as the organization is sometimes haphazard within the longer notes files, i.e. the React notes.
 
-Feel free to take a look!
+Feel free to take a look.
